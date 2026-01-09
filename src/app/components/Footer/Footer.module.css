@@ -1,7 +1,7 @@
 .footer {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     padding: 4rem 1rem 2rem;
-    background: var(--muted);
+    background: #000;
 }
 
 .container {
@@ -11,44 +11,53 @@
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: 2fr 1fr 1fr;
     gap: 3rem;
-    margin-bottom: 4rem;
+    margin-bottom: 3rem;
 }
 
 .brand h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 1.25rem;
+    font-weight: 700;
     margin-bottom: 0.75rem;
+    color: var(--primary);
+    text-shadow:
+        0 0 10px rgba(245, 165, 36, 0.5),
+        0 0 20px rgba(245, 165, 36, 0.3),
+        0 0 30px rgba(245, 165, 36, 0.2);
 }
 
 .brand p {
-    color: #555;
-    font-size: 0.8rem;
-    line-height: 1.5;
+    color: #666;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    max-width: 280px;
 }
 
 .column h4 {
-    font-size: 0.8rem;
+    font-size: 0.8125rem;
     font-weight: 600;
-    margin-bottom: 1.25rem;
-    color: #fff;
+    margin-bottom: 1rem;
+    color: rgba(255, 255, 255, 0.5);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 .column ul {
     list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .column li {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.625rem;
 }
 
 .column a {
-    color: #666;
-    font-size: 0.8rem;
+    color: #888;
+    font-size: 0.875rem;
     transition: color 0.2s;
+    text-decoration: none;
 }
 
 .column a:hover {
@@ -57,10 +66,39 @@
 
 .bottom {
     padding-top: 2rem;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--muted-foreground);
-    font-size: 0.875rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: center;
+    color: #555;
+    font-size: 0.8125rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .footer {
+        padding: 3rem 1rem 1.5rem;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .brand p {
+        max-width: 100%;
+    }
+
+    .column h4 {
+        font-size: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .column a {
+        font-size: 0.8125rem;
+    }
+
+    .bottom {
+        padding-top: 1.5rem;
+        font-size: 0.75rem;
+    }
 }

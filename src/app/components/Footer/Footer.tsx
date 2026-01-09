@@ -10,30 +10,20 @@ export const Footer = () => {
                 <div className={styles.grid}>
                     <div className={styles.brand}>
                         <h3>Promptly</h3>
-                        <p>Empoderando desenvolvedores com <br /> prompts de IA prontos para produção.</p>
+                        <p>Transforme suas ideias em prompts técnicos profissionais para IA.</p>
                     </div>
                     <div className={styles.column}>
-                        <h4>Produto</h4>
+                        <h4>Navegação</h4>
                         <ul>
-                            <li><Link href="#features">Funcionalidades</Link></li>
-                            <li><Link href="#pricing">Planos</Link></li>
-                            <li><Link href="#api">API</Link></li>
+                            <li><Link href="/">Início</Link></li>
+                            <li><Link href="/dashboard">Dashboard</Link></li>
+                            <li><Link href="/pricing">Planos</Link></li>
                         </ul>
                     </div>
                     <div className={styles.column}>
-                        <h4>Recursos</h4>
+                        <h4>Contato</h4>
                         <ul>
-                            <li><Link href="/docs">Documentação</Link></li>
-                            <li><Link href="/guides">Guias</Link></li>
-                            <li><Link href="/blog">Blog</Link></li>
-                        </ul>
-                    </div>
-                    <div className={styles.column}>
-                        <h4>Empresa</h4>
-                        <ul>
-                            <li><Link href="/about">Sobre</Link></li>
-                            <li><Link href="/careers">Carreiras</Link></li>
-                            <li><Link href="/legal">Legal</Link></li>
+                            <li><a href="mailto:iapromptly@gmail.com">iapromptly@gmail.com</a></li>
                         </ul>
                     </div>
                 </div>
