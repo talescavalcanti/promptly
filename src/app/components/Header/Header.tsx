@@ -84,6 +84,14 @@ export const Header = () => {
                     </button>
 
                     <nav className={styles.nav}>
+                        {user && (
+                            <Link
+                                href="/projects"
+                                className={`${styles.link} ${pathname?.startsWith('/projects') ? styles.active : ''}`}
+                            >
+                                Projetos
+                            </Link>
+                        )}
                         <Link
                             href="/pricing"
                             className={`${styles.link} ${pathname === '/pricing' ? styles.active : ''}`}
@@ -138,6 +146,7 @@ export const Header = () => {
                     {user ? (
                         <>
                             <Link href="/dashboard" className={styles.mobileLink}>Dashboard</Link>
+                            <Link href="/projects" className={styles.mobileLink}>Meus Projetos</Link>
                             <Link href="/dashboard/settings" className={styles.mobileLink}>Minha Conta</Link>
                             <button onClick={handleLogout} className={styles.mobileLogout}>Sair</button>
                         </>

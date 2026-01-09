@@ -162,8 +162,24 @@ export async function POST(req: Request) {
                 const text = response.text();
 
                 if (text) {
-                    // --- SUCCESS: INCREMENT USAGE ---
+                    // --- SUCCESS: INCREMENT USAGE & SAVE PROJECT ---
                     await supabase.rpc('increment_prompts');
+
+                    // Save to projects
+                    const title = body.appName || body.objective?.substring(0, 30) || "Projeto Sem Título";
+                    const { error: saveError } = await supabase
+                        .from('projects')
+                        .insert({
+                            user_id: user.id,
+                            title: title,
+                            inputs: body,
+                            generated_content: text
+                        });
+
+                    if (saveError) {
+                        console.error("Erro ao salvar projeto:", saveError);
+                        // Non-blocking error, but worth logging
+                    }
 
                     return NextResponse.json({ result: text });
                 }
