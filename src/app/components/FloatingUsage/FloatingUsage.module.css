@@ -1,0 +1,104 @@
+/* Apple-style Floating Widget */
+.container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 9999;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.pill {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px 10px 20px;
+    background: rgba(30, 30, 30, 0.65);
+    border: 0.5px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    box-shadow:
+        0 4px 24px -1px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+    cursor: default;
+    color: #fff;
+}
+
+.pill:hover {
+    background: rgba(40, 40, 40, 0.75);
+    transform: translateY(-1px);
+    box-shadow:
+        0 8px 32px -4px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1;
+    gap: 2px;
+}
+
+.label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.45);
+    font-weight: 600;
+}
+
+.count {
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    font-feature-settings: "tnum";
+    letter-spacing: -0.01em;
+}
+
+.upgradeBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%);
+    color: #8a6d0b;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    text-decoration: none;
+    font-size: 12px;
+    box-shadow: 0 2px 8px rgba(253, 185, 49, 0.3);
+}
+
+.upgradeBtn:hover {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+}
+
+.upgradeBtn:active {
+    transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+    .container {
+        bottom: 1.5rem;
+        right: 1.5rem;
+    }
+}

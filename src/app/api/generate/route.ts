@@ -1,8 +1,52 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
     try {
+        // --- AUTH & LIMITS CHECK ---
+        const supabase = createRouteHandlerClient({ cookies });
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (!session) {
+            return NextResponse.json({ error: "Unauthorized: Faça login para continuar." }, { status: 401 });
+        }
+
+        const user = session.user;
+        const isDeveloper = user.email === 'talesscavalacanti006@gmail.com';
+
+        // Fetch profile
+        const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('plan, prompts_used')
+            .eq('id', user.id)
+            .single();
+
+        if (profileError || !profile) {
+            console.error("Profile error:", profileError);
+            return NextResponse.json({ error: "Erro ao carregar perfil de usuário." }, { status: 500 });
+        }
+
+        const PLAN_LIMITS: Record<string, number> = {
+            'free': 5,
+            'starter': 100,
+            'pro': 400
+        };
+
+        const userPlan = profile.plan || 'free';
+        const limit = PLAN_LIMITS[userPlan] || 5;
+        const currentUsage = profile.prompts_used || 0;
+
+        if (!isDeveloper && currentUsage >= limit) {
+            return NextResponse.json({
+                error: `Limite de ${limit} prompts atingido no plano ${userPlan}. Faça o upgrade para continuar.`
+            }, { status: 403 });
+        }
+
+        // --- GENERATION LOGIC ---
         const body = await req.json();
         const {
             appName, appType, segment, stage,
@@ -17,7 +61,6 @@ export async function POST(req: Request) {
         }
 
         let prompt = "";
-        const isDesignMode = promptMode === 'design';
 
         if (promptMode === 'design') {
             prompt = `
@@ -95,6 +138,9 @@ export async function POST(req: Request) {
                 const text = response.text();
 
                 if (text) {
+                    // --- SUCCESS: INCREMENT USAGE ---
+                    await supabase.rpc('increment_prompts');
+
                     return NextResponse.json({ result: text });
                 }
             } catch (err: any) {

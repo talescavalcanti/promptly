@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -15,29 +14,68 @@ const navItems = [
     { label: 'Configurações', href: '/dashboard/settings', icon: '⚙️' },
 ];
 
+interface UserProfile {
+    plan: string;
+    prompts_used: number;
+}
+
 export const Sidebar = () => {
     const pathname = usePathname();
     const [user, setUser] = useState<User | null>(null);
+    const [profile, setProfile] = useState<UserProfile | null>(null);
+
+    const fetchProfile = async (userId: string) => {
+        const { data } = await supabase
+            .from('profiles')
+            .select('plan, prompts_used')
+            .eq('id', userId)
+            .single();
+        if (data) setProfile(data);
+    };
 
     useEffect(() => {
         const getUser = async () => {
             const { data: { session } } = await supabase.auth.getSession();
-            setUser(session?.user ?? null);
+            if (session?.user) {
+                setUser(session.user);
+                fetchProfile(session.user.id);
+            }
         };
         getUser();
 
-        // Listen for user metadata updates (like avatar_url or full_name)
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user ?? null);
+            if (session?.user) {
+                fetchProfile(session.user.id);
+            }
         });
+
+        // Optional: Polling for usage updates
+        const interval = setInterval(() => {
+            if (user?.id) fetchProfile(user.id);
+        }, 5000);
 
         return () => {
             subscription.unsubscribe();
+            clearInterval(interval);
         };
-    }, []);
+    }, [user?.id]); // Re-subscribe if user changes? No, logic is fine.
 
     const fullName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Usuário';
     const avatarUrl = user?.user_metadata?.avatar_url;
+    const isDeveloper = user?.email === 'talesscavalacanti006@gmail.com';
+
+    // Limits logic
+    const PLAN_LIMITS: Record<string, number> = {
+        free: 5,
+        starter: 100,
+        pro: 400
+    };
+    const currentPlan = profile?.plan || 'free';
+    const limit = isDeveloper ? 9999 : (PLAN_LIMITS[currentPlan] || 5);
+    const used = profile?.prompts_used || 0;
+    const percent = Math.min(100, (used / limit) * 100);
+    const isFree = currentPlan === 'free' && !isDeveloper;
 
     return (
         <aside className={styles.sidebar}>
@@ -56,6 +94,7 @@ export const Sidebar = () => {
                     </Link>
                 ))}
             </nav>
+
             <div className={styles.user}>
                 <div className={styles.avatar}>
                     {avatarUrl ? (
@@ -66,7 +105,28 @@ export const Sidebar = () => {
                 </div>
                 <div className={styles.userInfo}>
                     <span className={styles.userName}>{fullName}</span>
-                    <span className={styles.userEmail}>Free Plan</span>
+                    <span className={styles.userEmail}>
+                        {isDeveloper ? 'Developer' : `${currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)} Plan`}
+                    </span>
+
+                    {/* Usage Stats */}
+                    <div className={styles.usage}>
+                        <div className={styles.usageHeader}>
+                            <span>{used} / {isDeveloper ? '∞' : limit}</span>
+                            <span>{Math.round(percent)}%</span>
+                        </div>
+                        <div className={styles.progressBar}>
+                            <div
+                                className={styles.progressFill}
+                                style={{ width: `${percent}%` }}
+                            />
+                        </div>
+                        {(isFree || percent >= 80) && !isDeveloper && (
+                            <Link href="/pricing" className={styles.upgradeBtn}>
+                                ⚡ Fazer Upgrade
+                            </Link>
+                        )}
+                    </div>
                 </div>
             </div>
         </aside>

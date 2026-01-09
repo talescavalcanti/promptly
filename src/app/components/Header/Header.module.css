@@ -210,11 +210,90 @@
     letter-spacing: -0.02em;
 }
 
+/* Usage Widget - Apple Style Pill */
+.usagePill {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 99px;
+    margin-right: 0.5rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.usagePill:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.usageInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1;
+}
+
+.planName {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 2px;
+    font-weight: 600;
+}
+
+.usageCount {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+}
+
+.upgradeButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #000;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.upgradeButton:hover {
+    transform: scale(1.1);
+}
+
+.mobileUsage {
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+@media (max-width: 768px) {
+    .usagePill {
+        display: none;
+    }
+}
+
 /* Responsiveness */
 @media (max-width: 768px) {
 
     .nav,
-    .desktopOnly {
+    .desktopOnly,
+    .usageWidget {
         display: none !important;
     }
 

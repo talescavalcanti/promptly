@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   description: "Transforme ideias em prompts técnicos para IA.",
 };
 
+import { FloatingUsage } from "./components/FloatingUsage/FloatingUsage";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -21,6 +23,7 @@ export default function RootLayout({
       </head>
       <body>
         <Header />
+        <FloatingUsage />
         {children}
       </body>
     </html>

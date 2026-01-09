@@ -19,33 +19,23 @@ export const Header = () => {
     useEffect(() => {
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
-
-            // If menu is open, don't hide header
             if (isMenuOpen) return;
-
-            // Show if scrolling up or at the very top
             if (currentScrollY < lastScrollY || currentScrollY < 10) {
                 setIsVisible(true);
-            }
-            // Hide if scrolling down and not at the top
-            else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+            } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
                 setIsVisible(false);
             }
-
             setLastScrollY(currentScrollY);
         };
-
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, [lastScrollY, isMenuOpen]);
 
-    // Close menu on route change
     useEffect(() => {
         setIsMenuOpen(false);
     }, [pathname]);
 
     useEffect(() => {
-        // Prevent scroll when menu is open
         if (isMenuOpen) {
             document.body.style.overflow = 'hidden';
         } else {
@@ -54,14 +44,12 @@ export const Header = () => {
     }, [isMenuOpen]);
 
     useEffect(() => {
-        // Initial session check
         const getSession = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             setUser(session?.user ?? null);
         };
         getSession();
 
-        // Listen for changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
             setUser(session?.user ?? null);
         });
@@ -77,7 +65,6 @@ export const Header = () => {
         router.push('/');
     };
 
-    // Hide header on auth pages
     if (pathname === '/login' || pathname === '/signup') {
         return null;
     }
@@ -125,6 +112,7 @@ export const Header = () => {
                                     {user.user_metadata?.full_name || user.email?.split('@')[0]}
                                 </span>
                             </Link>
+
                             <Link href="/dashboard" className={styles.desktopOnly}>
                                 <Button variant="ghost">Dashboard</Button>
                             </Link>

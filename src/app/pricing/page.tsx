@@ -10,6 +10,15 @@ import { useScrollReveal } from '../../lib/hooks/useScrollReveal';
 
 export default function PricingPage() {
     useScrollReveal();
+    const [user, setUser] = React.useState<any>(null);
+
+    React.useEffect(() => {
+        const checkUser = async () => {
+            const { data: { session } } = await import('../../lib/supabase').then(m => m.supabase.auth.getSession());
+            setUser(session?.user);
+        };
+        checkUser();
+    }, []);
 
     return (
         <div className={styles.wrapper}>
@@ -23,11 +32,13 @@ export default function PricingPage() {
                         Transforme suas ideias em especificações técnicas de alta fidelidade.
                         Comece hoje mesmo sem custos e evolua seu plano conforme sua necessidade cresce.
                     </p>
-                    <Link href="/signup">
-                        <Button variant="primary" className={styles.heroButton}>
-                            Começar grátis agora
-                        </Button>
-                    </Link>
+                    {!user && (
+                        <Link href="/signup">
+                            <Button variant="primary" className={styles.heroButton}>
+                                Começar grátis agora
+                            </Button>
+                        </Link>
+                    )}
                 </section>
 
                 {/* Pricing Table */}
@@ -54,9 +65,13 @@ export default function PricingPage() {
 
                             <div className={styles.cardFooter}>
                                 <p className={styles.note}>Ativado automaticamente ao criar sua conta. No credit card required.</p>
-                                <Link href="/signup">
-                                    <Button variant="outline" fullWidth>Criar conta e usar Free</Button>
-                                </Link>
+                                {user ? (
+                                    <Button variant="outline" fullWidth disabled>Plano Atual</Button>
+                                ) : (
+                                    <Link href="/signup">
+                                        <Button variant="outline" fullWidth>Criar conta e usar Free</Button>
+                                    </Link>
+                                )}
                             </div>
                         </div>
 
@@ -82,8 +97,10 @@ export default function PricingPage() {
 
                             <div className={styles.cardFooter}>
                                 <p className={styles.note}>Cancele quando quiser.</p>
-                                <Link href="/signup">
-                                    <Button variant="primary" fullWidth>Assinar Starter</Button>
+                                <Link href={user ? "#upgrade-starter" : "/signup"}>
+                                    <Button variant="primary" fullWidth>
+                                        {user ? "Fazer Upgrade para Starter" : "Assinar Starter"}
+                                    </Button>
                                 </Link>
                             </div>
                         </div>
@@ -109,8 +126,10 @@ export default function PricingPage() {
 
                             <div className={styles.cardFooter}>
                                 <p className={styles.note}>Faturamento mensal sem fidelidade.</p>
-                                <Link href="/signup">
-                                    <Button variant="outline" fullWidth>Assinar Pro</Button>
+                                <Link href={user ? "#upgrade-pro" : "/signup"}>
+                                    <Button variant="outline" fullWidth>
+                                        {user ? "Fazer Upgrade para Pro" : "Assinar Pro"}
+                                    </Button>
                                 </Link>
                             </div>
                         </div>
