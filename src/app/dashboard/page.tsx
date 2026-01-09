@@ -172,7 +172,28 @@ export default function DashboardPage() {
         };
 
         checkUser();
+
+        checkUser();
     }, [router]);
+
+    // Load Draft from LocalStorage (if coming from "Continuar Editando")
+    useEffect(() => {
+        const draft = localStorage.getItem('promptly_draft');
+        if (draft) {
+            try {
+                const parsed = JSON.parse(draft);
+                setFormData(prev => ({ ...prev, ...parsed }));
+                if (parsed.promptMode) {
+                    setPromptMode(parsed.promptMode as PromptMode);
+                }
+                // Clear immediately so it doesn't persist forever
+                localStorage.removeItem('promptly_draft');
+            } catch (e) {
+                console.error("Erro ao carregar rascunho", e);
+            }
+        }
+    }, []);
+
 
     const handleInputChange = (field: keyof FormData, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));

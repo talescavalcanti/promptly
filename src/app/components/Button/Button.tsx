@@ -33,7 +33,7 @@ export const Button = ({
                     <div className={styles.spinnerInner}></div>
                 </div>
             )}
-            <span className={loading ? styles.hiddenText : ''}>{children}</span>
+            <span className={loading ? styles.hiddenText : ''} style={{ display: 'flex', alignItems: 'center', gap: 'inherit' }}>{children}</span>
         </button>
     );
 };

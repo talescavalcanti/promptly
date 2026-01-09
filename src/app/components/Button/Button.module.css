@@ -11,8 +11,9 @@
     height: 3.25rem;
     font-size: 0.9375rem;
     border: 1px solid transparent;
-    line-height: 1;
+    /* line-height: 1; Removed for better icon alignment */
     transition:
+
         transform var(--motion-fast) var(--easing-standard),
         background-color var(--motion-fast) var(--easing-standard),
         border-color var(--motion-fast) var(--easing-standard),
@@ -118,5 +119,16 @@
 @keyframes spin {
     to {
         transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .button {
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        white-space: normal;
+        text-align: center;
+        height: auto;
+        min-height: 3.25rem;
     }
 }
