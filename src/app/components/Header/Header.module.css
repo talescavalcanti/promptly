@@ -1,0 +1,64 @@
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5rem;
+    z-index: 50;
+    background: rgba(5, 5, 5, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.logo {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    letter-spacing: -0.01em;
+    flex: 0 0 auto;
+}
+
+.icon {
+    color: var(--primary);
+    font-size: 1.25rem;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    flex: 1;
+}
+
+.link {
+    color: #666;
+    font-size: 0.85rem;
+    font-weight: 400;
+    transition: color 0.2s;
+}
+
+.link:hover,
+.active {
+    color: var(--primary);
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    justify-content: flex-end;
+}

@@ -1,0 +1,87 @@
+.section {
+    padding: 8rem 1rem 5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    background: var(--background);
+}
+
+.engineBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 1rem;
+    border-radius: 9999px;
+    background: transparent;
+    border: 1px solid rgba(245, 165, 36, 0.2);
+    color: var(--primary);
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.siteSubtitle {
+    color: #888;
+    font-size: 0.95rem;
+    font-weight: 400;
+    margin-bottom: 2rem;
+}
+
+.title {
+    font-size: 3.75rem;
+    line-height: 1.1;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+    max-width: 900px;
+    color: #fff;
+}
+
+.capsSubtitle {
+    color: var(--primary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    margin-bottom: 2rem;
+    max-width: 800px;
+}
+
+.highlight {
+    color: var(--primary);
+    /* Gold */
+    display: block;
+    /* Make it block to break line if needed, or inline-block. Image shows roughly same line. */
+}
+
+.description {
+    max-width: 800px;
+    margin-bottom: 4rem;
+    font-weight: 400;
+}
+
+.ctaGroup {
+    display: flex;
+    flex-direction: row;
+    /* Side by side buttons */
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.secondaryCta {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 1rem 2rem;
+    border: 1px solid #333;
+    border-radius: var(--radius);
+    transition: all 0.2s;
+    background: #0f0f0f;
+}
+
+.secondaryCta:hover {
+    border-color: #666;
+    background: #1a1a1a;
+}

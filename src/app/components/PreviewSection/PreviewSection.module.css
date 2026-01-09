@@ -1,0 +1,75 @@
+.section {
+    padding: 4rem 1rem;
+    display: flex;
+    justify-content: center;
+    background: var(--background);
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+}
+
+.card {
+    border: 1px solid rgba(245, 165, 36, 0.15);
+    /* Much subtler gold border */
+    border-radius: 1.25rem;
+    padding: 2.5rem;
+    background: #080808;
+    position: relative;
+    overflow: hidden;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #222;
+    padding-bottom: 1.5rem;
+}
+
+.headerContent h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.4rem;
+}
+
+.headerContent p {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    max-width: 400px;
+}
+
+.badge {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    color: #ccc;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-weight: 500;
+}
+
+.codeBlock {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: #ccc;
+}
+
+.line {
+    margin-bottom: 1.5rem;
+}
+
+.key {
+    color: var(--primary);
+    /* Gold/Orange */
+    font-weight: 600;
+}
+
+.value {
+    color: #ccc;
+}
