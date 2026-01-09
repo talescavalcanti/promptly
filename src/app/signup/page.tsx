@@ -54,6 +54,8 @@ export default function SignupPage() {
         }
     };
 
+
+
     return (
         <div className={styles.container}>
             <div className={`${styles.card} animate-fade-blur`}>
@@ -64,6 +66,7 @@ export default function SignupPage() {
                     <h1 className={styles.title}>Criar Conta</h1>
                     <p className={styles.subtitle}>Comece a criar prompts profissionais hoje</p>
                 </div>
+
                 <form className={styles.form} onSubmit={handleSignup}>
                     {error && <div className={styles.error}>{error}</div>}
                     <div className={styles.field}>

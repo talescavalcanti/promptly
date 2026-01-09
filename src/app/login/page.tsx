@@ -37,6 +37,8 @@ export default function LoginPage() {
         }
     };
 
+
+
     return (
         <div className={styles.container}>
             <div className={`${styles.card} animate-fade-blur`}>
@@ -47,6 +49,7 @@ export default function LoginPage() {
                     <h1 className={styles.title}>Bem-vindo de volta</h1>
                     <p className={styles.subtitle}>Entre na sua conta Promptly</p>
                 </div>
+
                 <form className={styles.form} onSubmit={handleLogin}>
                     {error && <div className={styles.error}>{error}</div>}
                     <div className={styles.field}>
