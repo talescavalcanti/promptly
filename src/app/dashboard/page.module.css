@@ -167,6 +167,8 @@
 }
 
 .advancedToggle {
+    border: none;
+    background: transparent;
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -257,6 +259,7 @@
     transition: all 0.25s var(--easing-standard);
     text-align: left;
     width: 100%;
+    border: none;
 }
 
 .modeCard:hover {
@@ -267,7 +270,7 @@
 
 .modeCard.active {
     background: rgba(245, 165, 36, 0.08);
-    border-color: var(--primary);
+    border: 1px solid var(--primary);
     box-shadow: 0 10px 30px -10px rgba(245, 165, 36, 0.15);
 }
 
@@ -373,6 +376,7 @@
     gap: 1rem;
     cursor: pointer;
     transition: all 0.2s;
+    border: none;
 }
 
 .radioCard:hover {
@@ -381,7 +385,7 @@
 
 .radioCard.active {
     background: rgba(245, 165, 36, 0.05);
-    border-color: var(--primary);
+    border: 1px solid var(--primary);
 }
 
 .radioIndicator {
@@ -486,4 +490,131 @@
     background: var(--primary);
     color: #000;
     border-color: var(--primary);
+}
+
+/* Comprehensive Mobile Responsiveness */
+@media (max-width: 768px) {
+    .container {
+        padding: 1.5rem 1rem 4rem;
+    }
+
+    .header {
+        margin-bottom: 2.5rem;
+    }
+
+    .title {
+        font-size: 1.75rem;
+        letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .modeToggle {
+        width: 100%;
+    }
+
+    .inputSection,
+    .previewCard {
+        padding: 1.5rem;
+        border-radius: 20px;
+    }
+
+    .stepTitle {
+        font-size: 1.35rem;
+    }
+
+    .stepDesc {
+        font-size: 0.9rem;
+    }
+
+    .wizardContent {
+        gap: 1.75rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .mainTextarea {
+        min-height: 140px;
+        font-size: 1rem;
+        padding: 1rem;
+    }
+
+    .chipGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+
+    .chip {
+        padding: 1rem 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .modeCard {
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .modeIcon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .modeTitle {
+        font-size: 0.9rem;
+    }
+
+    .modeDesc {
+        font-size: 0.75rem;
+    }
+
+    .radioGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .wizardActions {
+        margin-top: 2.5rem;
+        padding-top: 2rem;
+        flex-direction: column-reverse;
+        gap: 1rem;
+    }
+
+    .wizardActions button {
+        width: 100%;
+    }
+
+    .previewSection {
+        position: relative;
+        top: 0;
+        margin-top: 1rem;
+    }
+
+    .previewHeader {
+        margin-bottom: 1rem;
+    }
+
+    .previewContent {
+        padding: 1.25rem;
+        border-radius: 16px;
+    }
+
+    .previewContent pre {
+        font-size: 0.85rem;
+        line-height: 1.6;
+    }
+
+    .advancedSection {
+        padding: 1rem;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .chipGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .title {
+        font-size: 1.5rem;
+    }
 }

@@ -51,9 +51,7 @@
 
 .highlight {
     color: var(--primary);
-    /* Gold */
     display: block;
-    /* Make it block to break line if needed, or inline-block. Image shows roughly same line. */
 }
 
 .description {
@@ -65,7 +63,6 @@
 .ctaGroup {
     display: flex;
     flex-direction: row;
-    /* Side by side buttons */
     align-items: center;
     gap: 1.5rem;
 }
@@ -73,15 +70,67 @@
 .secondaryCta {
     color: #fff;
     text-decoration: none;
-    font-size: 1rem;
-    padding: 1rem 2rem;
+    font-size: 0.8125rem;
+    padding: 0.4rem 1rem;
     border: 1px solid #333;
     border-radius: var(--radius);
     transition: all 0.2s;
     background: #0f0f0f;
+    width: fit-content;
 }
 
 .secondaryCta:hover {
     border-color: #666;
     background: #1a1a1a;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .section {
+        padding: 6rem 1rem 3rem;
+    }
+
+    .title {
+        font-size: 2.1rem;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+    }
+
+    .siteSubtitle {
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .capsSubtitle {
+        font-size: 0.7rem;
+        letter-spacing: 0.15em;
+        margin-bottom: 1.5rem;
+    }
+
+    .description {
+        font-size: 0.95rem;
+        margin-bottom: 3.1rem;
+    }
+
+    .ctaGroup {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.75rem;
+    }
+
+    /* Only the first link (CTA Principal) should be full width on mobile */
+    .ctaGroup a:first-child {
+        width: 100%;
+    }
+
+    /* Secondary button should stay compact */
+    .secondaryCta {
+        width: fit-content !important;
+        margin: 0 auto;
+        padding: 0.4rem 1rem !important;
+        font-size: 0.75rem !important;
+        background: transparent;
+        border-color: transparent;
+        color: rgba(255, 255, 255, 0.4);
+    }
 }

@@ -30,7 +30,6 @@
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    /* Slightly wider cards */
     gap: 1.5rem;
 }
 
@@ -51,7 +50,6 @@
     border: 1px solid #161616;
 }
 
-/* User might want hover effect still */
 .card:hover {
     border-color: #333;
 }
@@ -70,7 +68,6 @@
 
 .icon {
     color: var(--primary);
-    /* Gold */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -81,4 +78,28 @@
     line-height: 1.5;
     font-size: 0.875rem;
     font-weight: 300;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .section {
+        padding: 4rem 1rem;
+    }
+
+    .header {
+        margin-bottom: 2.5rem;
+    }
+
+    .title {
+        font-size: 1.5rem;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .card {
+        padding: 1.5rem;
+    }
 }

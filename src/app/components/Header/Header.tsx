@@ -14,10 +14,14 @@ export const Header = () => {
     const [user, setUser] = useState<User | null>(null);
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
+
+            // If menu is open, don't hide header
+            if (isMenuOpen) return;
 
             // Show if scrolling up or at the very top
             if (currentScrollY < lastScrollY || currentScrollY < 10) {
@@ -33,7 +37,21 @@ export const Header = () => {
 
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [lastScrollY]);
+    }, [lastScrollY, isMenuOpen]);
+
+    // Close menu on route change
+    useEffect(() => {
+        setIsMenuOpen(false);
+    }, [pathname]);
+
+    useEffect(() => {
+        // Prevent scroll when menu is open
+        if (isMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+    }, [isMenuOpen]);
 
     useEffect(() => {
         // Initial session check
@@ -55,6 +73,7 @@ export const Header = () => {
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
+        setIsMenuOpen(false);
         router.push('/');
     };
 
@@ -64,19 +83,31 @@ export const Header = () => {
     }
 
     return (
-        <header className={`${styles.header} ${!isVisible ? styles.hidden : ''}`}>
+        <header className={`${styles.header} ${!isVisible ? styles.hidden : ''} ${isMenuOpen ? styles.menuOpen : ''}`}>
             <div className={styles.container}>
-                <nav className={styles.nav}>
-                    <Link
-                        href="/pricing"
-                        className={`${styles.link} ${pathname === '/pricing' ? styles.active : ''}`}
+                <div className={styles.left}>
+                    <button
+                        className={styles.hamburger}
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        aria-label="Toggle menu"
                     >
-                        Planos
-                    </Link>
-                </nav>
+                        <div className={`${styles.bar} ${isMenuOpen ? styles.bar1Open : ''}`} />
+                        <div className={`${styles.bar} ${isMenuOpen ? styles.bar2Open : ''}`} />
+                        <div className={`${styles.bar} ${isMenuOpen ? styles.bar3Open : ''}`} />
+                    </button>
 
-                <Link href="/" className={styles.logo}>
-                    <img src="/logo.png" alt="Promptly Logo" width={32} height={32} style={{ objectFit: 'contain' }} /> Promptly
+                    <nav className={styles.nav}>
+                        <Link
+                            href="/pricing"
+                            className={`${styles.link} ${pathname === '/pricing' ? styles.active : ''}`}
+                        >
+                            Planos
+                        </Link>
+                    </nav>
+                </div>
+
+                <Link href="/" className={styles.logo} onClick={() => setIsMenuOpen(false)}>
+                    <img src="/logo.png" alt="Promptly Logo" width={32} height={32} style={{ objectFit: 'contain' }} /> <span>Promptly</span>
                 </Link>
 
                 <div className={styles.actions}>
@@ -94,20 +125,36 @@ export const Header = () => {
                                     {user.user_metadata?.full_name || user.email?.split('@')[0]}
                                 </span>
                             </Link>
-                            <Link href="/dashboard">
+                            <Link href="/dashboard" className={styles.desktopOnly}>
                                 <Button variant="ghost">Dashboard</Button>
                             </Link>
-                            <Button variant="outline" onClick={handleLogout}>Sair</Button>
+                            <Button variant="outline" onClick={handleLogout} className={styles.desktopOnly}>Sair</Button>
                         </>
                     ) : (
                         <>
-                            <Link href="/login">
+                            <Link href="/login" className={styles.desktopOnly}>
                                 <Button variant="ghost">Entrar</Button>
                             </Link>
                             <Link href="/signup">
-                                <Button variant="primary">Criar conta</Button>
+                                <Button variant="primary">Começar</Button>
                             </Link>
                         </>
+                    )}
+                </div>
+            </div>
+
+            {/* Mobile Menu Overlay */}
+            <div className={`${styles.mobileMenu} ${isMenuOpen ? styles.mobileMenuOpen : ''}`}>
+                <div className={styles.mobileNav}>
+                    <Link href="/pricing" className={styles.mobileLink}>Planos</Link>
+                    {user ? (
+                        <>
+                            <Link href="/dashboard" className={styles.mobileLink}>Dashboard</Link>
+                            <Link href="/dashboard/settings" className={styles.mobileLink}>Minha Conta</Link>
+                            <button onClick={handleLogout} className={styles.mobileLogout}>Sair</button>
+                        </>
+                    ) : (
+                        <Link href="/login" className={styles.mobileLink}>Entrar</Link>
                     )}
                 </div>
             </div>
