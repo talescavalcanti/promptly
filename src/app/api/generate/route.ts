@@ -7,7 +7,7 @@ export async function POST(req: Request) {
         const {
             appName, appType, segment, stage,
             stackFrontend, stackBackend, database,
-            style, objective, context
+            style, objective, context, promptMode
         } = body;
 
         const apiKey = process.env.GEMINI_API_KEY?.trim();
@@ -16,19 +16,64 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "ERRO: GEMINI_API_KEY não encontrada no servidor (.env.local)" }, { status: 500 });
         }
 
-        const prompt = `
-            Atue como um Arquiteto de Software Sênior e Tech Lead. Gere uma Especificação Técnica para o projeto:
-            - Nome: ${appName}
-            - Tipo: ${appType}
-            - Segmento: ${segment}
-            - Estágio: ${stage}
-            - Stack: ${stackFrontend?.join(', ')} / ${stackBackend?.join(', ')} / ${database}
-            - Estilo: ${style?.join(', ')}
-            - Objetivo: ${objective}
-            - Contexto: ${context}
+        let prompt = "";
+        const isDesignMode = promptMode === 'design';
 
-            Gere um Markdown técnico profissional e completo.
-        `;
+        if (promptMode === 'design') {
+            prompt = `
+                Atue como um Designer UI/UX Sênior e Especialista em Interfaces Modernas e Premium. 
+                Gere um Guia de Design ultra-detalhado para o seguinte objetivo:
+                
+                OBJETIVO VISUAL: ${objective}
+                DIRETRIZES ESTÉTICAS: ${style?.join(', ')}
+                DETALHES DE UI: ${context}
+
+                O prompt deve focar EXCLUSIVAMENTE em:
+                1. Paleta de Cores, Tipografia e Design System.
+                2. Estilos de componentes (botões, inputs, cards) e estados de interação.
+                3. Layout, Grids e Componentes React + Tailwind.
+
+                NÃO inclua informações sobre backend, banco de dados ou regras de negócio complexas.
+            `;
+        } else if (promptMode === 'logic') {
+            prompt = `
+                Atue como um Engenheiro de Software Sênior Especialista em Backend e Infraestrutura. 
+                Gere uma Especificação Técnica focada EXCLUSIVAMENTE em Lógica e Dados para:
+                
+                OBJETIVO TÉCNICO: ${objective}
+                REGRAS E FLUXOS: ${context}
+                STACK DE DADOS: ${database}
+
+                Foque em: Schema do Banco de Dados, Documentação de Rotas API, Fluxos de Segurança (JWT, Auth) e Arquitetura de Servidor.
+                NÃO inclua nenhuma informação sobre interface visual, cores, fontes ou CSS.
+            `;
+        } else if (promptMode === 'feature') {
+            prompt = `
+                Atue como um Desenvolvedor Fullstack Sênior. 
+                Gere um roteiro técnico para implementar uma NOVA FUNCIONALIDADE:
+                
+                RECURSO SOLICITADO: ${objective}
+                REQUISITOS ADICIONAIS: ${context}
+
+                Foque em: Passo a passo técnico para implementação, alterações no banco, novas rotas e componentes necessários. Seja direto e técnico.
+            `;
+        } else {
+            // Default MVP / Software Architect
+            prompt = `
+                Atue como um Arquiteto de Software Sênior e Tech Lead. 
+                Gere uma Especificação Técnica completa para um MVP do projeto:
+                
+                PROJETO: ${appName}
+                TIPO: ${appType} | MERCADO: ${segment} | ESTÁGIO: ${stage}
+                STACK: ${stackFrontend?.join(', ')} / ${stackBackend?.join(', ')} / ${database}
+                OBJETIVO: ${objective}
+                CONTEXTO: ${context}
+                Gere um Markdown técnico profissional com arquitetura de pastas, fluxos principais e stack recomendada.
+            `;
+        }
+
+        // Mandatory Footer
+        prompt += `\n\n**IMPORTANTE**: implemente tudo isso de imediato, sem me fazer mais perguntas, só me faça uma sugestão depois de implementar TUDO que eu te falei.`;
 
         // Modelos identificados na lista do usuário
         const modelsToTry = [
@@ -43,7 +88,7 @@ export async function POST(req: Request) {
 
         for (const modelId of modelsToTry) {
             try {
-                console.log(`Tentando modelo identificado: ${modelId}`);
+                console.log(`Tentando modelo identificado: ${modelId} `);
                 const model = genAI.getGenerativeModel({ model: modelId });
                 const result = await model.generateContent(prompt);
                 const response = await result.response;
@@ -53,18 +98,18 @@ export async function POST(req: Request) {
                     return NextResponse.json({ result: text });
                 }
             } catch (err: any) {
-                console.warn(`Falha no modelo ${modelId}:`, err.message);
-                lastErrorMsg += `[${modelId}]: ${err.message}. `;
+                console.warn(`Falha no modelo ${modelId}: `, err.message);
+                lastErrorMsg += `[${modelId}]: ${err.message}.`;
             }
         }
 
         return NextResponse.json({
-            error: `Não foi possível gerar com os modelos da sua lista. Erros: ${lastErrorMsg}`
+            error: `Não foi possível gerar com os modelos da sua lista.Erros: ${lastErrorMsg} `
         }, { status: 500 });
 
     } catch (error: any) {
         return NextResponse.json({
-            error: `Erro fatal no servidor: ${error.message || error.toString()}`
+            error: `Erro fatal no servidor: ${error.message || error.toString()} `
         }, { status: 500 });
     }
 }

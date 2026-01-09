@@ -41,6 +41,9 @@ export default function LoginPage() {
         <div className={styles.container}>
             <div className={`${styles.card} animate-fade-blur`}>
                 <div className={styles.header}>
+                    <Link href="/" className={styles.brand}>
+                        <span className={styles.brandName}>Promptly</span>
+                    </Link>
                     <h1 className={styles.title}>Bem-vindo de volta</h1>
                     <p className={styles.subtitle}>Entre na sua conta Promptly</p>
                 </div>

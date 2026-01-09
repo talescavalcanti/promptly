@@ -57,6 +57,17 @@
     letter-spacing: 0.05em;
 }
 
+.stepBadge {
+    background: rgba(245, 165, 36, 0.1);
+    border: 1px solid rgba(245, 165, 36, 0.2);
+    color: var(--primary);
+    padding: 0.5rem 1.25rem;
+    border-radius: 50px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+}
+
 
 /* Main Grid */
 .grid {
@@ -106,7 +117,8 @@
     display: flex;
     flex-direction: column;
     gap: 2.5rem;
-    min-height: 480px;
+    min-height: auto;
+    margin-bottom: 3.5rem;
 }
 
 .field {
@@ -146,6 +158,55 @@
     color: rgba(255, 255, 255, 0.2);
 }
 
+.mainTextarea {
+    min-height: 180px;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.advancedToggle {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding-top: 1rem;
+    transition: color 0.2s;
+    user-select: none;
+    width: fit-content;
+}
+
+.advancedToggle:hover {
+    color: var(--primary);
+}
+
+.advancedSection {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    animation: slideDown 0.3s var(--easing-standard);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* --- THE GRIDS (Fixed) --- */
 .chipGrid {
     display: grid;
@@ -169,6 +230,81 @@
     .radioGrid {
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     }
+}
+
+/* Mode Selector Grid */
+.modeGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+@media (min-width: 640px) {
+    .modeGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.modeCard {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 18px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    cursor: pointer;
+    transition: all 0.25s var(--easing-standard);
+    text-align: left;
+    width: 100%;
+}
+
+.modeCard:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.modeCard.active {
+    background: rgba(245, 165, 36, 0.08);
+    border-color: var(--primary);
+    box-shadow: 0 10px 30px -10px rgba(245, 165, 36, 0.15);
+}
+
+.modeIcon {
+    width: 42px;
+    height: 42px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.6);
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+.modeCard.active .modeIcon {
+    background: var(--primary);
+    color: #000;
+}
+
+.modeText {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.modeTitle {
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.modeDesc {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.8125rem;
+    line-height: 1.4;
 }
 
 /* Sophisticated Chips */

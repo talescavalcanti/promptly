@@ -12,6 +12,28 @@ export const Header = () => {
     const router = useRouter();
     const pathname = usePathname();
     const [user, setUser] = useState<User | null>(null);
+    const [isVisible, setIsVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+
+            // Show if scrolling up or at the very top
+            if (currentScrollY < lastScrollY || currentScrollY < 10) {
+                setIsVisible(true);
+            }
+            // Hide if scrolling down and not at the top
+            else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                setIsVisible(false);
+            }
+
+            setLastScrollY(currentScrollY);
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [lastScrollY]);
 
     useEffect(() => {
         // Initial session check
@@ -36,8 +58,13 @@ export const Header = () => {
         router.push('/');
     };
 
+    // Hide header on auth pages
+    if (pathname === '/login' || pathname === '/signup') {
+        return null;
+    }
+
     return (
-        <header className={styles.header}>
+        <header className={`${styles.header} ${!isVisible ? styles.hidden : ''}`}>
             <div className={styles.container}>
                 <nav className={styles.nav}>
                     <Link
