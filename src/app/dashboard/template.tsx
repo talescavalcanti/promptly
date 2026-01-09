@@ -3,11 +3,11 @@
 import { motion } from 'framer-motion';
 
 /**
- * Global Template component for Next.js.
- * This component remounts on every route change, providing a reliable
- * point for entrance animations while keeping layouts (Header/Nav) static.
+ * Dashboard Template.
+ * Ensures that transitions between /dashboard and /dashboard/settings (and others)
+ * are always animated, even though they share the same DashboardLayout.
  */
-export default function Template({ children }: { children: React.ReactNode }) {
+export default function DashboardTemplate({ children }: { children: React.ReactNode }) {
     return (
         <motion.div
             initial={{

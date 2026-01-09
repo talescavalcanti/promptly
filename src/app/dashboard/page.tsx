@@ -130,7 +130,7 @@ const STEPS = [
 
 export default function DashboardPage() {
     const router = useRouter();
-    const [authLoading, setAuthLoading] = useState(true);
+    const [authLoading, setAuthLoading] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState('');
@@ -272,32 +272,7 @@ export default function DashboardPage() {
     };
 
     // Render Logic
-    if (authLoading) {
-        return (
-            <div style={{
-                minHeight: '100vh',
-                backgroundColor: '#000',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#fff'
-            }}>
-                <div style={{ textAlign: 'center' }}>
-                    <div style={{
-                        width: '40px',
-                        height: '40px',
-                        border: '2px solid rgba(245, 165, 36, 0.1)',
-                        borderTopColor: '#f5a524',
-                        borderRadius: '50%',
-                        margin: '0 auto 1.5rem',
-                        animation: 'spin 1s linear infinite'
-                    }}></div>
-                    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-                    <p style={{ opacity: 0.5, fontSize: '0.875rem' }}>Verificando acesso...</p>
-                </div>
-            </div>
-        );
-    }
+    if (authLoading) return null;
 
     const renderWizardField = (field: string) => {
         switch (field) {
@@ -492,7 +467,7 @@ export default function DashboardPage() {
             <div className={styles.grid}>
                 {/* Left Column */}
                 <div className={styles.inputSection}>
-                    <div className={`${styles.wizard} animate-entrance`} key={currentStep}>
+                    <div className={styles.wizard} key={currentStep}>
                         <div className={styles.wizardHeader}>
                             <h3 className={styles.stepTitle}>{STEPS[currentStep].title}</h3>
                             <p className={styles.stepDesc}>{STEPS[currentStep].description}</p>

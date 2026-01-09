@@ -55,6 +55,18 @@ export const Header = () => {
                 <div className={styles.actions}>
                     {user ? (
                         <>
+                            <Link href="/dashboard/settings" className={styles.userProfile}>
+                                <div className={styles.avatar}>
+                                    {user.user_metadata?.avatar_url ? (
+                                        <img src={user.user_metadata.avatar_url} alt="Avatar" />
+                                    ) : (
+                                        (user.user_metadata?.full_name?.charAt(0) || user.email?.charAt(0) || 'U').toUpperCase()
+                                    )}
+                                </div>
+                                <span className={styles.userName}>
+                                    {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                                </span>
+                            </Link>
                             <Link href="/dashboard">
                                 <Button variant="ghost">Dashboard</Button>
                             </Link>

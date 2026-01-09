@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Header } from '../components/Header/Header';
 import { Footer } from '../components/Footer/Footer';
 import { Button } from '../components/Button/Button';
 import { Check } from 'lucide-react';
@@ -14,8 +13,6 @@ export default function PricingPage() {
 
     return (
         <div className={styles.wrapper}>
-            <Header />
-
             <main className={styles.main}>
                 {/* Hero section */}
                 <section className={`${styles.hero} animate-fade-blur`}>

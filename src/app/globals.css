@@ -11,7 +11,7 @@
 
   /* Neutral Colors (Dark Mode Default) */
   --background: #000000;
-  /* Almost Black */
+  /* Pure Black */
   --foreground: #ffffff;
   --muted: #111111;
   /* Slightly lighter black */
@@ -20,6 +20,8 @@
   --border: #222222;
   --input: #1a1a1a;
   --ring: #F5A524;
+  --apple-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --apple-blur: blur(12px);
 
   /* Radius */
   --radius: 2rem;
