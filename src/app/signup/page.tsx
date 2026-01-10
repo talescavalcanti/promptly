@@ -45,7 +45,8 @@ export default function SignupPage() {
             if (signupError) throw signupError;
 
             if (data.user) {
-                router.push('/dashboard');
+                // Redirect to verify email page
+                router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
             }
         } catch (err: any) {
             setError(err.message || 'Ocorreu um erro ao criar sua conta.');

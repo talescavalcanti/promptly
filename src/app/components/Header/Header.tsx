@@ -65,7 +65,7 @@ export const Header = () => {
         router.push('/');
     };
 
-    if (pathname === '/login' || pathname === '/signup') {
+    if (pathname === '/login' || pathname === '/signup' || pathname === '/auth/verify-email') {
         return null;
     }
 
