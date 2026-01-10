@@ -84,6 +84,16 @@
     object-fit: contain;
 }
 
+.logo span {
+    transition: text-shadow 0.3s ease;
+}
+
+.logo:hover span {
+    text-shadow:
+        0 0 12px rgba(245, 165, 36, 0.8),
+        0 0 24px rgba(245, 165, 36, 0.4);
+}
+
 .nav {
     display: flex;
     align-items: center;

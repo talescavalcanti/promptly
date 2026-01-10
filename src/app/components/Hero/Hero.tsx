@@ -47,27 +47,23 @@ export const Hero = () => {
             </motion.div>
 
             <motion.div className={styles.siteSubtitle} variants={itemVariants}>
-                Crie sites completos usando IA com prompts prontos de desenvolvimento.
+                Comece agora e gere seu primeiro prompt técnico profissional em minutos.
             </motion.div>
 
             <motion.h1 className={styles.title} variants={itemVariants}>
-                O jeito profissional de <br />
-                transformar ideia em <br />
-                prompt técnico para IA.
+                Transforme qualquer ideia em código de nível sênior com prompts cirúrgicos para IA.
             </motion.h1>
 
-            <motion.h2 className={styles.capsSubtitle} variants={itemVariants}>
-                QUANTO MELHOR VOCÊ TRADUZIR SUA IDEIA EM DETALHES, MAIS PODEROSO SERÁ O PROMPT GERADO.
-            </motion.h2>
-
             <motion.p className={styles.description} variants={itemVariants}>
-                Estruture requisitos, stack e contexto de forma clara para que modelos de IA geradores de código criem aplicações web modernas com muito menos tentativa e erro.
+                Fale com a IA como um arquiteto de software: requisitos claros, stack certa e contexto perfeito — menos tentativa e erro, mais resultado em produção.
+                <br /><br />
+                Quem domina o prompt, domina o projeto.
             </motion.p>
 
-            <motion.div className={styles.ctaGroup} variants={itemVariants}>
+            <motion.div className={styles.ctaGroup}>
                 <Link href="/dashboard">
                     <Button variant="primary" style={{ padding: '1rem 2rem', fontSize: '1rem', height: 'auto' }}>
-                        Gerar Meu Primeiro Prompt
+                        Quero dominar prompts de IA agora
                     </Button>
                 </Link>
                 <Link href="#example" className={styles.secondaryCta}>

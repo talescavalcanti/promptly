@@ -9,7 +9,7 @@ export const PreviewSection = () => {
     useScrollReveal();
 
     return (
-        <section className={`${styles.section} reveal`}>
+        <section id="example" className={`${styles.section} reveal`}>
             <div className={styles.container}>
                 <div className={styles.card}>
                     <div className={styles.header}>
