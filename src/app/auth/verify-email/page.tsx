@@ -1,13 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Mail, ArrowLeft } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import styles from '../../login/auth.module.css';
 import { Button } from '../../components/Button/Button';
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
     const searchParams = useSearchParams();
     const email = searchParams.get('email');
 
@@ -56,14 +56,28 @@ export default function VerifyEmailPage() {
                     <button
                         className={styles.link}
                         style={{ border: 'none', background: 'none', cursor: 'pointer' }}
-                        onClick={() => alert('Funcionalidade de reenvio em breve')} // Placeholder for now or just generic advice
+                        onClick={() => alert('Funcionalidade de reenvio em breve')}
                     >
                         Reenviar
                     </button>
-                    {/* Note: Resend functionality usually requires a specific endpoint or re-triggering signup/login logic depending on Supabase config. 
-                        For now keeping it simple as a UI placeholder or we can remove it. Let's keep it simple. */}
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function VerifyEmailPage() {
+    return (
+        <Suspense fallback={
+            <div className={styles.container}>
+                <div className={`${styles.card} animate-fade-blur`}>
+                    <div className={styles.header}>
+                        <p className={styles.subtitle}>Carregando...</p>
+                    </div>
+                </div>
+            </div>
+        }>
+            <VerifyEmailContent />
+        </Suspense>
     );
 }
