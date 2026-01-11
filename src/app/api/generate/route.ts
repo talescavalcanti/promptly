@@ -43,15 +43,49 @@ export async function POST(req: Request) {
         const isDeveloper = user.email === 'talesscavalacanti006@gmail.com';
 
         // Fetch profile
-        const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('plan, prompts_used')
+        // Fetch profile from 'users' table (which matches the rest of the system)
+        let { data: profile, error: profileError } = await supabase
+            .from('users')
+            .select('plano_ativo, prompts_used')
             .eq('id', user.id)
-            .single();
+            .maybeSingle();
+
+        // Self-healing: If profile doesn't exist, create it
+        if (!profile && !profileError) {
+            console.log("Profile missing for user, creating default entry...");
+            const { error: insertError } = await supabase
+                .from('users')
+                .insert({
+                    id: user.id,
+                    email: user.email,
+                    name: user.user_metadata?.name || user.email?.split('@')[0] || 'User',
+                    prompts_used: 0,
+                    plano_ativo: 'free'
+                });
+
+            if (insertError) {
+                console.error("Failed to create missing profile:", insertError);
+                return NextResponse.json({ error: "Erro crítico ao criar perfil de usuário." }, { status: 500 });
+            }
+
+            // Retry fetch
+            const retry = await supabase
+                .from('users')
+                .select('plano_ativo, prompts_used')
+                .eq('id', user.id)
+                .single();
+
+            profile = retry.data;
+            profileError = retry.error;
+        }
 
         if (profileError || !profile) {
             console.error("Profile error:", profileError);
-            return NextResponse.json({ error: "Erro ao carregar perfil de usuário." }, { status: 500 });
+            return NextResponse.json({
+                error: "Erro ao carregar perfil de usuário.",
+                details: profileError?.message || "Perfil não encontrado",
+                code: profileError?.code
+            }, { status: 500 });
         }
 
         const PLAN_LIMITS: Record<string, number> = {
@@ -60,7 +94,9 @@ export async function POST(req: Request) {
             'pro': 400
         };
 
-        const userPlan = profile.plan || 'free';
+        // Map database value (STARTER/PRO) to limit keys (Fixed: removed duplicate declaration)
+        const userPlan = profile.plano_ativo ? profile.plano_ativo.toLowerCase() : 'free';
+
         const limit = PLAN_LIMITS[userPlan] || 5;
         const currentUsage = profile.prompts_used || 0;
 
@@ -116,13 +152,27 @@ export async function POST(req: Request) {
             `;
         } else if (promptMode === 'feature') {
             prompt = `
-                Atue como um Desenvolvedor Fullstack Sênior. 
-                Gere um roteiro técnico para implementar uma NOVA FUNCIONALIDADE:
+                Act as a **Senior Frontend Engineer & Component Architect**.
+                Create a **Frontend Implementation Roadmap** for the following FEATURE:
                 
-                RECURSO SOLICITADO: ${objective}
-                REQUISITOS ADICIONAIS: ${context}
+                REQUESTED FEATURE: ${objective}
+                PROJECT CONTEXT: ${context}
+                EXISTING APP: ${appName}
 
-                Foque em: Passo a passo técnico para implementação, alterações no banco, novas rotas e componentes necessários. Seja direto e técnico.
+                Generate a practical guide strictly following this structure:
+                1. **Routes & Application Structure**: Define new client-side routes and the component hierarchy (Smart Controllers vs Dumb Presentational components).
+                2. **Component Details**:
+                   - List main components needed.
+                   - Props interface and State definition (local vs global).
+                3. **Integration & Data Flow**:
+                   - How to handle data fetching (SWR/TanStack Query recommended).
+                   - Mocking the API (instruct to create a mock service layer if backend doesn't exist).
+                4. **UI/UX Details**: Interactions, loading states, and error handling.
+
+                **Golden Rules:**
+                - **NO BACKEND CODE**: Do not generate SQL, Database Schemas, or Server Side logic.
+                - Assume the API exists or tell the user to mock it.
+                - **OUTPUT STRICTLY IN ENGLISH.**
             `;
         } else {
             // Default MVP / Software Architect

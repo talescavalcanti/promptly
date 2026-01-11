@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
-import { Header } from '../components/Header/Header';
 import { Button } from '../components/Button/Button';
 import { Plus, ArrowRight, Clock } from 'lucide-react';
 
@@ -48,7 +47,7 @@ export default function ProjectsPage() {
 
     return (
         <div className={styles.page}>
-            <Header />
+
             <main className={styles.container}>
                 <div className={styles.header}>
                     <div className={styles.titleSection}>

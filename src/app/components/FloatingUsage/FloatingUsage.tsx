@@ -20,11 +20,16 @@ export const FloatingUsage = () => {
 
     const fetchProfile = async (userId: string) => {
         const { data } = await supabase
-            .from('profiles')
-            .select('plan, prompts_used')
+            .from('users')
+            .select('plano_ativo, prompts_used')
             .eq('id', userId)
             .single();
-        if (data) setProfile(data);
+        if (data) {
+            setProfile({
+                plan: data.plano_ativo?.toLowerCase() || 'free',
+                prompts_used: data.prompts_used || 0
+            });
+        }
     };
 
     useEffect(() => {

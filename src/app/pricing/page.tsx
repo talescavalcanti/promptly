@@ -15,7 +15,17 @@ export default function PricingPage() {
     React.useEffect(() => {
         const checkUser = async () => {
             const { data: { session } } = await import('../../lib/supabase').then(m => m.supabase.auth.getSession());
-            setUser(session?.user);
+
+            if (session?.user) {
+                const { data: profile } = await import('../../lib/supabase').then(m => m.supabase
+                    .from('users')
+                    .select('plano_ativo')
+                    .eq('id', session.user.id)
+                    .single()
+                );
+
+                setUser({ ...session.user, plan: profile?.plano_ativo });
+            }
         };
         checkUser();
     }, []);
@@ -65,7 +75,7 @@ export default function PricingPage() {
 
                             <div className={styles.cardFooter}>
                                 <p className={styles.note}>Ativado automaticamente ao criar sua conta. No credit card required.</p>
-                                {user ? (
+                                {(!user?.plan || user?.plan?.toLowerCase() === 'free') ? (
                                     <Button variant="outline" fullWidth disabled>Plano Atual</Button>
                                 ) : (
                                     <Link href="/signup">
@@ -97,11 +107,15 @@ export default function PricingPage() {
 
                             <div className={styles.cardFooter}>
                                 <p className={styles.note}>Cancele quando quiser.</p>
-                                <Link href={user ? "#upgrade-starter" : "/signup"}>
-                                    <Button variant="primary" fullWidth>
-                                        {user ? "Fazer Upgrade para Starter" : "Assinar Starter"}
-                                    </Button>
-                                </Link>
+                                {user?.plan?.toUpperCase() === 'STARTER' ? (
+                                    <Button variant="outline" fullWidth disabled>Plano Atual</Button>
+                                ) : (
+                                    <Link href={user ? "/checkout?plan=STARTER" : "/signup"}>
+                                        <Button variant="primary" fullWidth>
+                                            {user ? "Fazer Upgrade para Starter" : "Assinar Starter"}
+                                        </Button>
+                                    </Link>
+                                )}
                             </div>
                         </div>
 
@@ -126,11 +140,15 @@ export default function PricingPage() {
 
                             <div className={styles.cardFooter}>
                                 <p className={styles.note}>Faturamento mensal sem fidelidade.</p>
-                                <Link href={user ? "#upgrade-pro" : "/signup"}>
-                                    <Button variant="outline" fullWidth>
-                                        {user ? "Fazer Upgrade para Pro" : "Assinar Pro"}
-                                    </Button>
-                                </Link>
+                                {user?.plan?.toUpperCase() === 'PRO' ? (
+                                    <Button variant="outline" fullWidth disabled>Plano Atual</Button>
+                                ) : (
+                                    <Link href={user ? "/checkout?plan=PRO" : "/signup"}>
+                                        <Button variant="outline" fullWidth>
+                                            {user ? "Fazer Upgrade para Pro" : "Assinar Pro"}
+                                        </Button>
+                                    </Link>
+                                )}
                             </div>
                         </div>
                     </div>
