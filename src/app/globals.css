@@ -31,16 +31,32 @@
   --font-sans: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-display: var(--font-sans);
 
-  /* Motion Tokens */
-  --motion-fast: 150ms;
-  --motion-default: 280ms;
-  --motion-slow: 450ms;
+  /* Motion Tokens (Apple-like) */
+  --motion-ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --motion-ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+  --motion-duration-fast: 200ms;
+  --motion-duration-normal: 400ms;
+  --motion-duration-slow: 600ms;
 
-  --easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
-  --easing-soft: cubic-bezier(0, 0, 0.2, 1);
-  --easing-entrance: cubic-bezier(0, 0, 0.2, 1);
-  --easing-exit: cubic-bezier(0.4, 0, 1, 1);
+  /* Surface Tokens */
+  --surface-glass: rgba(20, 20, 20, 0.6);
+  --surface-glass-heavy: rgba(10, 10, 10, 0.8);
+  --surface-border: rgba(255, 255, 255, 0.08);
+  --surface-highlight: rgba(255, 255, 255, 0.05);
+
+  /* Glassmorphism Tokens (Refined) */
+  --glass-background: rgba(0, 0, 0, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --blur-amount: 20px;
+
+
+
+
 }
+
+
+
 
 * {
   box-sizing: border-box;
@@ -56,6 +72,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
   width: 100vw;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
 }
 
 

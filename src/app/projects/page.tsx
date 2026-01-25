@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../components/Button/Button';
 import { Plus, ArrowRight, Clock } from 'lucide-react';
+import { ScrollReveal } from '../components/ScrollReveal/ScrollReveal';
 
 import styles from './projects.module.css';
 
@@ -47,59 +48,64 @@ export default function ProjectsPage() {
 
     return (
         <div className={styles.page}>
-
             <main className={styles.container}>
-                <div className={styles.header}>
-                    <div className={styles.titleSection}>
-                        <h1>Meus Projetos</h1>
-                        <p>Gerencie e evolua seus prompts</p>
+                <ScrollReveal>
+                    <div className={styles.header}>
+                        <div className={styles.titleSection}>
+                            <h1>Meus Projetos</h1>
+                            <p>Gerencie e evolua seus prompts</p>
+                        </div>
+                        <Link href="/dashboard" tabIndex={-1}>
+                            <button className={styles.newProjectBtn}>
+                                <Plus size={20} />
+                                Novo Projeto
+                            </button>
+                        </Link>
                     </div>
-                    <Link href="/dashboard" tabIndex={-1}>
-                        <button className={styles.newProjectBtn}>
-                            <Plus size={20} />
-                            Novo Projeto
-                        </button>
-                    </Link>
-                </div>
+                </ScrollReveal>
 
                 {loading ? (
                     <div className={styles.loader}>Carregando...</div>
                 ) : projects.length === 0 ? (
-                    <div className={styles.emptyState}>
-                        <h3 className={styles.emptyTitle}>Nenhum projeto ainda</h3>
-                        <p className={styles.emptyDesc}>Comece gerando seu primeiro prompt profissional e ele aparecerá aqui automaticamente.</p>
-                        <Link href="/dashboard">
-                            <Button variant="secondary">Criar Agora</Button>
-                        </Link>
-                    </div>
-                ) : (
-                    <div className={styles.grid}>
-                        {projects.map((project) => (
-                            <Link href={`/projects/${project.id}`} key={project.id} style={{ textDecoration: 'none' }}>
-                                <div
-                                    className={styles.card}
-                                    onMouseMove={handleMouseMove}
-                                >
-                                    <h3 className={styles.cardTitle}>
-                                        {project.title || 'Projeto sem título'}
-                                    </h3>
-                                    <p className={styles.cardDesc}>
-                                        {project.inputs?.objective || 'Sem descrição'}
-                                    </p>
-
-                                    <div className={styles.cardFooter}>
-                                        <span className={styles.date}>
-                                            <Clock size={14} />
-                                            {new Date(project.created_at).toLocaleDateString()}
-                                        </span>
-                                        <span className={styles.openLink}>
-                                            Abrir <ArrowRight size={16} />
-                                        </span>
-                                    </div>
-                                </div>
+                    <ScrollReveal delay={0.1}>
+                        <div className={styles.emptyState}>
+                            <h3 className={styles.emptyTitle}>Nenhum projeto ainda</h3>
+                            <p className={styles.emptyDesc}>Comece gerando seu primeiro prompt profissional e ele aparecerá aqui automaticamente.</p>
+                            <Link href="/dashboard">
+                                <Button variant="secondary">Criar Agora</Button>
                             </Link>
-                        ))}
-                    </div>
+                        </div>
+                    </ScrollReveal>
+                ) : (
+                    <ScrollReveal delay={0.1}>
+                        <div className={styles.grid}>
+                            {projects.map((project) => (
+                                <Link href={`/projects/${project.id}`} key={project.id} style={{ textDecoration: 'none' }}>
+                                    <div
+                                        className={styles.card}
+                                        onMouseMove={handleMouseMove}
+                                    >
+                                        <h3 className={styles.cardTitle}>
+                                            {project.title || 'Projeto sem título'}
+                                        </h3>
+                                        <p className={styles.cardDesc}>
+                                            {project.inputs?.objective || 'Sem descrição'}
+                                        </p>
+
+                                        <div className={styles.cardFooter}>
+                                            <span className={styles.date}>
+                                                <Clock size={14} />
+                                                {new Date(project.created_at).toLocaleDateString()}
+                                            </span>
+                                            <span className={styles.openLink}>
+                                                Abrir <ArrowRight size={16} />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </ScrollReveal>
                 )}
             </main>
         </div>

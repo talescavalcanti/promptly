@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { useRouter, usePathname } from 'next/navigation';
 import { supabase } from '../../../lib/supabase';
 import styles from './Header.module.css';
@@ -65,7 +66,7 @@ export const Header = () => {
         router.push('/');
     };
 
-    if (pathname === '/login' || pathname === '/signup' || pathname === '/auth/verify-email' || pathname?.startsWith('/checkout')) {
+    if (pathname === '/login' || pathname === '/signup' || pathname === '/auth/verify-email' || pathname?.startsWith('/checkout') || pathname === '/builder') {
         return null;
     }
 
@@ -84,25 +85,47 @@ export const Header = () => {
                     </button>
 
                     <nav className={styles.nav}>
-                        {user && (
-                            <Link
-                                href="/projects"
-                                className={`${styles.link} ${pathname?.startsWith('/projects') ? styles.active : ''}`}
-                            >
-                                Projetos
-                            </Link>
-                        )}
-                        <Link
-                            href="/pricing"
-                            className={`${styles.link} ${pathname === '/pricing' ? styles.active : ''}`}
-                        >
-                            Planos
-                        </Link>
+                        {(() => {
+                            const items = [
+                                // Show Dashboard and Projects only if user is logged in
+                                ...(user ? [
+                                    { name: 'Dashboard', path: '/dashboard' },
+                                    { name: 'Projetos', path: '/projects' }
+                                ] : []),
+                                { name: 'Planos', path: '/pricing' }
+                            ];
+
+                            return items.map((item) => {
+                                const isActive = item.path === '/dashboard'
+                                    ? pathname === '/dashboard'
+                                    : pathname?.startsWith(item.path);
+
+                                return (
+                                    <Link
+                                        key={item.path}
+                                        href={item.path}
+                                        className={`${styles.link} ${isActive ? styles.active : ''}`}
+                                        style={{ position: 'relative' }}
+                                    >
+                                        {isActive && (
+                                            <motion.span
+                                                layoutId="navbar-active"
+                                                className={styles.activePill}
+                                                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                            />
+                                        )}
+                                        <span style={{ position: 'relative', zIndex: 10 }}>
+                                            {item.name}
+                                        </span>
+                                    </Link>
+                                );
+                            });
+                        })()}
                     </nav>
                 </div>
 
                 <Link href="/" className={styles.logo} onClick={() => setIsMenuOpen(false)}>
-                    <img src="/logo.png" alt="Promptly Logo" width={32} height={32} style={{ objectFit: 'contain' }} /> <span>Promptly</span>
+                    <img src="/logo.png" alt="Promptly Logo" width={32} height={32} style={{ objectFit: 'contain' }} />
                 </Link>
 
                 <div className={styles.actions}>
@@ -116,14 +139,10 @@ export const Header = () => {
                                         (user.user_metadata?.full_name?.charAt(0) || user.email?.charAt(0) || 'U').toUpperCase()
                                     )}
                                 </div>
-                                <span className={styles.userName}>
-                                    {user.user_metadata?.full_name || user.email?.split('@')[0]}
-                                </span>
+
                             </Link>
 
-                            <Link href="/dashboard" className={styles.desktopOnly}>
-                                <Button variant="ghost">Dashboard</Button>
-                            </Link>
+                            {/* Dashboard moved to main nav */}
                             <Button variant="outline" onClick={handleLogout} className={styles.desktopOnly}>Sair</Button>
                         </>
                     ) : (
@@ -155,6 +174,6 @@ export const Header = () => {
                     )}
                 </div>
             </div>
-        </header>
+        </header >
     );
 };

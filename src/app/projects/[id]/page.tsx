@@ -9,6 +9,8 @@ import { ArrowLeft, Copy, PenLine, RefreshCw } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import styles from './project-detail.module.css';
 
+import { extractVariables, fillVariables } from '../../../utils/prompt-utils';
+
 // Note: Since Next.js 15+, params are async in layouts/pages. 
 // We should use `use(params)` or handle `params` as a Promise.
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -17,9 +19,30 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     const [project, setProject] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
+    // Dynamic Variables State
+    const [variables, setVariables] = useState<Record<string, string>>({});
+    const [detectedVars, setDetectedVars] = useState<string[]>([]);
+
     useEffect(() => {
+        console.log('Project ID:', id);
         fetchProject();
     }, [id]);
+
+    useEffect(() => {
+        if (project?.generated_content) {
+            const vars = extractVariables(project.generated_content);
+            setDetectedVars(vars);
+
+            // Initialize empty values for new vars (persisting existing ones if re-parsing)
+            setVariables(prev => {
+                const newState = { ...prev };
+                vars.forEach(v => {
+                    if (!newState[v]) newState[v] = '';
+                });
+                return newState;
+            });
+        }
+    }, [project?.generated_content]);
 
     const fetchProject = async () => {
         try {
@@ -41,8 +64,13 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
     const handleCopy = () => {
         if (project?.generated_content) {
-            navigator.clipboard.writeText(project.generated_content);
-            alert('Copiado para a área de transferência!');
+            // Use filled content if variables exist, otherwise original
+            const contentToCopy = detectedVars.length > 0
+                ? fillVariables(project.generated_content, variables)
+                : project.generated_content;
+
+            navigator.clipboard.writeText(contentToCopy);
+            alert('Prompt copiado para a área de transferência!');
         }
     };
 
@@ -91,6 +119,9 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         }
     };
 
+    const handleVariableChange = (key: string, value: string) => {
+        setVariables(prev => ({ ...prev, [key]: value }));
+    };
 
     if (loading) return <div className={styles.loading}>Carregando...</div>;
     if (!project) return null;
@@ -131,17 +162,57 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                     <div className={styles.contentSection}>
                         <div className={styles.sectionHeader}>
                             <h2 className={styles.sectionTitle}>Prompt Gerado</h2>
-                            <Button variant="ghost" onClick={handleCopy} title="Copiar">
-                                <Copy size={18} />
+                            <Button variant="ghost" onClick={handleCopy} title="Copiar Prompt Preenchido">
+                                <Copy size={18} style={{ marginRight: detectedVars.length > 0 ? '0.5rem' : 0 }} />
+                                {detectedVars.length > 0 ? 'Copiar Preenchido' : ''}
                             </Button>
                         </div>
                         <div className={styles.markdownContent}>
-                            <ReactMarkdown>{project.generated_content}</ReactMarkdown>
+                            <ReactMarkdown>
+                                {fillVariables(project.generated_content || '', variables)}
+                            </ReactMarkdown>
                         </div>
                     </div>
 
                     {/* Sidebar de Ações e Inputs */}
                     <div className={styles.sidebar}>
+
+                        {/* Dynamic Variables Section */}
+                        {detectedVars.length > 0 && (
+                            <div className={styles.card} style={{ borderColor: 'rgba(16, 185, 129, 0.3)', background: 'rgba(16, 185, 129, 0.05)' }}>
+                                <h3 className={styles.cardTitle} style={{ color: '#10B981', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    ✨ Variáveis Dinâmicas
+                                </h3>
+                                <p style={{ fontSize: '0.85rem', color: '#aaa', marginBottom: '1rem' }}>
+                                    Preencha abaixo para personalizar o prompt.
+                                </p>
+                                <div className={styles.inputsList}>
+                                    {detectedVars.map(variable => (
+                                        <div key={variable} className={styles.inputGroup}>
+                                            <span className={styles.label} style={{ color: '#fff' }}>{variable}</span>
+                                            <input
+                                                type="text"
+                                                className={styles.value} // reusing styles.value usually works if it's text-like, but might need input specific style
+                                                style={{
+                                                    width: '100%',
+                                                    background: 'rgba(0,0,0,0.3)',
+                                                    border: '1px solid rgba(255,255,255,0.1)',
+                                                    padding: '0.5rem',
+                                                    borderRadius: '6px',
+                                                    color: 'white',
+                                                    fontSize: '0.9rem',
+                                                    marginTop: '0.25rem'
+                                                }}
+                                                value={variables[variable] || ''}
+                                                onChange={(e) => handleVariableChange(variable, e.target.value)}
+                                                placeholder={`Valor para ${variable}...`}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         <div className={styles.card}>
                             <h3 className={styles.cardTitle}>Ações</h3>
                             <div className={styles.actions}>

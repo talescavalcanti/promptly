@@ -1,19 +1,32 @@
 .header {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4rem;
+    top: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 1000px;
+    height: 4.5rem;
     z-index: 1000;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+    /* Glass / Pill Style */
+    background: var(--surface-glass);
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    border: 1px solid var(--surface-border);
+    border-radius: 9999px;
+
+    /* Layout */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 .hidden {
-    transform: translateY(-100%);
+    transform: translate(-50%, -200%);
+    /* Move up and keep centered */
 }
 
 .menuOpen {
@@ -25,16 +38,17 @@
     align-items: center;
     justify-content: space-between;
     height: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
+    width: 100%;
+    padding: 0 2rem;
 }
 
 .left {
     display: flex;
     align-items: center;
-    gap: 2.5rem;
+    gap: 2rem;
     flex: 1;
+    justify-content: flex-start;
+    /* Align nav to start */
 }
 
 .hamburger {
@@ -70,28 +84,38 @@
 }
 
 .logo {
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--primary);
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    letter-spacing: -0.01em;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.03);
+    /* Dark glass background */
+    border: 1px solid rgba(245, 165, 36, 0.2);
+    /* Subtle gold border */
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(245, 165, 36, 0.15);
+    /* Soft glow */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     flex: 0 0 auto;
+    margin: 0 1.5rem;
 }
 
 .logo img {
     object-fit: contain;
+    width: 28px;
+    height: 28px;
+    filter: none;
+    /* Restore original yellow color */
+    transform: translateX(1px);
+    /* Optical centering for the bolt */
 }
 
-.logo span {
-    transition: text-shadow 0.3s ease;
-}
-
-.logo:hover span {
-    text-shadow:
-        0 0 12px rgba(245, 165, 36, 0.8),
-        0 0 24px rgba(245, 165, 36, 0.4);
+.logo:hover {
+    background: rgba(245, 165, 36, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 25px rgba(245, 165, 36, 0.3);
+    transform: scale(1.05);
 }
 
 .nav {
@@ -109,7 +133,16 @@
 
 .link:hover,
 .active {
-    color: var(--primary);
+    color: #fff;
+    /* White text when active/hover for better contrast */
+}
+
+.activePill {
+    position: absolute;
+    inset: -0.5rem -1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 99px;
+    z-index: 1;
 }
 
 .actions {
@@ -129,19 +162,21 @@
 .userProfile {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem 0.75rem;
-    border-radius: 12px;
-    transition: background 0.2s;
+    justify-content: center;
+    padding: 0;
+    border-radius: 50%;
+    transition: transform 0.2s, opacity 0.2s;
+    cursor: pointer;
 }
 
 .userProfile:hover {
-    background: rgba(255, 255, 255, 0.05);
+    transform: scale(1.1);
+    opacity: 0.9;
 }
 
 .avatar {
-    width: 2.25rem;
-    height: 2.25rem;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: var(--primary);
     color: #000;
@@ -149,8 +184,9 @@
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 1rem;
     overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .avatar img {
@@ -159,19 +195,12 @@
     object-fit: cover;
 }
 
-.userName {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #fff;
-    max-width: 120px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+
 
 .mobileMenu {
     position: fixed;
-    top: 4rem;
+    top: 6.5rem;
+    /* 1.5rem top + 4.5rem height + 0.5rem gap */
     left: 0;
     right: 0;
     height: 0;
@@ -181,11 +210,11 @@
     overflow: hidden;
     transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 999;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    /* Removed border-bottom */
 }
 
 .mobileMenuOpen {
-    height: calc(100vh - 4rem);
+    height: calc(100vh - 6.5rem);
 }
 
 .mobileNav {

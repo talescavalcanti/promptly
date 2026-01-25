@@ -243,5 +243,29 @@
 
     .sidebar {
         position: static;
+        order: -1;
+        /* Show summary first on mobile? Or maybe keep it bottom. Let's keep default order but maybe give visual hint */
+    }
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .card {
+        padding: 1.5rem;
+    }
+
+    .formGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .paymentTabs {
+        flex-direction: column;
+    }
+
+    .planSelector {
+        grid-template-columns: 1fr;
     }
 }

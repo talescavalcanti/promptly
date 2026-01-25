@@ -109,9 +109,16 @@ export async function POST(req: Request) {
         // --- GENERATION LOGIC ---
         const body = await req.json();
         const {
-            appName, appType, segment, stage,
-            stackFrontend, stackBackend, database,
-            style, objective, context, promptMode
+            // Common
+            promptMode, objective, context, targetPlatform,
+            // SaaS Wizard Specifics
+            // SaaS Wizard Specifics
+            saasName, saasColor, saasFont, logoStyle, voiceTone,
+            saasNiche, businessModel, chargingModel, planNames,
+            coreEntity, coreView, dataInputType,
+            userRoles, loginMethod, registrationPolicy,
+            notificationChannels, integrations, supportChannels,
+            problemSolved, marketingHeadline, cta
         } = body;
 
         const apiKey = process.env.GEMINI_API_KEY?.trim();
@@ -122,79 +129,178 @@ export async function POST(req: Request) {
 
         let prompt = "";
 
-        if (promptMode === 'design') {
+        if (promptMode === 'saas_wizard') {
+            // SAAS WIZARD PROMPT
             prompt = `
-                Atue como um Designer UI/UX Sênior e Especialista em Interfaces Modernas e Premium. 
-                Gere um Guia de Design ultra-detalhado para o seguinte objetivo:
+                Atue como um **CTO, Arquiteto de Software e Product Manager Sênior**.
+                Estou construindo um SaaS do zero e preciso de uma Especificação Técnica e de Produto COMPLETA.
+
+                ## 1. Identidade do Projeto
+                - **Nome**: ${saasName || 'A definir'}
+                - **Nicho**: ${saasNiche || 'Geral'}
+                - **Identidade Visual**: Cores ${saasColor}, Fonte ${saasFont}, Logo ${logoStyle}
+                - **Tom de Voz**: ${voiceTone}
+
+                ## 2. Modelo de Negócio
+                - **Tipo**: ${businessModel}
+                - **Cobrança**: ${chargingModel} (Planos: ${planNames})
+                - **Resolver o Problema**: ${problemSolved}
+                - **Marketing Headline**: "${marketingHeadline}"
+                - **CTA**: "${cta}"
+
+                ## 3. Core do Produto (MVP)
+                - **Entidade Principal**: ${coreEntity}
+                - **Visualização de Dados**: ${coreView}
+                - **Entrada de Dados**: ${dataInputType}
+
+                ## 4. Acesso e Segurança
+                - **Perfis de Usuário**: ${userRoles}
+                - **Método de Login**: ${loginMethod}
+                - **Política de Registro**: ${registrationPolicy}
+
+                ## 5. Funcionalidades Extras
+                - **Notificações**: ${notificationChannels?.join(', ')}
+                - **Integrações**: ${integrations}
+                - **Suporte**: ${supportChannels?.join(', ')}
+
+                ### O QUE VOCÊ DEVE GERAR (OUTPUT):
+                Gere um documento Markdown estruturado contendo:
+
+                1.  **Guia de Identidade Visual (Design System)**:
+                    - Paleta de cores sugerida (HEX codes) baseada em "${saasColor}".
+                    - Tipografia recomendada baseada em "${saasFont}".
+                    - Estilo de componentes UI.
+                3.  **Arquitetura Técnica (Stack Recomendada)**:
+                    - Frontend (Framework, Libs de UI).
+                    - Backend (Linguagem, Framework).
+                    - Banco de Dados (Schema Relacional simplificado para ${coreEntity}).
+                    - Infraestrutura (Auth, Hosting, Storage).
+                4.  **Roadmap de Funcionalidades (MVP)**:
+                    - Lista de features essenciais para lançar.
+                    - Estrutura de Pastas do Projeto.
+                5.  **Estratégia de Marketing Inicial**:
+                    - Sugestão de Copy para a Hero Section usando a headline "${marketingHeadline}".
+            `;
+
+        } else if (promptMode === 'optimize_prompt') {
+            prompt = `
+                Atue como um **Engenheiro de Prompts Sênior** especializado em desenvolvimento de software com IA para ${targetPlatform || 'Lovable, GPT-Engineer, v0'}.
+                
+                SEU OBJETIVO: Escrever um prompt FINAL, técnico e extremamente detalhado que o usuário irá enviar para uma IA construtora de software.
+                
+                ### CONTEXTO DO PROJETO (Dados fornecidos pelo usuário):
+                - **Nome do SaaS**: ${saasName || 'Novo Projeto'}
+                - **Nicho de Mercado**: ${saasNiche}
+                - **Público Alvo**: ${body.targetAudience}
+                - **Identidade Visual**: Cores ${saasColor}, Fonte ${saasFont} (Peso: ${body.fontWeight || 'Padrão'}), Estilo ${logoStyle}
+                - **Tom de Voz**: ${voiceTone}
+                - **Widgets do Dashboard**: ${body.dashboardWidgets ? body.dashboardWidgets.join(', ') : 'Padrão de mercado'}
+                - **Funcionalidades Chave**: ${body.features ? body.features.join(', ') : 'Essenciais para o nicho'}
+
+                ### SUA TAREFA:
+                Escreva o prompt abaixo completando TODAS as lacunas com sua expertise técnica. Não deixe nada como "A definir". Invente os detalhes faltantes (Planos de preço, Schema do banco, Estrutura de arquivos) para que o projeto seja viável e profissional.
+
+                ### ESTRUTURA DO PROMPT QUE VOCÊ DEVE GERAR (Copie e preencha):
+
+                ---
+                "Atue como um CTO e Product Manager Experiente.
+                Estou criando um novo SaaS chamado **${saasName || 'Novo Projeto'}** focado em **${saasNiche}**.
+
+                ### 1. Identidade & Visual
+                - Cores: ${saasColor}
+                - Tipografia: ${saasFont} (Peso: ${body.fontWeight || 'Padrão'})
+                - Estilo: ${logoStyle}
+                - Tom de Voz: ${voiceTone}
+                - **Diretriz de Design**: Crie uma interface limpa, moderna e responsiva (Mobile-First) usando Shadcn UI e Tailwind CSS. Use animações sutis (Framer Motion) para uma sensação premium.
+
+                ### 2. Modelo de Negócio & Estratégia
+                - Nicho: ${saasNiche} para ${body.targetAudience}
+                - **Planos Sugeridos**: [Crie 3 nomes de planos e preços compatíveis com o mercado de ${saasNiche}]
+                - **Diferencial Competitivo**: [Descreva um diferencial técnico ou de UX para este projeto]
+
+                ### 3. Core do Produto (MVP)
+                - **Fluxo Principal**: O usuário entra, [Descreva o fluxo principal de uso do ${saasNiche}].
+                - **Dashboard**: Deve conter widgets de ${body.dashboardWidgets ? body.dashboardWidgets.join(', ') : 'Métricas principais'}.
+                - **Input de Dados**: Otimize para [Desktop/Mobile] com formulários intuitivos.
+
+                ### 4. Arquitetura Técnica (Mandatório)
+                - **Frontend**: React (Vite), TypeScript, Tailwind CSS, Shadcn UI, Lucide React.
+                - **Backend/BaaS**: Supabase (Auth, Postgres, Storage, Edge Functions).
+                - **State Management**: TanStack Query (React Query) + Context API.
+                - **Segurança**: Implemente RLS (Row Level Security) em TODAS as tabelas. Política padrão: usuários só veem seus próprios dados.
+
+                ### 5. Funcionalidades (Implementação Imediata)
+                ${body.features ? body.features.map((f: string) => `- ${f}`).join('\n') : '- CRUD completo da entidade principal'}
+                - [Adicione 2 funcionalidades técnicas essenciais para este nicho que o usuário esqueceu]
+
+                ### 6. Schema do Banco de Dados (Sugestão Inicial)
+                [Crie um esquema SQL simplificado para as tabelas principais: users, subscriptions, e a entidade principal de ${saasNiche}]
+
+                **INSTRUÇÃO FINAL**: Implemente o código inicial focado no Dashboard e na funcionalidade principal. Crie os arquivos necessários e a estrutura de pastas."
+                ---
+
+                **IMPORTANTE**: 
+                1. Sua resposta deve ser APENAS o prompt gerado acima. 
+                2. Mantenha os dados do usuário FIXOS. 
+                3. Seja criativo nos detalhes que faltam."
+            `;
+
+        } else if (promptMode === 'design') {
+            prompt = `
+                Atue como um Designer UI / UX Sênior e Especialista em Interfaces Modernas para ${targetPlatform || 'Web'}. 
+                Gere um Guia de Design ultra - detalhado para o seguinte objetivo:
                 
                 OBJETIVO VISUAL: ${objective}
-                DIRETRIZES ESTÉTICAS: ${style?.join(', ')}
                 DETALHES DE UI: ${context}
 
                 O prompt deve focar EXCLUSIVAMENTE em:
-                1. Paleta de Cores, Tipografia e Design System.
-                2. Estilos de componentes (botões, inputs, cards) e estados de interação.
+        1. Paleta de Cores, Tipografia e Design System.
+                2. Estilos de componentes(botões, inputs, cards) e estados de interação.
                 3. Layout, Grids e Componentes React + Tailwind.
 
-                NÃO inclua informações sobre backend, banco de dados ou regras de negócio complexas.
+                NÃO inclua informações sobre backend ou banco de dados.
             `;
         } else if (promptMode === 'logic') {
             prompt = `
                 Atue como um Engenheiro de Software Sênior Especialista em Backend e Infraestrutura. 
-                Gere uma Especificação Técnica focada EXCLUSIVAMENTE em Lógica e Dados para:
+                Gere uma Especificação Técnica focada EXCLUSIVAMENTE em Lógica e Dados para ${targetPlatform || 'Web'}:
                 
                 OBJETIVO TÉCNICO: ${objective}
                 REGRAS E FLUXOS: ${context}
-                STACK DE DADOS: ${database}
-
-                Foque em: Schema do Banco de Dados, Documentação de Rotas API, Fluxos de Segurança (JWT, Auth) e Arquitetura de Servidor.
+                
+                Foque em: Schema do Banco de Dados, Documentação de Rotas API, Fluxos de Segurança(JWT, Auth) e Arquitetura de Servidor.
                 NÃO inclua nenhuma informação sobre interface visual, cores, fontes ou CSS.
             `;
         } else if (promptMode === 'feature') {
             prompt = `
-                Act as a **Senior Frontend Engineer & Component Architect**.
-                Create a **Frontend Implementation Roadmap** for the following FEATURE:
+        Act as a ** Senior Frontend Engineer & Component Architect ** specialized in ${targetPlatform || 'Web Frameworks'}.
+                Create a ** Frontend Implementation Roadmap ** for the following FEATURE:
                 
                 REQUESTED FEATURE: ${objective}
                 PROJECT CONTEXT: ${context}
-                EXISTING APP: ${appName}
-
+                
                 Generate a practical guide strictly following this structure:
-                1. **Routes & Application Structure**: Define new client-side routes and the component hierarchy (Smart Controllers vs Dumb Presentational components).
-                2. **Component Details**:
-                   - List main components needed.
-                   - Props interface and State definition (local vs global).
-                3. **Integration & Data Flow**:
-                   - How to handle data fetching (SWR/TanStack Query recommended).
-                   - Mocking the API (instruct to create a mock service layer if backend doesn't exist).
-                4. **UI/UX Details**: Interactions, loading states, and error handling.
-
-                **Golden Rules:**
-                - **NO BACKEND CODE**: Do not generate SQL, Database Schemas, or Server Side logic.
+        1. ** Routes & Application Structure **: Define new client - side routes and the component hierarchy.
+                2. ** Component Details **: Props, State, and Interactions.
+                3. ** Integration **: Data fetching and API mocking.
+                
+                ** Golden Rules:**
+                - ** NO BACKEND CODE **: Do not generate SQL or Server logic.
                 - Assume the API exists or tell the user to mock it.
-                - **OUTPUT STRICTLY IN ENGLISH.**
             `;
         } else {
-            // Default MVP / Software Architect
-            prompt = `
-                Atue como um Arquiteto de Software Sênior e Tech Lead. 
-                Gere uma Especificação Técnica completa para um MVP do projeto:
-                
-                PROJETO: ${appName}
-                TIPO: ${appType} | MERCADO: ${segment} | ESTÁGIO: ${stage}
-                STACK: ${stackFrontend?.join(', ')} / ${stackBackend?.join(', ')} / ${database}
-                OBJETIVO: ${objective}
-                CONTEXTO: ${context}
-                Gere um Markdown técnico profissional com arquitetura de pastas, fluxos principais e stack recomendada.
-            `;
+            // Fallback
+            prompt = `Atue como Especialista em Software para ${targetPlatform || 'Web'}.Objetivo: ${objective}.Contexto: ${context}.`;
         }
 
         // Mandatory Footer
-        prompt += `\n\n**IMPORTANTE**: implemente tudo isso de imediato, sem me fazer mais perguntas, só me faça uma sugestão depois de implementar TUDO que eu te falei.`;
+        prompt += `\n\n ** IMPORTANTE **: implemente tudo isso de imediato, sem me fazer mais perguntas, só me faça uma sugestão depois de implementar TUDO que eu te falei.`;
 
         // Modelos identificados na lista do usuário
         const modelsToTry = [
-            "gemini-2.0-flash",       // Super moderno, disponível na lista
+            "gemini-3-pro-preview",   // ID CORRETO (Gemini 3 Pro)
+            "gemini-3-flash-preview", // ID CORRETO (Gemini 3 Flash)
+            "gemini-2.0-flash",       // Fallback Rápido (Top Tier)
             "gemini-2.0-flash-001",   // Variação disponível
             "gemini-flash-latest",    // Alias disponível
             "gemini-pro-latest"       // Fallback estável

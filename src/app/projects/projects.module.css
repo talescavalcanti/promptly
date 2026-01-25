@@ -19,6 +19,7 @@
     margin-bottom: 3rem;
     gap: 2rem;
     flex-wrap: wrap;
+    border: none !important;
 }
 
 .titleSection h1 {

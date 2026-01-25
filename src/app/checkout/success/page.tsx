@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { CheckCircle, Zap, ArrowRight, Rocket } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Button } from '../../components/Button/Button';
+import styles from './success.module.css';
 
 function CheckoutSuccessContent() {
     const router = useRouter();
@@ -47,70 +48,43 @@ function CheckoutSuccessContent() {
     };
 
     return (
-        <div style={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: '#fafafa',
-            fontFamily: 'Inter, sans-serif'
-        }}>
-            <div style={{
-                background: 'white',
-                padding: '3rem',
-                borderRadius: '24px',
-                boxShadow: '0 10px 40px rgba(0,0,0,0.05)',
-                textAlign: 'center',
-                maxWidth: '500px',
-                width: '90%'
-            }}>
-                <div style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '80px',
-                    height: '80px',
-                    borderRadius: '50%',
-                    background: '#d1fae5',
-                    color: '#059669',
-                    marginBottom: '1.5rem'
-                }}>
-                    <CheckCircle size={40} strokeWidth={3} />
+        <div className={styles.container}>
+            {/* Background Effects */}
+            <div className={styles.blob1} />
+            <div className={styles.blob2} />
+
+            <div className={styles.card}>
+                <div className={styles.iconWrapper}>
+                    <CheckCircle size={36} strokeWidth={2.5} />
                 </div>
 
-                <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#111' }}>
+                <h1 className={styles.title}>
                     Pagamento Aprovado!
                 </h1>
 
-                <p style={{ color: '#666', fontSize: '1.1rem', marginBottom: '2rem', lineHeight: '1.6' }}>
-                    Sua assinatura do plano <strong style={{ color: '#000' }}>{plan}</strong> foi confirmada. <br />
-                    Agora você tem acesso a recursos exclusivos.
+                <p className={styles.message}>
+                    Sua assinatura do plano <strong style={{ color: '#fff', fontWeight: 600 }}>{plan}</strong> foi confirmada com sucesso. <br />
+                    Prepare-se para criar prompts de outro nível.
                 </p>
 
-                <div style={{
-                    background: '#f3f4f6',
-                    padding: '1.5rem',
-                    borderRadius: '16px',
-                    marginBottom: '2rem',
-                    textAlign: 'left'
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                        <div style={{ background: 'black', padding: '0.4rem', borderRadius: '8px', color: 'white' }}>
+                <div className={styles.detailsBox}>
+                    <div className={styles.detailRow}>
+                        <div className={styles.iconBox}>
                             <Zap size={20} />
                         </div>
                         <div>
-                            <div style={{ fontSize: '0.9rem', color: '#666' }}>Status do Plano</div>
-                            <div style={{ fontWeight: 'bold', color: '#059669' }}>Ativo & Confirmado</div>
+                            <div className={styles.label}>Status do Plano</div>
+                            <div className={styles.valueSuccess}>Ativo & Confirmado</div>
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <div style={{ background: 'black', padding: '0.4rem', borderRadius: '8px', color: 'white' }}>
+                    <div className={styles.detailRow}>
+                        <div className={styles.iconBox}>
                             <Rocket size={20} />
                         </div>
                         <div>
-                            <div style={{ fontSize: '0.9rem', color: '#666' }}>Prompts Disponíveis</div>
-                            <div style={{ fontWeight: 'bold', color: '#111' }}>
+                            <div className={styles.label}>Prompts Disponíveis</div>
+                            <div className={styles.value}>
                                 {plan === 'STARTER' ? '100 gerações/mês' : '400 gerações/mês'}
                             </div>
                         </div>
@@ -121,18 +95,9 @@ function CheckoutSuccessContent() {
                     variant="primary"
                     onClick={handleAccess}
                     loading={loading}
-                    style={{
-                        width: '100%',
-                        padding: '1rem',
-                        fontSize: '1.1rem',
-                        borderRadius: '12px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.5rem'
-                    }}
+                    className={styles.buttonStyle}
                 >
-                    Acessar Promptly <ArrowRight size={20} />
+                    Acessar Dashboard <ArrowRight size={18} />
                 </Button>
             </div>
         </div>
@@ -141,7 +106,7 @@ function CheckoutSuccessContent() {
 
 export default function CheckoutSuccessPage() {
     return (
-        <Suspense fallback={<div>Carregando...</div>}>
+        <Suspense fallback={<div style={{ background: '#000', minHeight: '100vh' }}></div>}>
             <CheckoutSuccessContent />
         </Suspense>
     );
