@@ -248,3 +248,35 @@
         font-size: 2rem;
     }
 }
+
+@media (max-width: 768px) {
+    .hero {
+        padding: 4rem 1rem 2rem;
+    }
+
+    .heroTitle {
+        font-size: 1.75rem;
+    }
+
+    .pricingSection,
+    .infoSection,
+    .faqSection {
+        padding: 3rem 1rem;
+    }
+
+    .card {
+        padding: 1.5rem;
+    }
+
+    .amount {
+        font-size: 2rem;
+    }
+
+    .infoBlock {
+        text-align: center;
+    }
+
+    .infoGrid {
+        gap: 2rem;
+    }
+}
