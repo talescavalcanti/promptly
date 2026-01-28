@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '../../lib/supabase';
 import styles from './page.module.css';
 import { Button } from '../components/Button/Button';
+import { supabase } from '../../lib/supabase';
+import { LandingPageForm } from './LandingPageForm';
 import {
     LayoutTemplate, MonitorSmartphone, ShoppingCart, LayoutDashboard, GraduationCap, FileText, Store, Users, BarChart, Globe,
     Code2, Server, Database, Layers, Palette, Target, FileQuestion, Copy, Check, Briefcase, Zap, Shield, Megaphone, HelpCircle, Rocket, Monitor
@@ -12,24 +13,23 @@ import {
 
 import { TARGET_PLATFORMS } from '../../lib/saas_constants';
 import { ScrollReveal } from '../components/ScrollReveal/ScrollReveal';
+
 // --- Types & Config ---
 
 type FormData = {
-    promptMode: 'design' | 'feature' | 'logic';
+    promptMode: 'design' | 'feature' | 'logic' | 'landing_page';
     targetPlatform: string;
     objective: string;
     context: string;
 };
 
 const PROMPT_MODES = [
-    { id: 'guided_builder', label: 'Criador Visual', icon: <Rocket size={16} />, desc: 'Interface gráfica passo-a-passo' },
+    { id: 'guided_builder', label: 'Crie o seu saas do 0', icon: <Rocket size={16} />, desc: 'Crie o seu saas com apenas 1 prompt' },
+    { id: 'landing_page', label: 'Landing Page', icon: <LayoutTemplate size={16} />, desc: 'Gere uma landing page inteira com apenas 1 prompt.' },
     { id: 'design', label: 'Design (UI/UX)', icon: <Palette size={16} />, desc: 'Focado em interface, cores e componentes.' },
     { id: 'feature', label: 'Nova Funcionalidade', icon: <Code2 size={16} />, desc: 'Adicione novos recursos ao app existente.' },
     { id: 'logic', label: 'Lógica / Backend', icon: <Server size={16} />, desc: 'Schema de banco, rotas e arquitetura.' },
 ] as const;
-
-// Helper to keep code clean
-
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -63,7 +63,15 @@ export default function DashboardPage() {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
-
+    // Callback for the child form to update the main prompt
+    const handleLandingPagePrompt = (generatedPrompt: string) => {
+        if (formData.promptMode === 'landing_page') {
+            // Avoid infinite loop by checking if value changed
+            if (formData.objective !== generatedPrompt) {
+                updateField('objective', generatedPrompt);
+            }
+        }
+    };
 
     // --- Preview Generation Logic ---
     useEffect(() => {
@@ -71,7 +79,9 @@ export default function DashboardPage() {
         const mode = formData.promptMode as string;
         const platform = TARGET_PLATFORMS.find(p => p.id === formData.targetPlatform)?.value || 'Qualquer Plataforma';
 
-        if (mode === 'design') {
+        if (mode === 'landing_page') {
+            summary = formData.objective; // The child component constructs the full prompt
+        } else if (mode === 'design') {
             summary = `Atue como Designer UI/UX para ${platform}.\nObjetivo: ${formData.objective}\nContexto: ${formData.context}`;
         } else if (mode === 'feature') {
             summary = `Atue como Dev Fullstack para ${platform}.\nFuncionalidade: ${formData.objective}\nContexto: ${formData.context}`;
@@ -81,10 +91,12 @@ export default function DashboardPage() {
             summary = `Atue como Especialista de Software para ${platform}.\nObjetivo: ${formData.objective}\nContexto: ${formData.context}`;
         }
 
-        summary += `\n\n**IMPORTANTE**: implemente tudo isso de imediato, sem me fazer mais perguntas, só me faça uma sugestão depois de implementar TUDO que eu te falei.`;
+        if (mode !== 'landing_page') {
+            summary += `\n\n**IMPORTANTE**: implemente tudo isso de imediato, sem me fazer mais perguntas, só me faça uma sugestão depois de implementar TUDO que eu te falei.`;
+        }
+
         setResult(summary);
     }, [formData]);
-
 
     const handleGenerate = async () => {
         setLoading(true);
@@ -113,14 +125,14 @@ export default function DashboardPage() {
 
     if (authLoading) return null;
 
-    // --- Render Logic ---
-
-
-
     // --- Mode Selection Logic ---
     const handleModeSelect = (mode: string) => {
         if (mode === 'guided_builder') {
             router.push('/builder');
+            return;
+        }
+        if (mode === 'landing_page') {
+            router.push('/landing-builder');
             return;
         }
         updateField('promptMode', mode);
@@ -131,7 +143,7 @@ export default function DashboardPage() {
             <header className={styles.header}>
                 <div className={styles.headerContent}>
                     <div>
-                        <h1 className={styles.title}>Crie seu Saas do 0</h1>
+                        <h1 className={styles.title}>Gere o seu prompt</h1>
                         <p className={styles.subtitle}>Defina cada detalhe e gere a especificação técnica completa.</p>
                     </div>
                 </div>
@@ -177,7 +189,6 @@ export default function DashboardPage() {
                             </div>
                         </div>
 
-                        {/* WIZARD FORM (Empty Check needed to avoid error if I deleted the block) */}
                         {/* INPUT FORM */}
                         <div className={styles.wizardContent}>
                             <div className={styles.field}>
@@ -208,13 +219,7 @@ export default function DashboardPage() {
                                 variant="primary"
                                 onClick={handleGenerate}
                                 loading={loading}
-                                style={{
-                                    borderRadius: '50px',
-                                    padding: '1rem 3rem',
-                                    fontSize: '1.1rem',
-                                    width: '100%',
-                                    marginTop: '2rem'
-                                }}
+                                className={styles.generateButton}
                             >
                                 {loading ? 'Gerando Especificação...' : 'Gerar Prompt'}
                             </Button>
@@ -239,6 +244,5 @@ export default function DashboardPage() {
                 </div>
             </div>
         </div>
-
     );
 }

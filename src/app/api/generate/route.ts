@@ -2,6 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { SAAS_PROMPTS_V2 } from '../../builder/saas-prompts-v2';
+import { LANDING_PAGE_AGENT_V2_PROMPT } from '../../landing-builder/agentPrompts';
 
 export const dynamic = 'force-dynamic';
 
@@ -118,7 +120,10 @@ export async function POST(req: Request) {
             coreEntity, coreView, dataInputType,
             userRoles, loginMethod, registrationPolicy,
             notificationChannels, integrations, supportChannels,
-            problemSolved, marketingHeadline, cta
+            problemSolved, marketingHeadline, cta,
+            // Landing Builder Specifics
+            targetAudience, colorPalette, typography,
+            primaryColor, secondaryColor, fontWeight, useSingleFont
         } = body;
 
         const apiKey = process.env.GEMINI_API_KEY?.trim();
@@ -129,121 +134,126 @@ export async function POST(req: Request) {
 
         let prompt = "";
 
-        if (promptMode === 'saas_wizard') {
-            // SAAS WIZARD PROMPT
+        // Prompt already imported statically
+
+        if (promptMode === 'suggest_saas_details') {
             prompt = `
-                Atue como um **CTO, Arquiteto de Software e Product Manager Sênior**.
-                Estou construindo um SaaS do zero e preciso de uma Especificação Técnica e de Produto COMPLETA.
+                Atue como um Especialista de Produto e Designer de SaaS Sênior.
+                Analise o contexto abaixo e sugira detalhes criativos e técnicos para o projeto.
+                
+                NOME DO APP: ${saasName || 'Indefinido'}
+                CONTEXTO ATUAL: ${saasNiche ? `Nicho: ${saasNiche}` : 'Nicho Desconhecido'}
 
-                ## 1. Identidade do Projeto
-                - **Nome**: ${saasName || 'A definir'}
-                - **Nicho**: ${saasNiche || 'Geral'}
-                - **Identidade Visual**: Cores ${saasColor}, Fonte ${saasFont}, Logo ${logoStyle}
-                - **Tom de Voz**: ${voiceTone}
-
-                ## 2. Modelo de Negócio
-                - **Tipo**: ${businessModel}
-                - **Cobrança**: ${chargingModel} (Planos: ${planNames})
-                - **Resolver o Problema**: ${problemSolved}
-                - **Marketing Headline**: "${marketingHeadline}"
-                - **CTA**: "${cta}"
-
-                ## 3. Core do Produto (MVP)
-                - **Entidade Principal**: ${coreEntity}
-                - **Visualização de Dados**: ${coreView}
-                - **Entrada de Dados**: ${dataInputType}
-
-                ## 4. Acesso e Segurança
-                - **Perfis de Usuário**: ${userRoles}
-                - **Método de Login**: ${loginMethod}
-                - **Política de Registro**: ${registrationPolicy}
-
-                ## 5. Funcionalidades Extras
-                - **Notificações**: ${notificationChannels?.join(', ')}
-                - **Integrações**: ${integrations}
-                - **Suporte**: ${supportChannels?.join(', ')}
-
-                ### O QUE VOCÊ DEVE GERAR (OUTPUT):
-                Gere um documento Markdown estruturado contendo:
-
-                1.  **Guia de Identidade Visual (Design System)**:
-                    - Paleta de cores sugerida (HEX codes) baseada em "${saasColor}".
-                    - Tipografia recomendada baseada em "${saasFont}".
-                    - Estilo de componentes UI.
-                3.  **Arquitetura Técnica (Stack Recomendada)**:
-                    - Frontend (Framework, Libs de UI).
-                    - Backend (Linguagem, Framework).
-                    - Banco de Dados (Schema Relacional simplificado para ${coreEntity}).
-                    - Infraestrutura (Auth, Hosting, Storage).
-                4.  **Roadmap de Funcionalidades (MVP)**:
-                    - Lista de features essenciais para lançar.
-                    - Estrutura de Pastas do Projeto.
-                5.  **Estratégia de Marketing Inicial**:
-                    - Sugestão de Copy para a Hero Section usando a headline "${marketingHeadline}".
+                RETORNE APENAS UM JSON VÁLIDO (sem markdown, sem \`\`\`) com o seguinte formato:
+                {
+                    "niche": "Sugestão de nicho específico e lucrativo",
+                    "targetAudience": "Sugestão de público-alvo detalhado",
+                    "features": ["Feature 1", "Feature 2", "Feature 3", "Feature 4", "Feature 5"],
+                    "visualStyle": "Sugestão de estilo (ex: Minimalista, Cyberpunk, Corporativo)",
+                    "primaryColor": "Código HEX",
+                    "secondaryColor": "Código HEX",
+                    "typography": "Nome da fonte (ex: Inter, Poppins, Roboto)"
+                }
             `;
+        } else if (promptMode === 'saas_builder') {
+            const platformTarget = targetPlatform || 'Lovable';
 
+            prompt = `
+                ATUE COMO UM ENGENHEIRO DE PROMPTS ELITE E PRODUCT MANAGER SÊNIOR PARA A PLATAFORMA ${platformTarget.toUpperCase()}.
+                
+                SEU OBJETIVO:
+                Preparar o "Input Perfeito" para um Agente de IA construtor de SaaS na plataforma ${platformTarget}.
+                Você deve pegar as ideias iniciais do usuário, expandi-las com detalhes técnicos e de produto de alto nível, e formatar tudo dentro do template "ULTIMATE ONE-PROMPT SAAS BUILDER".
+
+                DADOS DO USUÁRIO & PERSONALIZAÇÃO:
+                - Nome do App: ${saasName || 'A definir'}
+                - Plataforma de Build: ${platformTarget}
+                - Nicho: ${saasNiche || 'Inferir baseado no nome'}
+                - Público: ${body.targetAudience || 'Inferir'}
+                - Features: ${body.features ? body.features.join(', ') : 'Inferir as essenciais para um MVP Premium'}
+                - Estilo Visual: ${logoStyle} | ${voiceTone}
+                - Cores: Primária ${saasColor}, Secundária ${body.secondaryColor || 'Inferir'}
+                - Tipografia: ${body.typography || 'Poppins (Padrão)'}
+
+                TEMPLATE OBRIGATÓRIO (MODIFICAR REGRAS SE NECESSÁRIO PARA CUSTOMIZAÇÃO):
+                ${SAAS_PROMPTS_V2}
+
+                SUA TAREFA:
+                1. Analise o "Nome do App" e os dados parciais.
+                2. Infira um Nicho Lucrativo, uma Persona Clara e 6 Features Indispensáveis para um MVP.
+                3. Defina um Estilo Visual Premium respeitando as cores e fontes do usuário.
+                4. GERE O PROMPT FINAL COMBINANDO:
+                   - O Conteúdo Rico que você inferiu (preenchendo a seção "ENTRADA DO USUÁRIO").
+                   - Todas as Regras/Seções do TEMPLATE original.
+                   - **IMPORTANTÍSSIMO**: Se o usuário definiu uma TIPOGRAFIA ou CORES, adicione uma instrução explícita no final do prompt gerado para SOBRESCREVER as regras padrões do Agente (ex: "OVERRIDE: Use font X instead of Poppins").
+                
+                SAÍDA ESPERADA:
+                Apenas o texto do prompt completo pronto para ser copiado e colado. Sem introduções.
+            `;
         } else if (promptMode === 'optimize_prompt') {
             prompt = `
-                Atue como um **Engenheiro de Prompts Sênior** especializado em desenvolvimento de software com IA para ${targetPlatform || 'Lovable, GPT-Engineer, v0'}.
+                Atue como um ** Engenheiro de Prompts Sênior ** especializado em desenvolvimento de software com IA para ${targetPlatform || 'Lovable, GPT-Engineer, v0'}.
                 
                 SEU OBJETIVO: Escrever um prompt FINAL, técnico e extremamente detalhado que o usuário irá enviar para uma IA construtora de software.
                 
-                ### CONTEXTO DO PROJETO (Dados fornecidos pelo usuário):
-                - **Nome do SaaS**: ${saasName || 'Novo Projeto'}
-                - **Nicho de Mercado**: ${saasNiche}
-                - **Público Alvo**: ${body.targetAudience}
-                - **Identidade Visual**: Cores ${saasColor}, Fonte ${saasFont} (Peso: ${body.fontWeight || 'Padrão'}), Estilo ${logoStyle}
-                - **Tom de Voz**: ${voiceTone}
-                - **Widgets do Dashboard**: ${body.dashboardWidgets ? body.dashboardWidgets.join(', ') : 'Padrão de mercado'}
-                - **Funcionalidades Chave**: ${body.features ? body.features.join(', ') : 'Essenciais para o nicho'}
+                ### CONTEXTO DO PROJETO(Dados fornecidos pelo usuário):
+                - ** Nome do SaaS **: ${saasName || 'Novo Projeto'}
+                - ** Nicho de Mercado **: ${saasNiche}
+                - ** Público Alvo **: ${body.targetAudience}
+                - ** Identidade Visual **: Cores ${saasColor}, Fonte ${saasFont} (Peso: ${body.fontWeight || 'Padrão'
+                }), Estilo ${logoStyle}
+                - ** Tom de Voz **: ${voiceTone}
+                - ** Widgets do Dashboard **: ${body.dashboardWidgets ? body.dashboardWidgets.join(', ') : 'Padrão de mercado'}
+                - ** Funcionalidades Chave **: ${body.features ? body.features.join(', ') : 'Essenciais para o nicho'}
 
                 ### SUA TAREFA:
-                Escreva o prompt abaixo completando TODAS as lacunas com sua expertise técnica. Não deixe nada como "A definir". Invente os detalhes faltantes (Planos de preço, Schema do banco, Estrutura de arquivos) para que o projeto seja viável e profissional.
+                Escreva o prompt abaixo completando TODAS as lacunas com sua expertise técnica.Não deixe nada como "A definir".Invente os detalhes faltantes(Planos de preço, Schema do banco, Estrutura de arquivos) para que o projeto seja viável e profissional.
 
-                ### ESTRUTURA DO PROMPT QUE VOCÊ DEVE GERAR (Copie e preencha):
+                ### ESTRUTURA DO PROMPT QUE VOCÊ DEVE GERAR(Copie e preencha):
 
-                ---
-                "Atue como um CTO e Product Manager Experiente.
-                Estou criando um novo SaaS chamado **${saasName || 'Novo Projeto'}** focado em **${saasNiche}**.
+    ---
+        "Atue como um CTO e Product Manager Experiente.
+                Estou criando um novo SaaS chamado ** ${saasName || 'Novo Projeto'}** focado em ** ${saasNiche}**.
 
                 ### 1. Identidade & Visual
-                - Cores: ${saasColor}
-                - Tipografia: ${saasFont} (Peso: ${body.fontWeight || 'Padrão'})
-                - Estilo: ${logoStyle}
-                - Tom de Voz: ${voiceTone}
-                - **Diretriz de Design**: Crie uma interface limpa, moderna e responsiva (Mobile-First) usando Shadcn UI e Tailwind CSS. Use animações sutis (Framer Motion) para uma sensação premium.
+        - Cores: ${saasColor}
+    - Tipografia: ${saasFont} (Peso: ${body.fontWeight || 'Padrão'
+                })
+- Estilo: ${logoStyle}
+- Tom de Voz: ${voiceTone}
+                - ** Diretriz de Design **: Crie uma interface limpa, moderna e responsiva(Mobile - First) usando Shadcn UI e Tailwind CSS.Use animações sutis(Framer Motion) para uma sensação premium.
 
                 ### 2. Modelo de Negócio & Estratégia
-                - Nicho: ${saasNiche} para ${body.targetAudience}
-                - **Planos Sugeridos**: [Crie 3 nomes de planos e preços compatíveis com o mercado de ${saasNiche}]
-                - **Diferencial Competitivo**: [Descreva um diferencial técnico ou de UX para este projeto]
+    - Nicho: ${saasNiche} para ${body.targetAudience}
+                - ** Planos Sugeridos **: [Crie 3 nomes de planos e preços compatíveis com o mercado de ${saasNiche}]
+    - ** Diferencial Competitivo **: [Descreva um diferencial técnico ou de UX para este projeto]
 
-                ### 3. Core do Produto (MVP)
-                - **Fluxo Principal**: O usuário entra, [Descreva o fluxo principal de uso do ${saasNiche}].
-                - **Dashboard**: Deve conter widgets de ${body.dashboardWidgets ? body.dashboardWidgets.join(', ') : 'Métricas principais'}.
-                - **Input de Dados**: Otimize para [Desktop/Mobile] com formulários intuitivos.
+                ### 3. Core do Produto(MVP)
+    - ** Fluxo Principal **: O usuário entra, [Descreva o fluxo principal de uso do ${saasNiche}].
+                - ** Dashboard **: Deve conter widgets de ${body.dashboardWidgets ? body.dashboardWidgets.join(', ') : 'Métricas principais'}.
+                - ** Input de Dados **: Otimize para[Desktop / Mobile] com formulários intuitivos.
 
-                ### 4. Arquitetura Técnica (Mandatório)
-                - **Frontend**: React (Vite), TypeScript, Tailwind CSS, Shadcn UI, Lucide React.
-                - **Backend/BaaS**: Supabase (Auth, Postgres, Storage, Edge Functions).
-                - **State Management**: TanStack Query (React Query) + Context API.
-                - **Segurança**: Implemente RLS (Row Level Security) em TODAS as tabelas. Política padrão: usuários só veem seus próprios dados.
+                ### 4. Arquitetura Técnica(Mandatório)
+    - ** Frontend **: React(Vite), TypeScript, Tailwind CSS, Shadcn UI, Lucide React.
+                - ** Backend / BaaS **: Supabase(Auth, Postgres, Storage, Edge Functions).
+                - ** State Management **: TanStack Query(React Query) + Context API.
+                - ** Segurança **: Implemente RLS(Row Level Security) em TODAS as tabelas.Política padrão: usuários só veem seus próprios dados.
 
-                ### 5. Funcionalidades (Implementação Imediata)
+                ### 5. Funcionalidades(Implementação Imediata)
                 ${body.features ? body.features.map((f: string) => `- ${f}`).join('\n') : '- CRUD completo da entidade principal'}
-                - [Adicione 2 funcionalidades técnicas essenciais para este nicho que o usuário esqueceu]
+-[Adicione 2 funcionalidades técnicas essenciais para este nicho que o usuário esqueceu]
 
-                ### 6. Schema do Banco de Dados (Sugestão Inicial)
-                [Crie um esquema SQL simplificado para as tabelas principais: users, subscriptions, e a entidade principal de ${saasNiche}]
+                ### 6. Schema do Banco de Dados(Sugestão Inicial)
+[Crie um esquema SQL simplificado para as tabelas principais: users, subscriptions, e a entidade principal de ${saasNiche}]
 
-                **INSTRUÇÃO FINAL**: Implemente o código inicial focado no Dashboard e na funcionalidade principal. Crie os arquivos necessários e a estrutura de pastas."
-                ---
+                ** INSTRUÇÃO FINAL **: Implemente o código inicial focado no Dashboard e na funcionalidade principal.Crie os arquivos necessários e a estrutura de pastas."
+---
 
-                **IMPORTANTE**: 
-                1. Sua resposta deve ser APENAS o prompt gerado acima. 
+                ** IMPORTANTE **:
+1. Sua resposta deve ser APENAS o prompt gerado acima. 
                 2. Mantenha os dados do usuário FIXOS. 
                 3. Seja criativo nos detalhes que faltam."
-            `;
+    `;
 
         } else if (promptMode === 'design') {
             prompt = `
@@ -254,7 +264,7 @@ export async function POST(req: Request) {
                 DETALHES DE UI: ${context}
 
                 O prompt deve focar EXCLUSIVAMENTE em:
-        1. Paleta de Cores, Tipografia e Design System.
+1. Paleta de Cores, Tipografia e Design System.
                 2. Estilos de componentes(botões, inputs, cards) e estados de interação.
                 3. Layout, Grids e Componentes React + Tailwind.
 
@@ -273,14 +283,14 @@ export async function POST(req: Request) {
             `;
         } else if (promptMode === 'feature') {
             prompt = `
-        Act as a ** Senior Frontend Engineer & Component Architect ** specialized in ${targetPlatform || 'Web Frameworks'}.
+Act as a ** Senior Frontend Engineer & Component Architect ** specialized in ${targetPlatform || 'Web Frameworks'}.
                 Create a ** Frontend Implementation Roadmap ** for the following FEATURE:
                 
                 REQUESTED FEATURE: ${objective}
                 PROJECT CONTEXT: ${context}
                 
                 Generate a practical guide strictly following this structure:
-        1. ** Routes & Application Structure **: Define new client - side routes and the component hierarchy.
+1. ** Routes & Application Structure **: Define new client - side routes and the component hierarchy.
                 2. ** Component Details **: Props, State, and Interactions.
                 3. ** Integration **: Data fetching and API mocking.
                 
@@ -288,6 +298,94 @@ export async function POST(req: Request) {
                 - ** NO BACKEND CODE **: Do not generate SQL or Server logic.
                 - Assume the API exists or tell the user to mock it.
             `;
+        } else if (promptMode === 'landing_page') {
+            if (promptMode === 'landing_page') {
+                const wizardMode = body.wizardMode || 'custom';
+
+                // --- DATA PREPARATION ---
+                // Ensure strict fallbacks for "Portfolio Mode" logic
+                const safeNiche = saasNiche || 'Serviço Premium';
+                const safeBrand = body.brandName || '(Invente um Nome Premium)';
+
+                // Design System Injection
+                const designSystemPrompt = `
+                ### 5. SISTEMA DE DESIGN & UI(Rigidamente Definido pelo Usuário)
+                Você DEVE seguir estas diretrizes visuais exatas:
+                
+                - ** Cor Primária(Destaque / CTA / Brand) **: ${primaryColor || '#000000'}
+                - ** Cor Secundária(Base / Fundo / Contraste) **: ${secondaryColor || '#ffffff'}
+                - ** Tipografia **: ${typography || 'Inter'}
+                - ** Peso da Fonte(Headings) **: ${fontWeight || 'Regular'}
+                - ** Modo de Fonte **: ${useSingleFont ? 'USAR APENAS ESSA FONTE (Single Font Mode).' : 'Usar par com font-sans padrão para corpo.'}
+                - ** Estilo Geral **: ${logoStyle || 'Premium Moderno'}
+                
+                * Instrução de Implementação *:
+1. Crie variáveis CSS ou config do Tailwind que reflitam essas cores exatas.
+                2. Use a cor primária para botões, ícones de destaque e bordas ativas.
+                3. Use a cor secundária para fundos de seções alternadas e contrastes.
+            `;
+
+                // Content Injection
+                const contentPrompt = `
+                ### 6. DADOS ESPECÍFICOS DO PROJETO
+    - ** Nicho **: ${safeNiche}
+                - ** Marca **: ${safeBrand}
+                - ** Público Alvo **: ${targetAudience || 'Clientes exigentes que buscam qualidade.'}
+                - ** Objetivo **: ${objective || 'Converter visitantes em agendamentos/leads.'}
+                - ** Tom de Voz **: ${voiceTone || 'Profissional, acolhedor e autoritário.'}
+                - ** Oferta Principal **: ${problemSolved || '(Invente uma oferta irresistível baseada no nicho)'}
+                - ** Contato **: ${cta || '(Invente dados críveis)'}
+                - ** Seções Solicitadas **: ${body.sections?.join(', ') || 'Todas as seções padrão do Template V2.'}
+`;
+
+                if (wizardMode === 'portfolio') {
+                    prompt = `
+                    ${LANDING_PAGE_AGENT_V2_PROMPT}
+
+                    ════════════════════════════════════════════
+                    ORDEM DE EXECUÇÃO: MODO PORTFÓLIO(FLASH)
+                    ════════════════════════════════════════════
+                    O usuário quer gerar um PORTFÓLIO IMPRESSIONANTE para o nicho "${safeNiche}" em segundos.
+                    
+                    SUA MISSÃO - O "DIRETOR CRIATIVO":
+1. ** INVENTE TUDO **: Nome da marca, slogan, dores, benefícios, ofertas, preços, depoimentos e FAQ.
+                    2. ** VIBE **: Crie uma estética visualmente rica e comercialmente viável.
+                    3. ** DADOS **: Preencha o arquivo 'constants.ts' com esses dados inventados(devem parecer ultra - reais).
+
+    ${designSystemPrompt}
+                    
+                    ** OBRIGATÓRIO **:
+- Siga a ARQUITETURA DE ARQUIVOS da V2(pages, components, lib).
+                    - Implemente o "UI KIT MÍNIMO OBRIGATÓRIO"(Button, Card, Section, Badge, etc.).
+                    - Entregue o código pronto para rodar.
+                `;
+                } else {
+                    // CUSTOM MODE
+                    prompt = `
+                    ${LANDING_PAGE_AGENT_V2_PROMPT}
+
+                    ════════════════════════════════════════════
+                    ORDEM DE EXECUÇÃO: MODO PERSONALIZADO(CIRÚRGICO)
+                    ════════════════════════════════════════════
+                    O usuário definiu especificações exatas.Você é o engenheiro responsável por trazê - las à vida.
+
+    ${contentPrompt}
+                    
+                    ${designSystemPrompt}
+
+                    ** INSTRUÇÕES CRÍTICAS DE "VIBE-CODING" **:
+1. ** Mini Design System **: Implemente as cores (${primaryColor}, ${secondaryColor}) e fontes(${typography}) como a alma do site.
+                    2. ** Copywriting **: Use o Tom de Voz "${voiceTone}" para adaptar * todos * os textos(Headlines, CTAs, Descrições).Escreva para o Público "${targetAudience}".
+                    3. ** Conteúdo **: Para o que o usuário não preencheu(ex: texto exato do "Sobre"), use sua criatividade para gerar lero - lero premium e convincente alinhado ao nicho.
+                    
+                    ** OBRIGATÓRIO **:
+- Siga a ARQUITETURA DE ARQUIVOS da V2 rigorosamente.
+                    - Mantenha a "Lei do CTA Único" e a "Lei do Ritmo" descritas na sua base de conhecimento.
+                    - Não explique nada.Apenas gere o código dos arquivos.
+                `;
+                }
+            }
+
         } else {
             // Fallback
             prompt = `Atue como Especialista em Software para ${targetPlatform || 'Web'}.Objetivo: ${objective}.Contexto: ${context}.`;
@@ -339,9 +437,10 @@ export async function POST(req: Request) {
 
                     return NextResponse.json({ result: text });
                 }
-            } catch (err: any) {
-                console.warn(`Falha no modelo ${modelId}: `, err.message);
-                lastErrorMsg += `[${modelId}]: ${err.message}.`;
+            } catch (err: unknown) {
+                const error = err as Error;
+                console.warn(`Falha no modelo ${modelId}: `, error.message);
+                lastErrorMsg += `[${modelId}]: ${error.message}.`;
             }
         }
 
@@ -349,9 +448,10 @@ export async function POST(req: Request) {
             error: `Não foi possível gerar com os modelos da sua lista.Erros: ${lastErrorMsg} `
         }, { status: 500 });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const err = error as Error;
         return NextResponse.json({
-            error: `Erro fatal no servidor: ${error.message || error.toString()} `
+            error: `Erro fatal no servidor: ${err.message || err.toString()} `
         }, { status: 500 });
     }
 }

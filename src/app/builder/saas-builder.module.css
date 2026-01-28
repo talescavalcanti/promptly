@@ -1,0 +1,1214 @@
+/* --- Variables & Tokens --- */
+.container {
+    /* Inherit from globals.css where possible */
+    --primary: #F5A524;
+    --primary-hover: #D98E15;
+
+    font-family: var(--font-sans);
+    /* Use Global Font (Poppins) */
+    background: var(--background);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: var(--foreground);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Background Ambient Glow (Subtle - Matching Dashboard vibe) */
+.container::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(245, 165, 36, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.closeButton {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    color: rgba(255, 255, 255, 0.4);
+    transition: all 0.2s;
+    z-index: 20;
+    padding: 0.5rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+}
+
+.closeButton:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: rotate(90deg);
+}
+
+/* --- Wizard Card (Matching Dashboard .previewCard style) --- */
+.wizardCard,
+.resultCard {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 900px;
+    /* Slightly wider like dashboard */
+
+    /* Dashboard Glass Style */
+    background: rgba(25, 25, 25, 0.4);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 28px;
+    /* Matching Dashboard Radius */
+    box-shadow: 0 40px 100px -30px rgba(0, 0, 0, 0.8);
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 600px;
+}
+
+/* --- Progress Bar --- */
+.progressBar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.03);
+    position: relative;
+}
+
+.progressFill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary) 0%, #FFD074 100%);
+    box-shadow: 0 0 10px rgba(245, 165, 36, 0.3);
+    transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* --- Step Content --- */
+.stepIndicator {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--primary);
+    font-weight: 600;
+    margin: 2.5rem 3rem 0;
+    /* Align with content padding */
+}
+
+.contentArea {
+    flex: 1;
+    padding: 2rem 3rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.stepHeader {
+    margin-bottom: 2.5rem;
+    text-align: left;
+}
+
+.stepTitle {
+    font-size: 2rem;
+    /* Matching Dashboard Title Size approximately */
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.03em;
+}
+
+.stepDescription {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.4);
+    /* Matching Dashboard .stepDesc */
+    line-height: 1.5;
+    max-width: 90%;
+}
+
+/* --- Components: Inputs & Chips --- */
+.inputGroup,
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    width: 100%;
+    margin-bottom: 2rem;
+    /* Increased spacing between groups */
+}
+
+.label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    margin-left: 4px;
+    letter-spacing: 0.01em;
+}
+
+/* Matching Dashboard .input style */
+.input,
+.textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    /* More subtle border */
+    border-radius: 16px;
+    /* Slightly more rounded */
+    padding: 1.1rem 1.35rem;
+    /* Taller inputs */
+    font-size: 1rem;
+    color: white;
+    font-family: var(--font-sans);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+}
+
+.input:focus,
+.textarea:focus {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(245, 165, 36, 0.1);
+}
+
+/* ... (Platform Grid styles below remain unchanged) ... */
+
+/* Result specific CTA styling (Primary Action) - Also used for Magic Suggest */
+.copyActionResult {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Ensure horizontal center */
+    gap: 0.6rem;
+    background: rgba(245, 165, 36, 0.1);
+    color: var(--primary);
+    font-weight: 600;
+    padding: 0.6rem 1.25rem 0.5rem;
+    /* Optical fix: slightly less bottom padding */
+    font-size: 0.9rem;
+    line-height: normal;
+    /* Allow natural centering */
+    border-radius: 50px;
+    border: 1px solid rgba(245, 165, 36, 0.2);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.copyActionResult:hover {
+    background: var(--primary);
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 165, 36, 0.2);
+}
+
+.copyActionResult:disabled {
+    opacity: 0.5;
+    cursor: default;
+    transform: none;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.chipGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+/* Matching Dashboard .chip style (renaming generic chip to match visually) */
+.chip {
+    padding: 0.6rem 1.25rem;
+    border-radius: 99px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: var(--font-sans);
+}
+
+.chip:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Added active state for chip */
+.chip.active {
+    background: rgba(245, 165, 36, 0.15);
+    border-color: var(--primary);
+    color: var(--primary);
+    box-shadow: 0 0 15px rgba(245, 165, 36, 0.2);
+}
+
+/* --- Components: Platform Selection Grid --- */
+.platformGrid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.platformCard {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+    width: 260px;
+    /* Fixed width for consistent grid */
+    flex-grow: 0;
+}
+
+.platformCard:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.platformCard.active {
+    background: rgba(245, 165, 36, 0.08);
+    /* Tinted with primary */
+    border-color: var(--primary);
+    box-shadow:
+        0 8px 24px rgba(245, 165, 36, 0.15),
+        inset 0 0 10px rgba(245, 165, 36, 0.05);
+}
+
+.platformIcon {
+    width: 48px;
+    height: 48px;
+    background: #000;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.4);
+    transition: all 0.3s;
+}
+
+.platformCard.active .platformIcon {
+    background: #000;
+    /* Deep black background for logos */
+    border-color: var(--primary);
+    transform: scale(1.05);
+}
+
+.platformLogoImg {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    filter: brightness(0.9) grayscale(0.2);
+    transition: all 0.3s;
+}
+
+.platformCard.active .platformLogoImg {
+    filter: none;
+    /* Full color when active */
+    transform: scale(1.1);
+}
+
+.platformInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.platformName {
+    font-weight: 600;
+    color: white;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+}
+
+.platformDomain {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.3);
+    font-family: var(--font-mono);
+}
+
+.platformActiveIndicator {
+    position: absolute;
+    inset: 0;
+    border: 2px solid var(--primary);
+    border-radius: 20px;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+
+.suggestionsGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.suggestionpill {
+    padding: 0.4rem 1rem;
+    border-radius: 99px;
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.02);
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.suggestionpill:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(245, 165, 36, 0.05);
+}
+
+.suggestionpill.active,
+.active {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(245, 165, 36, 0.15);
+    box-shadow: 0 0 10px rgba(245, 165, 36, 0.1);
+}
+
+.inputWithButton {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.addButton {
+    width: 50px;
+    height: 50px;
+    /* Match input height roughly */
+    flex-shrink: 0;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.addButton:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: black;
+    transform: scale(1.05);
+}
+
+/* --- Components: Cards (Grid 3 & 2) --- */
+.grid3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.grid2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.featuresGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+/* Matching Dashboard .modeCard style for our cards */
+/* Matching Dashboard .modeCard style for our cards */
+.card {
+    background: #080808;
+    /* Deep dark default */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    /* Barely visible border */
+    border-radius: 20px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    height: 100%;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover State - Subtle reveal */
+.card:hover {
+    background: #0f0f0f;
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-4px);
+}
+
+/* SELECTED STATE - The Glow Activation */
+.card.selected {
+    background: rgba(20, 20, 20, 0.8);
+    border-color: var(--primary);
+    /* Dynamic border */
+    box-shadow:
+        0 0 0 1px var(--primary),
+        /* Sharp inner border */
+        0 8px 40px -10px color-mix(in srgb, var(--primary) 30%, transparent),
+        /* Soft dynamic glow */
+        inset 0 0 20px color-mix(in srgb, var(--primary) 5%, transparent);
+    /* Inner ambient light */
+    transform: translateY(-2px) scale(1.01);
+}
+
+.cardIcon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+
+    /* Default Dark State */
+    background: #111;
+    color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Icon lights up when card is selected */
+.card.selected .cardIcon {
+    background: color-mix(in srgb, var(--primary) 15%, transparent);
+    /* Warm translucent glow */
+    color: var(--primary);
+    /* Bright gold icon */
+    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+    box-shadow: 0 0 30px color-mix(in srgb, var(--primary) 25%, transparent);
+    /* Focused icon glow */
+    transform: scale(1.1);
+}
+
+.cardTitle {
+    font-weight: 600;
+    color: white;
+    font-size: 1rem;
+}
+
+.cardDesc {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.4);
+    line-height: 1.4;
+}
+
+.featureCard {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    padding: 1rem;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.featureCard:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: white;
+}
+
+.featureCard.active {
+    border-color: var(--primary);
+    background: rgba(245, 165, 36, 0.08);
+    /* tinted */
+    color: white;
+}
+
+.checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.featureCard.active .checkbox {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+/* --- Review Section --- */
+.reviewCard {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.reviewItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.reviewItem:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.reviewLabel {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.95rem;
+}
+
+.reviewValue {
+    color: white;
+    font-weight: 500;
+    text-align: right;
+    max-width: 60%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* --- Navigation Buttons Wrapper --- */
+.navButtons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    /* Reduced from 3rem */
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* --- Footer Actions --- */
+.actions {
+    padding: 2rem 3rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.01);
+}
+
+.backButton {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: transparent;
+    /* Cleaner look */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.backButton:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateX(-2px);
+    /* Horizontal subtle move */
+}
+
+.backButton:active {
+    transform: scale(0.96);
+}
+
+.backButton:disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* Primary "Generate" Button with Premium Glow */
+.nextButton {
+    position: relative;
+    overflow: hidden;
+    /* For shimmer */
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--primary);
+    color: #000;
+    font-weight: 600;
+    /* Increased weight for premium feel */
+    font-size: 1rem;
+    padding: 0.85rem 2.8rem;
+    border-radius: 50px;
+    /* Reverting to Pill to match AI Button */
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* Exact Clone of "Preencher com IA" Shadow */
+    box-shadow:
+        0 4px 14px rgba(255, 176, 32, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    /* Top highlight */
+}
+
+.nextButton:hover {
+    background: #FFB020;
+    transform: translateY(-2px);
+    box-shadow:
+        0 8px 20px rgba(245, 165, 36, 0.35),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.nextButton:active {
+    transform: scale(0.97) translateY(0);
+    box-shadow: rgba(245, 165, 36, 0.2) 0px 2px 8px;
+}
+
+/* Disabled state */
+.nextButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.3);
+    box-shadow: none;
+    transform: none;
+}
+
+/* --- Results --- */
+.resultHeader {
+    text-align: center;
+    padding: 3rem 3rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.iconCircle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 40px rgba(245, 165, 36, 0.3);
+    background: var(--primary);
+    color: black;
+}
+
+.resultTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+.resultDesc {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 1rem;
+}
+
+.promptBox {
+    flex: 1;
+    margin: 0 3rem;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 1.5rem;
+    overflow-y: auto;
+    position: relative;
+    min-height: 200px;
+}
+
+.promptBox pre {
+    white-space: pre-wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+}
+
+.loadingOverlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(4px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    color: var(--primary);
+    font-weight: 600;
+    z-index: 10;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(245, 165, 36, 0.2);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* --- Palette Grid --- */
+.paletteGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.paletteCard {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.paletteCard:hover {
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.paletteCard.active {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary);
+}
+
+.colorPreviewGroup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    /* Overlap effect */
+}
+
+.colorCircle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.colorCircle.secondary {
+    margin-left: -10px;
+    /* Overlap */
+    z-index: 10;
+}
+
+.paletteName {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+}
+
+/* --- Mock UI Preview --- */
+.mockPreview {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+}
+
+.mockHeading {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: white;
+    /* Uses primary in inline style usually */
+}
+
+.mockButton {
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: none;
+    cursor: default;
+}
+
+/* --- Font Selection Cards --- */
+.fontCard {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 0.8rem 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.fontCard:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateX(4px);
+}
+
+.fontCard.active {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary);
+    box-shadow: inset 3px 0 0 0 var(--primary);
+    /* Left border indicator */
+}
+
+.fontPreviewAa {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    opacity: 0.8;
+    width: 32px;
+    text-align: center;
+}
+
+.fontInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.fontName {
+    font-size: 1rem;
+    color: #fff;
+}
+
+.fontCat {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.resultActions,
+.promptActions {
+    padding: 2rem 3rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+/* Result specific CTA styling (Primary Action) */
+.copyActionResult {
+    position: relative;
+    overflow: hidden;
+    /* For shimmer effect */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #FFB020;
+    color: #000;
+    font-weight: 600;
+    padding: 0.85rem 2.8rem;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow:
+        0 4px 14px rgba(255, 176, 32, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Shimmer Effect Setup */
+.copyActionResult::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(105deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.4) 45%,
+            rgba(255, 255, 255, 0.7) 50%,
+            rgba(255, 255, 255, 0.4) 55%,
+            transparent 100%);
+    transform: skewX(-20deg);
+    transition: all 0.7s;
+    opacity: 0;
+}
+
+.copyActionResult:hover {
+    transform: translateY(-4px) scale(1.02);
+    background: #FFB020;
+    /* Keep base consistent, shimmer provides lightness */
+    box-shadow:
+        0 12px 28px rgba(255, 176, 32, 0.5),
+        0 0 40px rgba(255, 176, 32, 0.3),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.copyActionResult:hover::after {
+    left: 100%;
+    opacity: 1;
+    transition: left 0.7s ease-in-out, opacity 0.3s;
+}
+
+.copyActionResult:active {
+    transform: scale(0.94) translateY(0);
+    box-shadow:
+        0 2px 8px rgba(255, 176, 32, 0.3),
+        inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Inner shadow for press feel */
+}
+
+/* --- Editor Window Style (Result Step) --- */
+.editorWindow {
+    background: #1e1e1e;
+    /* VS Code dark background */
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 65vh;
+    /* Fixed height for scroll */
+    max-height: 600px;
+    margin-top: 1rem;
+    animation: slideUp 0.4s ease-out;
+}
+
+.editorHeader {
+    background: #252526;
+    padding: 0.8rem 1.2rem;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    gap: 1rem;
+}
+
+.windowControls {
+    display: flex;
+    gap: 8px;
+}
+
+.controlDot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.fileName {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.badge {
+    font-size: 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.editorBody {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    background: #1e1e1e;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.promptContent {
+    font-family: 'Consolas', 'Monaco', monospace;
+    /* Code font */
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #d4d4d4;
+    /* VS Code default text */
+    white-space: pre-wrap;
+    margin: 0;
+}
+
+.editorFooter {
+    background: #252526;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.secondaryAction {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.secondaryAction:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .closeButton {
+        top: 1rem;
+        right: 1rem;
+        background: rgba(25, 25, 25, 0.6);
+        backdrop-filter: blur(10px);
+    }
+
+    .wizardCard {
+        border-radius: 20px;
+        width: 100%;
+        border: none;
+        background: transparent;
+        backdrop-filter: none;
+        box-shadow: none;
+    }
+
+    /* On mobile, remove the card effect to avoid nested padding issues, or keep it but reduce padding */
+    .wizardCard,
+    .resultCard {
+        background: rgba(25, 25, 25, 0.6);
+        backdrop-filter: blur(40px);
+        padding: 0;
+        min-height: auto;
+        margin-bottom: 2rem;
+    }
+
+    .closeButton {
+        top: 1rem;
+        right: 1rem;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(10px);
+    }
+
+    .contentArea {
+        padding: 1.5rem;
+    }
+
+    .actions {
+        padding: 1.5rem;
+    }
+
+    .stepIndicator {
+        margin: 1.5rem 1.5rem 0;
+    }
+
+    .stepTitle {
+        font-size: 1.5rem;
+    }
+
+    .grid3,
+    .grid2 {
+        grid-template-columns: 1fr;
+    }
+
+    .featuresGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .promptBox {
+        margin: 0 1.5rem;
+    }
+
+    /* --- Mobile Enhancements --- */
+    .platformCard {
+        width: 100%;
+        max-width: none;
+        margin-bottom: 0.5rem;
+    }
+
+    .navButtons {
+        flex-direction: column-reverse;
+        gap: 1rem;
+    }
+
+    .backButton,
+    .nextButton {
+        width: 100%;
+        justify-content: center;
+    }
+}

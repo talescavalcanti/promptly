@@ -119,6 +119,22 @@ a.secondary {
     font-size: 32px;
     line-height: 40px;
     letter-spacing: -1.92px;
+    max-width: 100%;
+    /* Prevent overflow */
+  }
+
+  .ctas {
+    flex-direction: column;
+    /* Stack buttons on mobile */
+    align-items: stretch;
+    /* Full width buttons */
+    width: 100%;
+  }
+
+  .ctas a {
+    width: 100%;
+    /* Full width touch targets */
+    justify-content: center;
   }
 }
 

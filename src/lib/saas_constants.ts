@@ -119,7 +119,7 @@ export const SAAS_MARKETING_CTAS = [
 
 export const TARGET_PLATFORMS = [
     { id: 'lovable', label: 'Lovable', value: 'lovable.dev', logo: '/platforms/lovable.png' },
-    { id: 'bolt', label: 'Bolt', value: 'bolt.new', logo: '/platforms/bolt.png' },
-    { id: 'base44', label: 'Base 44', value: 'base44.com', logo: '/platforms/base44.png' },
-    { id: 'vercel', label: 'Vercel', value: 'v0.dev', logo: '/platforms/vercel.png' },
+    { id: 'bolt', label: 'Bolt.new', value: 'bolt.new', logo: '/platforms/bolt.png' },
+    { id: 'v0', label: 'v0 (Vercel)', value: 'v0.dev', logo: '/platforms/vercel.png' },
+    { id: 'replit', label: 'Replit', value: 'replit.com', logo: '/platforms/replit.png' },
 ];

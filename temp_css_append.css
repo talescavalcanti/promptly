@@ -1,0 +1,110 @@
+/* --- Editor Window Style (Synced) --- */
+.editorWindow {
+    background: #1e1e1e;
+    /* VS Code dark background */
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 65vh;
+    /* Fixed height for scroll */
+    max-height: 600px;
+    margin-top: 1rem;
+    animation: slideUp 0.4s ease-out;
+}
+
+.editorHeader {
+    background: #252526;
+    padding: 0.8rem 1.2rem;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    gap: 1rem;
+}
+
+.windowControls {
+    display: flex;
+    gap: 8px;
+}
+
+.controlDot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.fileName {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.badge {
+    font-size: 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.editorBody {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    background: #1e1e1e;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.promptContent {
+    font-family: 'Consolas', 'Monaco', monospace;
+    /* Code font */
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #d4d4d4;
+    /* VS Code default text */
+    white-space: pre-wrap;
+    margin: 0;
+}
+
+.editorFooter {
+    background: #252526;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.secondaryAction {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.secondaryAction:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

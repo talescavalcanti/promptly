@@ -3,326 +3,89 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Calendar, Users, ShoppingBag, GraduationCap, Bot, BarChart,
-    ArrowRight, ArrowLeft, Check, Copy, Palette, Smartphone, Globe, Layout, Type,
-    Target, Zap, Smile, Briefcase, Table, Kanban, UploadCloud, MessageSquare, Loader2,
-    ChevronDown, ChevronUp, Trash2, Rocket, Lightbulb, Sparkles, Plus, X
+    Rocket, Target, Zap, Layout, Check, Copy, ChevronDown, ChevronUp, Bot, Sparkles, Lightbulb, Layers, X, Feather, Smartphone, Globe, Palette, Type, Briefcase, Monitor
 } from 'lucide-react';
-import styles from './builder.module.css';
+import Link from 'next/link';
+import styles from './saas-builder.module.css';
 import { TARGET_PLATFORMS } from '../../lib/saas_constants';
-import { ScrollReveal } from '../components/ScrollReveal/ScrollReveal';
+import Image from 'next/image';
 
 // --- Types ---
-type BuilderState = {
-    targetPlatform: string; // New field
-    projectName: string;
-    personality: string;
+type SaasBuilderState = {
+    appName: string;
     niche: string;
-    problem: string;
-    target: string;
-    layout: string;
+    targetAudience: string;
+    features: string[];
+    visualStyle: string;
     primaryColor: string;
     secondaryColor: string;
-    // colorScheme removed
     typography: string;
-    fontWeight: string;
-    mediaStyle: string;
-    tone: string;
-    features: string[];
-    dashboardWidgets: string[];
+    typographyWeight: number;
+    targetPlatform: string;
 };
 
-const INITIAL_STATE: BuilderState = {
-    targetPlatform: '',
-    projectName: '',
-    personality: '',
+const INITIAL_STATE: SaasBuilderState = {
+    appName: '',
     niche: '',
-    problem: '',
-    target: '',
-    layout: 'Sidebar Lateral',
-    primaryColor: '',
-    secondaryColor: '',
-    typography: 'Padrão (Inter)',
-    fontWeight: 'Normal',
-    mediaStyle: '',
-    tone: '',
+    targetAudience: '',
     features: [],
-    dashboardWidgets: []
+    visualStyle: 'Moderno & Clean',
+    primaryColor: '#3b82f6',
+    secondaryColor: '#ffffff',
+    typography: 'Inter',
+    typographyWeight: 400,
+    targetPlatform: 'Lovable',
 };
 
-// --- Options Constants ---
-const PERSONALITIES = ['Séria', 'Moderna', 'Criativa', 'Elegante'];
-
-const NICHES = [
-    { id: 'barber', label: 'Barbearia / Estética Masculina', icon: <img src="https://cdn-icons-png.flaticon.com/512/3592/3592881.png" width="24" height="24" alt="Barber" style={{ filter: 'brightness(0) invert(1)' }} /> },
-    { id: 'food', label: 'Alimentação / Lanchonete', icon: <ShoppingBag size={24} /> },
-    { id: 'health', label: 'Saúde / Clínica', icon: <Users size={24} /> },
-    { id: 'delivery', label: 'Delivery / Entregas', icon: <ShoppingBag size={24} /> }, // Using generic icons for now if specialized ones aren't imported
-    { id: 'finance', label: 'Finanças / Controle', icon: <BarChart size={24} /> },
-    { id: 'fitness', label: 'Fitness / Academia', icon: <Users size={24} /> },
-    { id: 'diet', label: 'Emagrecimento / Dieta', icon: <Calendar size={24} /> },
-    { id: 'beauty', label: 'Beleza / Estética', icon: <Users size={24} /> },
-    { id: 'pet', label: 'Pet Shop / Veterinária', icon: <Smile size={24} /> },
-    { id: 'education', label: 'Educação / Cursos', icon: <GraduationCap size={24} /> },
-    { id: 'ecommerce', label: 'E-commerce / Loja', icon: <ShoppingBag size={24} /> },
-    { id: 'schedule', label: 'Agendamento / Reservas', icon: <Calendar size={24} /> },
-    { id: 'law', label: 'Advocacia / Jurídico', icon: <Briefcase size={24} /> },
-    { id: 'accounting', label: 'Contabilidade / Fiscal', icon: <BarChart size={24} /> },
-    { id: 'mechanic', label: 'Mecânica / Oficina', icon: <Zap size={24} /> },
-    { id: 'hotel', label: 'Hotelaria / Hospedagem', icon: <Globe size={24} /> },
-    { id: 'travel', label: 'Turismo / Viagens', icon: <Globe size={24} /> },
-    { id: 'other', label: 'Outro (personalizado)', icon: <Target size={24} /> },
-];
-
-const TARGETS = [
-    { id: 'b2b', label: 'Empresas (B2B)', desc: 'Visual denso e informativo' },
-    { id: 'b2c', label: 'Consumidor (B2C)', desc: 'Visual amigável e simples' },
-    { id: 'youth', label: 'Jovem/Criativo', desc: 'Visual trendy e ousado' },
-];
-
-const LAYOUTS = [
-    { id: 'sidebar', label: 'Menu Lateral', icon: <Layout size={32} /> },
-    { id: 'navbar', label: 'Menu no Topo', icon: <Globe size={32} /> },
-    { id: 'minimal', label: 'Minimalista', icon: <Smartphone size={32} /> },
+const STYLES = [
+    { id: 'modern', label: 'Moderno & Clean', desc: 'Minimalista, muito espaço em branco, foco no conteúdo.', icon: Layout, color: '#3b82f6' }, // Blue
+    { id: 'corporate', label: 'Corporativo & Sério', desc: 'Cores sóbrias, tipografia densa, dados confiáveis.', icon: Briefcase, color: '#64748b' }, // Slate
+    { id: 'creative', label: 'Criativo & Vibrante', desc: 'Gradientes, cores fortes e formas orgânicas.', icon: Zap, color: '#ec4899' }, // Pink
+    { id: 'tech', label: 'Tech & Dark Mode', desc: 'Fundo escuro, neon, futurista e high-tech.', icon: Monitor, color: '#10b981' }, // Emerald
 ];
 
 const COLORS = [
-    { id: 'blue', label: 'Confiança', desc: 'Segurança e Força', color: '#3b82f6' },
-    { id: 'purple', label: 'Criativo', desc: 'Imaginação e Sabedoria', color: '#8b5cf6' },
-    { id: 'green', label: 'Pacífico', desc: 'Saúde e Crescimento', color: '#22c55e' },
-    { id: 'red', label: 'Excitação', desc: 'Ação e Juventude', color: '#ef4444' },
-    { id: 'orange', label: 'Amigável', desc: 'Alegria e Confiança', color: '#f97316' },
-    { id: 'yellow', label: 'Otimismo', desc: 'Clareza e Calor', color: '#eab308' },
-    { id: 'pink', label: 'Inovação', desc: 'Diversão e Ousadia', color: '#ec4899' },
-    { id: 'black', label: 'Luxo', desc: 'Poder e Elegância', color: '#000000' },
-    { id: 'teal', label: 'Clareza', desc: 'Tecnologia e Frescor', color: '#14b8a6' },
-    { id: 'neutral', label: 'Equilíbrio', desc: 'Neutro e Minimalista', color: '#737373' },
+    { id: 'blue', label: 'Azul Tech', color: '#3b82f6' },
+    { id: 'emerald', label: 'Verde Saúde', color: '#10b981' },
+    { id: 'purple', label: 'Roxo Criativo', color: '#8b5cf6' },
+    { id: 'orange', label: 'Laranja Vibrante', color: '#f97316' },
+    { id: 'red', label: 'Vermelho Bold', color: '#ef4444' },
+    { id: 'slate', label: 'Cinza Neutro', color: '#64748b' },
+    { id: 'black', label: 'Preto Luxo', color: '#000000' },
+    { id: 'white', label: 'Branco Clean', color: '#ffffff' },
+    { id: 'gold', label: 'Dourado Premium', color: '#d4af37' },
+    { id: 'teal', label: 'Teal Moderno', color: '#14b8a6' },
 ];
 
 const FONTS = [
-    { id: 'sans', label: 'Moderna', sub: 'Inter', family: 'var(--font-inter), sans-serif', preview: 'Aa' },
-    { id: 'poppins', label: 'Geométrica', sub: 'Poppins', family: '"Poppins", sans-serif', preview: 'Aa' },
-    { id: 'serif', label: 'Elegante', sub: 'Playfair Display', family: 'serif', preview: 'Aa' },
-    { id: 'mono', label: 'Tech', sub: 'Space Mono', family: 'monospace', preview: 'Aa' },
-    { id: 'quicksand', label: 'Amigável', sub: 'Quicksand', family: '"Quicksand", sans-serif', preview: 'Aa' },
-    { id: 'nunito', label: 'Suave', sub: 'Nunito', family: '"Nunito", sans-serif', preview: 'Aa' },
+    { id: 'Inter', label: 'Inter', category: 'Sans-Serif' },
+    { id: 'Poppins', label: 'Poppins', category: 'Sans-Serif' },
+    { id: 'Roboto', label: 'Roboto', category: 'Sans-Serif' },
+    { id: 'Open Sans', label: 'Open Sans', category: 'Sans-Serif' },
+    { id: 'Montserrat', label: 'Montserrat', category: 'Sans-Serif' },
+    { id: 'Playfair Display', label: 'Playfair', category: 'Serif' },
+    { id: 'Lora', label: 'Lora', category: 'Serif' },
+    { id: 'Merriweather', label: 'Merriweather', category: 'Serif' },
+    { id: 'JetBrains Mono', label: 'JetBrains', category: 'Monospace' },
+    { id: 'Oswald', label: 'Oswald', category: 'Condensed' },
 ];
 
-const MEDIA_STYLES = [
-    'Minimalista/Geométrico', 'Fotos Realistas', 'Ilustrações 3D', 'Desenhos Lineares'
-];
-
-const TONES = [
-    { id: 'direct', label: 'Direto', desc: 'Objetivo e sem rodeios', icon: <Target size={32} /> },
-    { id: 'persuasive', label: 'Persuasivo', desc: 'Focado em convenção', icon: <Zap size={32} /> },
-    { id: 'friendly', label: 'Amigável', desc: 'Próximo e acolhedor', icon: <Smile size={32} /> },
-    { id: 'formal', label: 'Formal', desc: 'Sério e corporativo', icon: <Briefcase size={32} /> },
-];
-
-const FEATURES = [
-    'Login Social (Google)', 'Pagamentos/Assinatura', 'Sistema de Notificações',
-    'Perfil de Usuário', 'Tutorial Inicial (Onboarding)'
-];
-
-const WIDGETS = [
-    { id: 'charts', label: 'Gráficos', desc: 'Visualizar métricas e KPIs', icon: <BarChart size={32} /> },
-    { id: 'tables', label: 'Tabelas', desc: 'Listar e filtrar dados', icon: <Table size={32} /> },
-    { id: 'kanban', label: 'Kanban', desc: 'Gestão de tarefas em fases', icon: <Kanban size={32} /> },
-    { id: 'upload', label: 'Arquivos', desc: 'Upload e gestão de documentos', icon: <UploadCloud size={32} /> },
-    { id: 'chat', label: 'Chat/Suporte', desc: 'Comunicação em tempo real', icon: <MessageSquare size={32} /> },
-];
-
-const PROBLEM_SUGGESTIONS: Record<string, string[]> = {
-    barber: [
-        "Agendamentos perdidos por falta de confirmação e horários ociosos.",
-        "Dificuldade em gerenciar comissões dos barbeiros e estoque de produtos.",
-        "Falta de fidelização de clientes e controle de histórico de cortes."
-    ],
-    food: [
-        "Demora no atendimento de pedidos via WhatsApp e erros na cozinha.",
-        "Cardápio desatualizado e dificuldade em calcular custos dos pratos.",
-        "Falta de controle de entregas e taxas de motoboys."
-    ],
-    health: [
-        "Paciente falta à consulta e agenda fica vázia (No-show).",
-        "Prontuários em papel difíceis de organizar e acessar.",
-        "Falta de acompanhamento pós-consulta e lembretes de retorno."
-    ],
-    delivery: [
-        "Roteirização ineficiente causando atrasos nas entregas.",
-        "Dificuldade em rastrear encomendas em tempo real.",
-        "Gestão complexa de frota e custos de combustível."
-    ],
-    finance: [
-        "Descontrole de fluxo de caixa e mistura de contas pessoais com da empresa.",
-        "Dificuldade em cobrar inadimplentes e gerar boletos.",
-        "Falta de relatórios claros para tomada de decisão."
-    ],
-    fitness: [
-        "Alunos desmotivados abandonando a academia (Churn alto).",
-        "Dificuldade em montar e acompanhar treinos personalizados.",
-        "Gestão financeira de planos recorrentes e catracas."
-    ],
-    education: [
-        "Baixo engajamento dos alunos em cursos online.",
-        "Dificuldade em corrigir provas e emitir certificados.",
-        "Comunicação falha entre escola, alunos e pais."
-    ],
-    ecommerce: [
-        "Abandono de carrinho no checkout por frete alto ou complexidade.",
-        "Controle de estoque manual gerando furos e perdas.",
-        "Dificuldade em gerenciar múltiplos canais de venda (Marketplaces)."
-    ],
-    // Default fallback
-    other: [
-        "Processos manuais em planilhas que geram erros e perda de tempo.",
-        "Falta de visibilidade dos dados para crescer o negócio.",
-        "Comunicação descentralizada causando falhas na equipe."
-    ]
-    // ... (keeping existing PROBLEM_SUGGESTIONS)
-};
-
-const TARGET_SUGGESTIONS: Record<string, string[]> = {
-    barber: ["Homens vaidosos de 18-35 anos", "Profissionais liberais da região", "Noivos e padrinhos"],
-    food: ["Jovens universitários", "Famílias com crianças", "Trabalhadores de escritório no almoço"],
-    health: ["Pacientes com doenças crônicas", "Idosos que precisam de acompanhamento", "Pais de primeira viagem"],
-    delivery: ["Pessoas que trabalham em home office", "Estudantes sem tempo de cozinhar", "Casais jovens"],
-    finance: ["Pequenos empreendedores", "Autônomos e freelancers", "Investidores iniciantes"],
-    fitness: ["Pessoas buscando emagrecimento", "Atletas amadores", "Iniciantes na musculação"],
-    education: ["Estudantes de vestibular", "Profissionais buscando recolocação", "Crianças em fase de alfabetização"],
-    ecommerce: ["Compradores de eletrônicos", "Fãs de moda sustentável", "Colecionadores"],
-    other: ["Donos de pequenos negócios", "Gestores de RH", "Freelancers de tecnologia"]
-};
-
-// New Feature Suggestions
-const FEATURE_SUGGESTIONS: Record<string, string[]> = {
-    barber: ["Agendamento online", "Lembrete via WhatsApp", "Clube de assinaturas de corte"],
-    food: ["Cardápio digital via QR Code", "Rastreamento do motoboy", "Cupons de desconto"],
-    health: ["Prontuário eletrônico", "Prescrição digital", "Telemedicina"],
-    delivery: ["Otimização de rotas", "Chat com entregador", "Calculadora de frete"],
-    finance: ["Conciliação bancária", "Emissão de boletos", "Relatórios de fluxo de caixa"],
-    fitness: ["Vídeos de exercícios", " Diário de alimentação", "Gráfico de evolução"],
-    education: ["Sala de aula virtual", "Quiz gamificado", "Emissão de certificados"],
-    ecommerce: ["Recuperação de carrinho abandonado", "Vitrine inteligente", "Checkout transparente"],
-    other: ["Dashboard personalizável", "Exportação de dados", "Gestão de usuários"]
-};
-
-export default function BuilderPage() {
-    const [step, setStep] = useState(1);
-    const [state, setState] = useState<BuilderState>({
+export default function SaasBuilderPage() {
+    const [step, setStep] = useState(0);
+    const [state, setState] = useState<SaasBuilderState>({
         ...INITIAL_STATE,
-        primaryColor: '',
-        secondaryColor: ''
+        secondaryColor: '#ffffff',
+        typography: 'Inter',
+        targetPlatform: 'Lovable'
     });
     const [generatedPrompt, setGeneratedPrompt] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
+    const [isSuggesting, setIsSuggesting] = useState(false);
     const [copied, setCopied] = useState(false);
-    const [isNicheOpen, setIsNicheOpen] = useState(false);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const [customSuggestions, setCustomSuggestions] = useState<string[]>([]);
-    const [customTargetSuggestions, setCustomTargetSuggestions] = useState<string[]>([]);
     const [featureInput, setFeatureInput] = useState('');
-    const [customFeatureSuggestions, setCustomFeatureSuggestions] = useState<string[]>([]);
 
-    const getSuggestions = () => {
-        const nicheObj = NICHES.find(n => n.label === state.niche);
-        const nicheId = nicheObj ? nicheObj.id : 'other';
-        const defaults = PROBLEM_SUGGESTIONS[nicheId] || PROBLEM_SUGGESTIONS['other'];
-        return [...defaults, ...customSuggestions];
-    };
-
-    const getTargetSuggestions = () => {
-        const nicheObj = NICHES.find(n => n.label === state.niche);
-        const nicheId = nicheObj ? nicheObj.id : 'other';
-        const defaults = TARGET_SUGGESTIONS[nicheId] || TARGET_SUGGESTIONS['other'];
-        return [...defaults, ...customTargetSuggestions];
-    };
-
-    const getFeatureSuggestions = () => {
-        const nicheObj = NICHES.find(n => n.label === state.niche);
-        const nicheId = nicheObj ? nicheObj.id : 'other';
-        const defaults = FEATURE_SUGGESTIONS[nicheId] || FEATURE_SUGGESTIONS['other'];
-        return [...defaults, ...customFeatureSuggestions];
-    };
-
-    const handleGenerateMore = () => {
-        const newIdeas = [
-            "Falta de automação em processos repetitivos e manuais.",
-            "Dificuldade em escalar o negócio sem aumentar custos operacionais.",
-            "Baixa retenção de clientes por falta de programas de fidelidade.",
-            "Gestão de estoque ineficiente causando rupturas.",
-            "Comunicação interna falha gerando retrabalho.",
-            "Falta de padronização nos processos de venda."
-        ];
-
-        const currentSuggestions = getSuggestions();
-        const availableIdeas = newIdeas.filter(idea => !currentSuggestions.includes(idea));
-
-        if (availableIdeas.length > 0) {
-            const randomIdea = availableIdeas[Math.floor(Math.random() * availableIdeas.length)];
-            setCustomSuggestions(prev => [...prev, randomIdea]);
-        }
-    };
-
-    const handleGenerateTargetMore = () => {
-        const newTargets = [
-            "Microempreendedores individuais em expansão",
-            "Gestores de equipes remotas",
-            "Estudantes de pós-graduação e pesquisadores",
-            "Famílias que buscam organização financeira",
-            "Profissionais de saúde autônomos",
-            "Pequenas agências de marketing",
-            "Desenvolvedores indie"
-        ];
-
-        const currentTargets = getTargetSuggestions();
-        const availableTargets = newTargets.filter(t => !currentTargets.includes(t));
-
-        if (availableTargets.length > 0) {
-            const randomTarget = availableTargets[Math.floor(Math.random() * availableTargets.length)];
-            setCustomTargetSuggestions(prev => [...prev, randomTarget]);
-        }
-    };
-
-    const handleGenerateFeatureMore = () => {
-        const newFeatures = [
-            "Gamificação com pontos e níveis",
-            "Integração com calendários externos (Google/Outlook)",
-            "Modo offline para acesso sem internet",
-            "Geração de relatórios em PDF/Excel",
-            "Login com biometria",
-            "Notificações push personalizáveis",
-            "Suporte a múltiplos idiomas"
-        ];
-
-        const currentFeatures = getFeatureSuggestions();
-        const availableFeatures = newFeatures.filter(f => !currentFeatures.includes(f));
-
-        if (availableFeatures.length > 0) {
-            const randomFeature = availableFeatures[Math.floor(Math.random() * availableFeatures.length)];
-            setCustomFeatureSuggestions(prev => [...prev, randomFeature]);
-        }
-    };
-
-    const updateState = (key: keyof BuilderState, value: any) => {
+    const updateState = (key: keyof SaasBuilderState, value: string | string[] | number) => {
         setState(prev => ({ ...prev, [key]: value }));
-    };
-
-    const handleColorSelect = (colorId: string) => {
-        setState(prev => {
-            // If clicking the current primary, deselect it
-            if (prev.primaryColor === colorId) return { ...prev, primaryColor: '' };
-            // If clicking the current secondary, deselect it
-            if (prev.secondaryColor === colorId) return { ...prev, secondaryColor: '' };
-
-            // If primary is empty, set it
-            if (!prev.primaryColor) return { ...prev, primaryColor: colorId };
-            // If secondary is empty and color is different, set it
-            if (!prev.secondaryColor) return { ...prev, secondaryColor: colorId };
-
-            // If both full, replace primary (cycle) or do nothing? Let's replace primary for smoother flow
-            return { ...prev, primaryColor: colorId };
-        });
     };
 
     const toggleFeature = (feat: string) => {
@@ -343,66 +106,93 @@ export default function BuilderPage() {
         }
     };
 
-    const toggleWidget = (widget: string) => {
-        setState(prev => ({
-            ...prev,
-            dashboardWidgets: prev.dashboardWidgets.includes(widget)
-                ? prev.dashboardWidgets.filter(w => w !== widget)
-                : [...prev.dashboardWidgets, widget]
-        }));
-    };
-
-
-
     const nextStep = () => {
-        if (step < 12) setStep(step + 1); // Increased total steps to 12
-        else handleGenerateWithAI();
+        if (step < 6) setStep(step + 1); // Updated for new step count (0-6)
+        else handleGeneratePrompt();
     };
 
     const prevStep = () => {
-        if (step > 1) setStep(step - 1);
+        if (step > 0) setStep(step - 1);
     };
 
-    const handleGenerateWithAI = async () => {
-        setStep(13); // Move to result screen (12+1)
-        setIsGenerating(true);
-        setGeneratedPrompt(''); // Clear previous
-
+    // --- AI Suggestion Logic ---
+    const handleMagicSuggest = async () => {
+        if (!state.appName) return;
+        setIsSuggesting(true);
         try {
-            const pColor = COLORS.find(c => c.id === state.primaryColor)?.label || 'Indefinido';
-            const sColor = COLORS.find(c => c.id === state.secondaryColor)?.label || 'Indefinido';
-
-            const payload = {
-                promptMode: 'optimize_prompt',
-                targetPlatform: state.targetPlatform, // Pass to API
-                saasName: state.projectName || 'Projeto Sem Nome',
-                saasNiche: state.niche,
-                targetAudience: state.target,
-                saasColor: `Primária: ${pColor}, Secundária: ${sColor}`,
-                saasFont: `${state.typography} (Peso: ${state.fontWeight})`,
-                logoStyle: state.mediaStyle,
-                voiceTone: state.tone,
-                features: state.features,
-                dashboardWidgets: state.dashboardWidgets
-            };
-
             const response = await fetch('/api/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({
+                    promptMode: 'suggest_saas_details',
+                    saasName: state.appName,
+                    saasNiche: state.niche
+                }),
             });
 
+            if (!response.ok) throw new Error('Erro na sugestão IA');
             const data = await response.json();
 
-            if (data.error) {
-                setGeneratedPrompt(`Erro: ${data.error}`);
-            } else {
-                setGeneratedPrompt(data.result);
-            }
+            // Clean markdown if present - more robust regex
+            const jsonMatch = data.result.match(/```json\n?([\s\S]*?)\n?```/) || data.result.match(/(\{[\s\S]*\})/);
+            const cleanJson = jsonMatch ? jsonMatch[1] : data.result.trim();
+            const suggestions = JSON.parse(cleanJson);
+
+            setState(prev => ({
+                ...prev,
+                niche: suggestions.niche || prev.niche,
+                targetAudience: suggestions.targetAudience || prev.targetAudience,
+                features: [...prev.features, ...(suggestions.features || [])],
+                primaryColor: suggestions.primaryColor || prev.primaryColor,
+                secondaryColor: suggestions.secondaryColor || prev.secondaryColor,
+                typography: suggestions.typography || prev.typography,
+                visualStyle: suggestions.visualStyle || prev.visualStyle
+            }));
 
         } catch (error) {
-            console.error(error);
-            setGeneratedPrompt('Erro ao conectar com a IA. Tente novamente.');
+            console.error("Magic Suggest Error:", error);
+            // Optional: Show toast
+        } finally {
+            setIsSuggesting(false);
+        }
+    };
+
+    const handleGeneratePrompt = async () => {
+        setStep(7); // Result screen
+        setIsGenerating(true);
+        setGeneratedPrompt('');
+
+        try {
+            const response = await fetch('/api/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    promptMode: 'saas_builder',
+                    saasName: state.appName,
+                    saasNiche: state.niche,
+                    targetAudience: state.targetAudience,
+                    features: state.features,
+                    saasColor: state.primaryColor,
+                    secondaryColor: state.secondaryColor,
+                    typography: `${state.typography} (Weight: ${state.typographyWeight})`,
+                    targetPlatform: state.targetPlatform,
+                    logoStyle: state.visualStyle,
+                    voiceTone: 'Profissional e Persuasivo'
+                }),
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.error || 'Erro ao gerar prompt');
+            }
+
+            const data = await response.json();
+            setGeneratedPrompt(data.result);
+
+        } catch (error: unknown) {
+            const err = error as Error;
+            console.error(err);
+            setGeneratedPrompt(`Erro: ${err.message || 'Falha na conexão'}. Tente novamente.`);
         } finally {
             setIsGenerating(false);
         }
@@ -417,676 +207,454 @@ export default function BuilderPage() {
     // --- Render Steps ---
     const renderStepContent = () => {
         switch (step) {
-            case 1:
+            case 0: // App Name & Platform
                 return (
                     <>
                         <div className={styles.stepHeader}>
-                            <h2 className={styles.stepTitle}>Plataforma Alvo</h2>
-                            <p className={styles.stepDescription}>Para qual ferramenta devemos otimizar o prompt?</p>
-                        </div>
-                        <div className={styles.grid3}>
-                            {TARGET_PLATFORMS.map(p => (
-                                <div
-                                    key={p.id}
-                                    className={`${styles.card} ${styles.platformCard} ${state.targetPlatform === p.id ? styles.selected : ''}`}
-                                    onClick={() => updateState('targetPlatform', p.id)}
-                                >
-                                    <div className={styles.cardIcon}>
-                                        <img
-                                            src={p.logo}
-                                            alt={p.label}
-                                            style={{
-                                                width: '28px',
-                                                height: '28px',
-                                                objectFit: 'contain',
-                                                filter: state.targetPlatform === p.id ? 'none' : 'grayscale(100%) opacity(0.7)',
-                                                transition: 'all 0.3s'
-                                            }}
-                                        />
-                                    </div>
-                                    <span className={styles.cardTitle}>{p.label}</span>
-                                    <span className={styles.cardDesc} style={{ fontSize: '0.8rem', opacity: 0.7 }}>
-                                        {p.value}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-                    </>
-                );
-            case 2:
-                return (
-                    <>
-                        <div className={styles.stepHeader}>
-                            <h2 className={styles.stepTitle}>Vamos começar pelo nome</h2>
-                            <p className={styles.stepDescription}>Como você gostaria de chamar o seu projeto?</p>
-                        </div>
-                        <input
-                            className={styles.input}
-                            placeholder="Digite o nome..."
-                            value={state.projectName}
-                            onChange={(e) => updateState('projectName', e.target.value)}
-                            autoFocus
-                        />
-                        <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-                            <p className={styles.stepDescription} style={{ marginBottom: '1rem' }}>Qual a vibe do projeto?</p>
-                            <div className={styles.chipGrid}>
-                                {PERSONALITIES.map(p => (
-                                    <button
-                                        key={p}
-                                        className={`${styles.chip} ${state.personality === p ? styles.selected : ''}`}
-                                        onClick={() => updateState('personality', p)}
-                                    >
-                                        {p}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </>
-                );
-            case 3:
-                return (
-                    <>
-                        <div className={styles.stepHeader}>
-                            <div style={{
-                                width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem',
-                                border: '1px solid rgba(255,255,255,0.1)'
-                            }}>
-                                <Target size={32} color="var(--primary)" />
-                            </div>
-                            <h2 className={styles.stepTitle}>Nicho do Projeto</h2>
-                            <p className={styles.stepDescription}>
-                                Selecione o nicho que melhor representa seu aplicativo
-                            </p>
+                            <h2 className={styles.stepTitle}>Identidade do Projeto</h2>
+                            <p className={styles.stepDescription}>Comece definindo o nome e onde você vai construir.</p>
                         </div>
 
-                        <div style={{ position: 'relative', width: '100%', maxWidth: '600px', margin: '0 auto' }}>
-                            {/* Trigger */}
-                            <div
-                                className={styles.selectTrigger}
-                                onClick={() => setIsNicheOpen(!isNicheOpen)}
-                                style={{
-                                    border: isNicheOpen ? '1px solid var(--primary, #F5A524)' : '1px solid rgba(255,255,255,0.1)'
-                                }}
-                            >
-                                <span style={{ color: state.niche ? '#fff' : 'rgba(255,255,255,0.5)' }}>
-                                    {state.niche || 'Selecione o nicho...'}
-                                </span>
-                                {isNicheOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                            </div>
-
-                            {/* Dropdown Menu */}
-                            {isNicheOpen && (
-                                <div className={styles.selectDropdown}>
-                                    {NICHES.map(n => (
+                        <div className={styles.formGroup}>
+                            <label className={styles.label} style={{ width: '100%', textAlign: 'center', display: 'block' }}>
+                                Plataforma de IA (Onde você vai colar o prompt?)
+                            </label>
+                            <div className={styles.platformGrid}>
+                                {TARGET_PLATFORMS.map(platform => {
+                                    return (
                                         <div
-                                            key={n.id}
-                                            className={styles.selectItem}
-                                            onClick={() => {
-                                                updateState('niche', n.label);
-                                                setIsNicheOpen(false);
-                                            }}
+                                            key={platform.id}
+                                            className={`${styles.platformCard} ${state.targetPlatform === platform.id ? styles.active : ''}`}
+                                            onClick={() => updateState('targetPlatform', platform.id)}
                                         >
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '24px' }}>
-                                                {n.icon}
+                                            <div className={styles.platformIcon}>
+                                                <img
+                                                    src={platform.logo}
+                                                    alt={platform.label}
+                                                    className={styles.platformLogoImg}
+                                                />
                                             </div>
-                                            <span>{n.label}</span>
+                                            <div className={styles.platformInfo}>
+                                                <span className={styles.platformName}>{platform.label}</span>
+                                                <span className={styles.platformDomain}>{platform.value}</span>
+                                            </div>
+                                            {state.targetPlatform === platform.id && (
+                                                <motion.div
+                                                    layoutId="active-platform"
+                                                    className={styles.platformActiveIndicator}
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                />
+                                            )}
                                         </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </>
-                );
-            case 4:
-                return (
-                    <>
-                        <div className={styles.stepHeaderRow}>
-                            <div className={styles.iconCircle}>
-                                <Rocket size={28} color="var(--primary)" />
-                            </div>
-                            <div className={styles.headerText}>
-                                <h2 className={styles.stepTitle}>Qual problema resolve?</h2>
-                                <div className={styles.tipText}>
-                                    <Lightbulb size={16} color="#F5A524" />
-                                    <span>"Organizar pedidos da lanchonete", "Gerenciar agenda de consultas"</span>
-                                </div>
+                                    );
+                                })}
                             </div>
                         </div>
 
-                        <div style={{ width: '100%' }}>
-                            {/* Suggestions Button */}
-                            <button
-                                className={`${styles.suggestionsBtn} ${showSuggestions ? styles.active : ''}`}
-                                onClick={() => setShowSuggestions(!showSuggestions)}
-                            >
-                                <Sparkles size={16} /> Sugestões
-                            </button>
-
-                            <AnimatePresence>
-                                {showSuggestions && (
-                                    <motion.div
-                                        initial={{ opacity: 0, height: 0, overflow: 'hidden' }}
-                                        animate={{ opacity: 1, height: 'auto', transitionEnd: { overflow: 'visible' } }}
-                                        exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
-                                        style={{ marginBottom: '1.5rem' }}
-                                    >
-                                        <div className={styles.suggestionsGrid} style={{ marginBottom: 0 }}>
-                                            {getSuggestions().map((sug, idx) => {
-                                                const isSelected = state.problem.includes(sug);
-                                                return (
-                                                    <div
-                                                        key={idx}
-                                                        className={`${styles.suggestionCard} ${isSelected ? styles.selected : ''}`}
-                                                        onClick={() => {
-                                                            if (isSelected) {
-                                                                // Optional: Remove it? Ideally yes for true toggle
-                                                                const newText = state.problem.replace(sug, '').replace(/\n\n\n/g, '\n\n').trim();
-                                                                updateState('problem', newText);
-                                                            } else {
-                                                                const newText = state.problem
-                                                                    ? state.problem + '\n\n' + sug
-                                                                    : sug;
-                                                                updateState('problem', newText);
-                                                            }
-                                                        }}
-                                                    >
-                                                        "{sug}"
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                        <button
-                                            className={styles.generateBtn}
-                                            onClick={handleGenerateMore}
-                                        >
-                                            <Bot size={16} /> Gerar novas ideias com IA
-                                        </button>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-
-                            {/* Textarea */}
-                            <textarea
-                                className={styles.problemTextarea}
-                                placeholder="Descreva o problema que sua ferramenta resolve..."
-                                value={state.problem}
-                                onChange={(e) => updateState('problem', e.target.value)}
+                        <div className={styles.formGroup} style={{ marginTop: '2rem' }}>
+                            <label className={styles.label}>Nome do SaaS</label>
+                            <input
+                                className={styles.input}
+                                placeholder="Ex: TaskFlow, FinanceAI..."
+                                value={state.appName}
+                                onChange={(e) => updateState('appName', e.target.value)}
+                                autoFocus
                             />
                         </div>
 
-                    </>
-                );
-            case 5:
-                return (
-                    <>
-                        <div className={styles.stepHeaderRow}>
-                            <div className={styles.iconCircle}>
-                                <Users size={28} color="var(--primary)" />
-                            </div>
-                            <div className={styles.headerText}>
-                                <h2 className={styles.stepTitle}>Público-alvo</h2>
-                                <div className={styles.tipText}>
-                                    <Lightbulb size={16} color="#F5A524" />
-                                    <span>"Donos de lanchonetes", "Pacientes de clínicas"</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style={{ width: '100%' }}>
-                            <button
-                                className={`${styles.suggestionsBtn} ${showSuggestions ? styles.active : ''}`}
-                                onClick={() => setShowSuggestions(!showSuggestions)}
-                            >
-                                <Sparkles size={16} /> Sugestões
+                        <div className={styles.navButtons}>
+                            <button className={styles.backButton} style={{ visibility: 'hidden' }}>Voltar</button>
+                            <button className={styles.nextButton} onClick={nextStep} disabled={!state.appName.trim()}>
+                                Próximo <ChevronDown style={{ transform: 'rotate(-90deg)' }} size={20} />
                             </button>
-
-                            <AnimatePresence>
-                                {showSuggestions && (
-                                    <motion.div
-                                        initial={{ opacity: 0, height: 0, overflow: 'hidden' }}
-                                        animate={{ opacity: 1, height: 'auto', transitionEnd: { overflow: 'visible' } }}
-                                        exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
-                                        style={{ marginBottom: '1.5rem' }}
-                                    >
-                                        <div className={styles.suggestionsGrid} style={{ marginBottom: 0 }}>
-                                            {getTargetSuggestions().map((sug, idx) => {
-                                                const isSelected = state.target.includes(sug);
-                                                return (
-                                                    <div
-                                                        key={idx}
-                                                        className={`${styles.suggestionCard} ${isSelected ? styles.selected : ''}`}
-                                                        onClick={() => {
-                                                            if (isSelected) {
-                                                                const newText = state.target.replace(sug, '').replace(/\n\n\n/g, '\n\n').trim();
-                                                                updateState('target', newText);
-                                                            } else {
-                                                                const newText = state.target
-                                                                    ? state.target + '\n\n' + sug
-                                                                    : sug;
-                                                                updateState('target', newText);
-                                                            }
-                                                        }}
-                                                    >
-                                                        "{sug}"
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                        <button
-                                            className={styles.generateBtn}
-                                            onClick={handleGenerateTargetMore}
-                                        >
-                                            <Bot size={16} /> Gerar novas ideias com IA
-                                        </button>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-
-                            <textarea
-                                className={styles.problemTextarea} // Reusing problem textarea style
-                                placeholder="Descreva seu público-alvo..."
-                                value={state.target}
-                                onChange={(e) => updateState('target', e.target.value)}
-                            />
                         </div>
                     </>
                 );
-            case 6:
+            case 1: // Niche & AI Magic
                 return (
                     <>
-                        <div className={styles.stepHeaderRow}>
-                            <div className={styles.iconCircle}>
-                                <Zap size={28} color="var(--primary)" />
-                            </div>
-                            <div className={styles.headerText}>
-                                <h2 className={styles.stepTitle}>Funcionalidades</h2>
-                                <div className={styles.tipText}>
-                                    <Lightbulb size={16} color="#F5A524" />
-                                    <span>"Sistema de pedidos, Cardápio digital, Chat"</span>
+                        <div className={styles.stepHeader} style={{ marginBottom: '1rem' }}>
+                            <div className="flex flex-col md:flex-row justify-between items-start gap-8">
+                                <div>
+                                    <h2 className={styles.stepTitle}>Nicho e Público</h2>
+                                    <p className={styles.stepDescription}>Defina o mercado. Ou deixe a IA sugerir.</p>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div style={{ width: '100%' }}>
-                            <button
-                                className={`${styles.suggestionsBtn} ${showSuggestions ? styles.active : ''}`}
-                                onClick={() => setShowSuggestions(!showSuggestions)}
-                            >
-                                <Sparkles size={16} /> Sugestões
-                            </button>
-
-                            <AnimatePresence>
-                                {showSuggestions && (
-                                    <motion.div
-                                        initial={{ opacity: 0, height: 0, overflow: 'hidden' }}
-                                        animate={{ opacity: 1, height: 'auto', transitionEnd: { overflow: 'visible' } }}
-                                        exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
-                                        style={{ marginBottom: '1.5rem' }}
-                                    >
-                                        <div className={styles.suggestionsGrid} style={{ marginBottom: 0 }}>
-                                            {getFeatureSuggestions().map((sug, idx) => {
-                                                const isSelected = state.features.includes(sug);
-                                                return (
-                                                    <div
-                                                        key={idx}
-                                                        className={`${styles.suggestionCard} ${isSelected ? styles.selected : ''}`}
-                                                        onClick={() => toggleFeature(sug)}
-                                                    >
-                                                        "{sug}"
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                        <button
-                                            className={styles.generateBtn}
-                                            onClick={handleGenerateFeatureMore}
-                                        >
-                                            <Bot size={16} /> Gerar novas ideias com IA
-                                        </button>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-
-                            <div className={styles.inputWithButton}>
-                                <input
-                                    className={styles.featureInput}
-                                    placeholder="Digite uma funcionalidade e pressione Enter..."
-                                    value={featureInput}
-                                    onChange={(e) => setFeatureInput(e.target.value)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') addFeature();
-                                    }}
-                                />
-                                <button className={styles.addButton} onClick={addFeature}>
-                                    <Plus size={24} />
+                                <button
+                                    className={styles.copyActionResult}
+                                    onClick={handleMagicSuggest}
+                                    disabled={isSuggesting || !state.appName}
+                                >
+                                    {isSuggesting && (
+                                        <div className={styles.spinner} style={{ width: 16, height: 16, borderWidth: 2 }} />
+                                    )}
+                                    {isSuggesting ? 'Pensando...' : 'Preencher com IA'}
                                 </button>
                             </div>
+                        </div>
 
-                            {/* Applied Features Chips */}
-                            {state.features.length > 0 && (
-                                <div className={styles.chipGrid} style={{ marginTop: '1.5rem', justifyContent: 'flex-start' }}>
-                                    {state.features.map((feat, idx) => (
-                                        <div key={idx} className={`${styles.chip} ${styles.selected}`} onClick={() => toggleFeature(feat)}>
-                                            {feat} <span style={{ opacity: 0.5, marginLeft: '0.5rem' }}>×</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>Nicho de Mercado</label>
+                            <input
+                                className={styles.input}
+                                placeholder="Ex: Gestão e Projetos..."
+                                value={state.niche}
+                                onChange={(e) => updateState('niche', e.target.value)}
+                            />
+                        </div>
+                        <div className={styles.formGroup} style={{ marginTop: '1.5rem' }}>
+                            <label className={styles.label}>Público Alvo</label>
+                            <input
+                                className={styles.input}
+                                placeholder="Ex: Freelancers, Startups..."
+                                value={state.targetAudience}
+                                onChange={(e) => updateState('targetAudience', e.target.value)}
+                            />
+                        </div>
+                        <div className={styles.navButtons}>
+                            <button className={styles.backButton} onClick={prevStep}>Voltar</button>
+                            <button className={styles.nextButton} onClick={nextStep}>
+                                Próximo <ChevronDown style={{ transform: 'rotate(-90deg)' }} size={20} />
+                            </button>
                         </div>
                     </>
                 );
-            case 7: // Navigation
+            case 2: // Features
                 return (
                     <>
                         <div className={styles.stepHeader}>
-                            <h2 className={styles.stepTitle}>Estrutura de Navegação</h2>
-                            <p className={styles.stepDescription}>Como os usuários vão se mover pelo app?</p>
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h2 className={styles.stepTitle}>Funcionalidades</h2>
+                                    <p className={styles.stepDescription}>O que seu app vai fazer?</p>
+                                </div>
+                                {!state.features.length && state.appName && (
+                                    <button
+                                        className={styles.backButton}
+                                        style={{ fontSize: '0.8rem', padding: '0.4rem 1rem' }}
+                                        onClick={handleMagicSuggest}
+                                        disabled={isSuggesting}
+                                    >
+                                        <Bot size={16} className="mr-2" /> Sugerir Features
+                                    </button>
+                                )}
+                            </div>
                         </div>
-                        <div className={styles.grid3}>
-                            {LAYOUTS.map(l => (
-                                <div
-                                    key={l.id}
-                                    className={`${styles.card} ${state.layout === l.label ? styles.selected : ''}`}
-                                    onClick={() => updateState('layout', l.label)}
-                                >
-                                    <div className={styles.cardIcon}>{l.icon}</div>
-                                    <span className={styles.cardTitle}>{l.label}</span>
+                        <div className={styles.inputWithButton}>
+                            <input
+                                className={styles.input}
+                                placeholder="Digite uma feature..."
+                                value={featureInput}
+                                onChange={(e) => setFeatureInput(e.target.value)}
+                                onKeyDown={(e) => { if (e.key === 'Enter') addFeature(); }}
+                            />
+                            <button className={styles.addButton} onClick={addFeature}>+</button>
+                        </div>
+                        <div className={styles.chipGrid}>
+                            {state.features.map((feat, idx) => (
+                                <div key={idx} className={styles.chip} onClick={() => toggleFeature(feat)}>
+                                    {feat} <X size={14} style={{ marginLeft: 6 }} />
                                 </div>
                             ))}
                         </div>
+                        <div className={styles.suggestionsGrid}>
+                            {['Auth', 'Dashboard', 'Pagamentos', 'Admin', 'Relatórios'].map(sug => (
+                                <div key={sug} className={styles.suggestionpill} onClick={() => {
+                                    if (!state.features.includes(sug)) toggleFeature(sug);
+                                }}>+ {sug}</div>
+                            ))}
+                        </div>
+                        <div className={styles.navButtons}>
+                            <button className={styles.backButton} onClick={prevStep}>Voltar</button>
+                            <button className={styles.nextButton} onClick={nextStep}>
+                                Próximo <ChevronDown style={{ transform: 'rotate(-90deg)' }} size={20} />
+                            </button>
+                        </div>
                     </>
                 );
-            case 8: // Colors
+            case 3: // Visual Style Only
+                return (
+                    <>
+                        <div className={styles.stepHeader}>
+                            <h2 className={styles.stepTitle}>Estilo Visual</h2>
+                            <p className={styles.stepDescription}>Qual a "vibe" do seu SaaS?</p>
+                        </div>
+                        <div className={styles.grid2} style={{ marginTop: '1rem' }}>
+                            {STYLES.map(s => (
+                                <div
+                                    key={s.id}
+                                    className={`${styles.card} ${state.visualStyle === s.label ? styles.selected : ''}`}
+                                    onClick={() => updateState('visualStyle', s.label)}
+                                    style={{ '--primary': s.color } as React.CSSProperties}
+                                >
+                                    <div className={styles.cardIcon}><s.icon size={24} /></div>
+                                    <span className={styles.cardTitle}>{s.label}</span>
+                                </div>
+                            ))}
+                        </div>
+                        <div className={styles.navButtons}>
+                            <button className={styles.backButton} onClick={prevStep}>Voltar</button>
+                            <button className={styles.nextButton} onClick={nextStep}>
+                                Próximo <ChevronDown style={{ transform: 'rotate(-90deg)' }} size={20} />
+                            </button>
+                        </div>
+                    </>
+                );
+            case 4: // Colors Only (Synced with Landing Builder)
                 return (
                     <>
                         <div className={styles.stepHeader}>
                             <h2 className={styles.stepTitle}>Paleta de Cores</h2>
-                            <p className={styles.stepDescription}>
-                                Escolha 2 cores: <strong style={{ color: 'var(--primary)' }}>Primária</strong> e <strong style={{ color: '#fff' }}>Secundária</strong>.
-                            </p>
+                            <p className={styles.stepDescription}>Defina as cores da sua marca.</p>
                         </div>
 
-                        <div className={styles.grid3}>
-                            {COLORS.map(c => {
-                                const isPrimary = state.primaryColor === c.id;
-                                const isSecondary = state.secondaryColor === c.id;
-                                const isSelected = isPrimary || isSecondary;
+                        {/* Colors */}
+                        <div className={styles.grid2} style={{ marginBottom: '2rem' }}>
+                            {/* Primary Color */}
+                            <div>
+                                <label className={styles.label} style={{ marginBottom: '0.5rem', display: 'block' }}>Cor Primária (Destaques)</label>
+                                <div className={styles.featuresGrid} style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(40px, 1fr))', gap: '8px' }}>
+                                    {COLORS.filter(c => c.id !== 'white').map(c => (
+                                        <div
+                                            key={`p-${c.id}`}
+                                            onClick={() => updateState('primaryColor', c.color)}
+                                            style={{
+                                                width: '40px', height: '40px', borderRadius: '10px', background: c.color, cursor: 'pointer',
+                                                border: state.primaryColor === c.color ? '2px solid white' : '1px solid rgba(255,255,255,0.1)',
+                                                boxShadow: state.primaryColor === c.color ? `0 0 10px ${c.color}` : 'none',
+                                                transition: 'all 0.2s'
+                                            }}
+                                            title={c.label}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
 
-                                return (
-                                    <div
-                                        key={c.id}
-                                        className={`${styles.colorCard} ${isSelected ? styles.selected : ''}`}
-                                        onClick={() => handleColorSelect(c.id)}
-                                        style={{
-                                            '--card-color': c.color,
-                                            borderColor: isPrimary ? c.color : (isSecondary ? '#fff' : undefined)
-                                        } as React.CSSProperties}
-                                    >
-                                        <div className={styles.colorPreview} style={{ backgroundColor: c.color }}>
-                                            {isPrimary && <span className={styles.colorBadge}>1</span>}
-                                            {isSecondary && <span className={styles.colorBadge}>2</span>}
-                                        </div>
-                                        <div className={styles.colorInfo}>
-                                            <span className={styles.cardTitle}>{c.label}</span>
-                                            <span className={styles.cardDesc}>{c.desc}</span>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                            {/* Secondary Color */}
+                            <div>
+                                <label className={styles.label} style={{ marginBottom: '0.5rem', display: 'block' }}>Cor Secundária (Fundo/Base)</label>
+                                <div className={styles.featuresGrid} style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(40px, 1fr))', gap: '8px' }}>
+                                    {COLORS.map(c => (
+                                        <div
+                                            key={`s-${c.id}`}
+                                            onClick={() => updateState('secondaryColor', c.color)}
+                                            style={{
+                                                width: '40px', height: '40px', borderRadius: '10px', background: c.color, cursor: 'pointer',
+                                                border: state.secondaryColor === c.color ? '2px solid white' : '1px solid rgba(255,255,255,0.1)',
+                                                transform: state.secondaryColor === c.color ? 'scale(1.1)' : 'scale(1)',
+                                                transition: 'all 0.2s'
+                                            }}
+                                            title={c.label}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Live Preview (Kept as it adds value and fits the structure) */}
+                        <div className={styles.mockPreview}>
+                            <h3 className={styles.mockHeading} style={{ color: state.primaryColor }}>Preview do seu SaaS</h3>
+                            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', textAlign: 'center' }}>
+                                A percepção de valor aumenta com cores consistentes.
+                            </p>
+                            <button className={styles.mockButton} style={{ background: state.primaryColor, color: state.secondaryColor === '#ffffff' || state.secondaryColor.startsWith('#f') ? '#000' : '#fff' }}>
+                                Botão de Ação
+                            </button>
+                        </div>
+
+
+                        <div className={styles.navButtons}>
+                            <button className={styles.backButton} onClick={prevStep}>Voltar</button>
+                            <button className={styles.nextButton} onClick={nextStep}>
+                                Próximo <ChevronDown style={{ transform: 'rotate(-90deg)' }} size={20} />
+                            </button>
                         </div>
                     </>
                 );
-            case 9: // Typography
+            case 5: // Typography & Weight
                 return (
                     <>
                         <div className={styles.stepHeader}>
                             <h2 className={styles.stepTitle}>Tipografia</h2>
-                            <p className={styles.stepDescription}>Qual estilo de fonte combina mais?</p>
+                            <p className={styles.stepDescription}>A voz visual da sua marca.</p>
                         </div>
 
-                        <div className={styles.grid}>
-                            {FONTS.map(f => (
-                                <div
-                                    key={f.id}
-                                    className={`${styles.fontCard} ${state.typography === f.label ? styles.selected : ''}`}
-                                    onClick={() => updateState('typography', f.label)}
-                                >
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>Família da Fonte</label>
+                            <div className="grid grid-cols-2 gap-3 mt-2" style={{ maxHeight: '360px', overflowY: 'auto', paddingRight: '5px' }}>
+                                {FONTS.map(font => (
                                     <div
-                                        className={styles.fontPreview}
-                                        style={{
-                                            fontFamily: f.family,
-                                            fontWeight: state.fontWeight === 'Bold' ? 700 : (state.fontWeight === 'Medium' ? 500 : 400)
-                                        }}
+                                        key={font.id}
+                                        className={`${styles.fontCard} ${state.typography === font.id ? styles.active : ''}`}
+                                        onClick={() => updateState('typography', font.id)}
+                                        style={{ fontFamily: font.id }}
                                     >
-                                        {f.preview}
+                                        <div className={styles.fontPreviewAa}>Aa</div>
+                                        <div className={styles.fontInfo}>
+                                            <span className={styles.fontName}>{font.label}</span>
+                                            <span className={styles.fontCat} style={{ fontFamily: 'var(--font-heading)' }}>{font.category}</span>
+                                        </div>
                                     </div>
-                                    <div className={styles.fontInfo}>
-                                        <span className={styles.cardTitle}>{f.label}</span>
-                                        <span className={styles.cardDesc}>{f.sub}</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className={styles.subsection}>
-                            <p className={styles.subsectionTitle}>Espessura do Texto</p>
-                            <div className={styles.chipGrid}>
-                                {['Normal', 'Medium', 'Bold'].map(w => (
-                                    <button
-                                        key={w}
-                                        className={`${styles.chip} ${state.fontWeight === w ? styles.selected : ''}`}
-                                        onClick={() => updateState('fontWeight', w)}
-                                    >
-                                        {w === 'Normal' ? 'Normal' : (w === 'Medium' ? 'Médio' : 'Negrito')}
-                                    </button>
                                 ))}
                             </div>
                         </div>
-                    </>
-                );
-            case 10: // Media
-                return (
-                    <>
-                        <div className={styles.stepHeader}>
-                            <h2 className={styles.stepTitle}>Estilo de Imagens</h2>
-                            <p className={styles.stepDescription}>
-                                Como você imagina as ilustrações ou fotos do seu app?
-                                <br />
-                                <span style={{ fontSize: '0.9rem', opacity: 0.7 }}>
-                                    Isso ajuda a IA a sugerir bancos de imagens ou estilos de ilustração.
-                                </span>
-                            </p>
+
+                        <div className={styles.formGroup} style={{ marginTop: '2rem' }}>
+                            <div className="flex justify-between items-center mb-2">
+                                <label className={styles.label}>Espessura (Peso): <span style={{ color: 'var(--primary)' }}>{state.typographyWeight}</span></label>
+                            </div>
+                            <input
+                                type="range"
+                                min="100"
+                                max="900"
+                                step="100"
+                                value={state.typographyWeight}
+                                onChange={(e) => updateState('typographyWeight', parseInt(e.target.value))}
+                                className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-orange-500"
+                                style={{ accentColor: 'var(--primary)' }}
+                            />
+
+                            {/* Live Preview Box */}
+                            <div style={{
+                                marginTop: '1.5rem',
+                                padding: '2rem',
+                                background: 'rgba(0,0,0,0.3)',
+                                borderRadius: 16,
+                                border: '1px solid rgba(255,255,255,0.05)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '0.5rem',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                minHeight: '120px'
+                            }}>
+                                <p style={{
+                                    fontFamily: state.typography,
+                                    fontWeight: state.typographyWeight,
+                                    fontSize: '1.8rem',
+                                    color: 'white',
+                                    textAlign: 'center',
+                                    lineHeight: 1.2
+                                }}>
+                                    Promptly SaaS
+                                </p>
+                                <p style={{
+                                    fontFamily: state.typography,
+                                    fontWeight: 400, // Contrast with body text
+                                    fontSize: '1rem',
+                                    color: 'rgba(255,255,255,0.6)',
+                                    textAlign: 'center'
+                                }}>
+                                    The quick brown fox jumps over the lazy dog.
+                                </p>
+                            </div>
                         </div>
-                        <div className={styles.grid3}>
-                            {MEDIA_STYLES.map(m => (
-                                <button
-                                    key={m}
-                                    className={`${styles.card} ${state.mediaStyle === m ? styles.selected : ''}`}
-                                    onClick={() => updateState('mediaStyle', m)}
-                                >
-                                    <span className={styles.cardTitle}>{m}</span>
-                                </button>
-                            ))}
-                        </div>
-                        <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }}>
-                            <button
-                                className={`${styles.skipButton} ${!state.mediaStyle ? styles.active : ''}`}
-                                onClick={() => updateState('mediaStyle', '')}
-                            >
-                                Decidir depois (Pular etapa)
+
+                        <div className={styles.navButtons}>
+                            <button className={styles.backButton} onClick={prevStep}>Voltar</button>
+                            <button className={styles.nextButton} onClick={nextStep}>
+                                Revisar <ChevronDown style={{ transform: 'rotate(-90deg)' }} size={20} />
                             </button>
                         </div>
                     </>
                 );
-            case 11: // Tone
+            case 6: // Review
                 return (
                     <>
                         <div className={styles.stepHeader}>
-                            <h2 className={styles.stepTitle}>Tom de Voz</h2>
-                            <p className={styles.stepDescription}>Como o seu SaaS fala com o usuário?</p>
+                            <h2 className={styles.stepTitle}>Revisão Final</h2>
+                            <p className={styles.stepDescription}>Plataforma Alvo: <span style={{ color: 'var(--primary)' }}>{state.targetPlatform}</span></p>
                         </div>
-                        <div className={styles.grid2x2}>
-                            {TONES.map(t => (
-                                <div
-                                    key={t.id}
-                                    className={`${styles.card} ${state.tone === t.label ? styles.selected : ''}`}
-                                    onClick={() => updateState('tone', t.label)}
-                                >
-                                    <div className={styles.cardIcon}>{t.icon}</div>
-                                    <span className={styles.cardTitle}>{t.label}</span>
-                                    <span className={styles.cardDesc}>{t.desc}</span>
-                                </div>
-                            ))}
+                        <div className={styles.reviewCard}>
+                            <div className={styles.reviewItem}> <span className={styles.reviewLabel}>App:</span> <span className={styles.reviewValue}>{state.appName}</span> </div>
+                            <div className={styles.reviewItem}> <span className={styles.reviewLabel}>Nicho:</span> <span className={styles.reviewValue}>{state.niche}</span> </div>
+                            <div className={styles.reviewItem}> <span className={styles.reviewLabel}>Estilo:</span> <span className={styles.reviewValue}>{state.visualStyle}</span> </div>
+                            <div className={styles.reviewItem}> <span className={styles.reviewLabel}>Stack:</span> <span className={styles.reviewValue}>{state.targetPlatform} + {state.typography} ({state.typographyWeight})</span> </div>
+                            <div className={styles.reviewItem}> <span className={styles.reviewLabel}>Features:</span> <span className={styles.reviewValue}>{state.features.length} funcionais</span> </div>
+                        </div>
+
+                        <div className={styles.navButtons}>
+                            <button className={styles.backButton} onClick={prevStep}>Voltar</button>
+                            <button className={styles.nextButton} onClick={handleGeneratePrompt}>Gerar Mágica</button>
                         </div>
                     </>
                 );
-            case 12: // Dashboard
-                return (
-                    <>
-                        <div className={styles.stepHeader}>
-                            <h2 className={styles.stepTitle}>O Painel (Dashboard)</h2>
-                            <p className={styles.stepDescription}>O que o usuário vê assim que entra?</p>
-                        </div>
-                        <div className={styles.gridCentered}>
-                            {WIDGETS.map(w => (
-                                <div
-                                    key={w.id}
-                                    className={`${styles.card} ${state.dashboardWidgets.includes(w.label) ? styles.selected : ''}`}
-                                    onClick={() => toggleWidget(w.label)}
-                                >
-                                    <div className={styles.cardIcon}>{w.icon}</div>
-                                    <span className={styles.cardTitle}>{w.label}</span>
-                                    <span className={styles.cardDesc}>{w.desc}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </>
-                );
-            case 13:
-                return (
-                    <div style={{ textAlign: 'center' }}>
-                        <div className={styles.stepHeader}>
-                            <h2 className={styles.stepTitle} style={{ fontSize: '2.5rem' }}>Seu Prompt Otimizado</h2>
-                            <p className={styles.stepDescription}>
-                                {isGenerating
-                                    ? 'A IA está analisando suas escolhas e criando o melhor prompt...'
-                                    : 'Pronto! Copie o código abaixo e use no seu gerador favorito.'}
-                            </p>
-                        </div>
-
-                        {isGenerating ? (
-                            <div className={styles.resultBox} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
-                                <motion.div
-                                    animate={{ rotate: 360 }}
-                                    transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-                                >
-                                    <Loader2 size={48} color="var(--primary)" />
-                                </motion.div>
-                            </div>
-                        ) : (
-                            <div className={styles.resultBox}>
-                                {generatedPrompt}
-                            </div>
-                        )}
-
-                        <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center', gap: '1rem' }}>
-                            <button
-                                className={styles.nextBtn}
-                                onClick={handleCopy}
-                                disabled={isGenerating}
-                                style={{ background: copied ? '#4ade80' : 'var(--primary)', opacity: isGenerating ? 0.5 : 1 }}
-                            >
-                                {copied ? <><Check size={20} /> Copiado!</> : <><Copy size={20} /> Copiar Prompt</>}
-                            </button>
-                        </div>
-                    </div>
-                );
-            default:
-                return null;
+            default: return null;
         }
     };
 
-    return (
-        <ScrollReveal width="100%">
+    // --- Result Screen ---
+    if (step === 7) {
+        return (
             <div className={styles.container}>
-                {/* Top Navigation */}
-                <div className={styles.topNav}>
-                    <a href="/dashboard" className={styles.navLink}>
-                        <ArrowLeft size={16} /> Sair
-                    </a>
-                    <button
-                        className={styles.navLink}
-                        onClick={() => setState(INITIAL_STATE)}
-                        style={{ color: '#ef4444' }}
-                    >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <Trash2 size={16} /> Limpar Opções
+                <Link href="/dashboard" className={styles.closeButton}><X size={24} /></Link>
+                <div className={styles.resultContainer}>
+                    <div className={styles.stepHeader}>
+                        <h2 className={styles.stepTitle}>Seu Prompt está Pronto</h2>
+                        <p className={styles.stepDescription}>Agora é só copiar e colar no <b>{state.targetPlatform}</b>.</p>
+                    </div>
+                    {isGenerating ? (
+                        <div className={styles.loadingState}>
+                            <div className={styles.spinner}></div>
+                            <p>Otimizando arquitetura para {state.targetPlatform}...</p>
                         </div>
-                    </button>
-                </div>
-
-                {/* Progress Section */}
-                {
-                    step < 12 && (
-                        <div className={styles.progressSection}>
-                            <div className={styles.progressHeader}>
-                                <div className={styles.stepBadge}>
-                                    Etapa {step} de 12
+                    ) : (
+                        <div className={styles.editorWindow}>
+                            <div className={styles.editorHeader}>
+                                <div className={styles.windowControls}>
+                                    <div className={styles.controlDot} style={{ background: '#FF5F56' }} />
+                                    <div className={styles.controlDot} style={{ background: '#FFBD2E' }} />
+                                    <div className={styles.controlDot} style={{ background: '#27C93F' }} />
                                 </div>
-                                <span className={styles.progressText}>
-                                    {Math.round(((step - 1) / 12) * 100)}% completo
-                                </span>
+                                <span className={styles.fileName}>prompt_gerado.md</span>
+                                <div style={{ flex: 1 }} />
+                                <div className={styles.badge}>{state.targetPlatform} Mode</div>
                             </div>
-                            <div className={styles.progressBarContainer}>
-                                <div
-                                    className={styles.progressBarFill}
-                                    style={{ width: `${((step - 1) / 12) * 100}%` }}
-                                />
+
+                            <div className={styles.editorBody}>
+                                <pre className={styles.promptContent}>{generatedPrompt}</pre>
                             </div>
-                        </div>
-                    )
-                }
 
-                {/* Main Content Card */}
-                <AnimatePresence mode='wait'>
-                    <motion.div
-                        key={step}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.3 }}
-                        className={styles.mainCard}
-                    >
-                        {renderStepContent()}
-                    </motion.div>
-                </AnimatePresence>
-
-                {/* Bottom Actions */}
-                {
-                    step < 12 && (
-                        <div className={styles.bottomBar}>
-                            <div className={styles.actionButtons}>
-                                <button className={styles.backBtn} onClick={prevStep} disabled={step === 1}>
-                                    <ArrowLeft size={18} /> Voltar
+                            <div className={styles.editorFooter}>
+                                <button className={styles.copyActionResult} onClick={handleCopy}>
+                                    {copied ? <Check size={18} /> : <Copy size={18} />}
+                                    {copied ? 'Copiado!' : 'Copiar Prompt'}
                                 </button>
-                                <button className={styles.nextBtn} onClick={nextStep} disabled={step === 1 && !state.targetPlatform}>
-                                    {step === 12 ? 'Finalizar e Gerar' : <>Próximo <ArrowRight size={18} /></>}
+                                <button className={styles.secondaryAction} onClick={() => setStep(0)}>
+                                    Criar Novo
                                 </button>
                             </div>
-
-                            <div className={styles.paginationDots}>
-                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((s) => (
-                                    <div
-                                        key={s}
-                                        className={`${styles.dot} ${s === step ? styles.active : ''}`}
-                                    />
-                                ))}
-                            </div>
                         </div>
-                    )
-                }
+                    )}
+                </div>
             </div>
-        </ScrollReveal>
+        );
+    }
+
+    return (
+        <div className={styles.container}>
+            <Link href="/dashboard" className={styles.closeButton}><X size={24} /></Link>
+            <div className={styles.wizardCard}>
+                <div className={styles.progressContainer}>
+                    <div className={styles.progressBar}>
+                        <div className={styles.progressFill} style={{ width: `${((step + 1) / 7) * 100}%` }} />
+                    </div>
+                </div>
+                <div className={styles.contentArea}>
+                    <AnimatePresence mode='wait'>
+                        <motion.div
+                            key={step}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.3 }}
+                            style={{ width: '100%' }}
+                        >
+                            {renderStepContent()}
+                        </motion.div>
+                    </AnimatePresence>
+                </div>
+            </div>
+        </div>
     );
 }
