@@ -8,7 +8,7 @@ import { supabase } from '../../lib/supabase';
 import { LandingPageForm } from './LandingPageForm';
 import {
     LayoutTemplate, MonitorSmartphone, ShoppingCart, LayoutDashboard, GraduationCap, FileText, Store, Users, BarChart, Globe,
-    Code2, Server, Database, Layers, Palette, Target, FileQuestion, Copy, Check, Briefcase, Zap, Shield, Megaphone, HelpCircle, Rocket, Monitor
+    Code2, Server, Database, Layers, Palette, Target, FileQuestion, Copy, Check, Briefcase, Zap, Shield, Megaphone, HelpCircle, Rocket, Monitor, ImagePlus, UploadCloud, RefreshCw
 } from 'lucide-react';
 
 import { TARGET_PLATFORMS } from '../../lib/saas_constants';
@@ -17,7 +17,7 @@ import { ScrollReveal } from '../components/ScrollReveal/ScrollReveal';
 // --- Types & Config ---
 
 type FormData = {
-    promptMode: 'design' | 'feature' | 'logic' | 'landing_page';
+    promptMode: 'design' | 'feature' | 'logic' | 'landing_page' | 'extract_design';
     targetPlatform: string;
     objective: string;
     context: string;
@@ -26,6 +26,7 @@ type FormData = {
 const PROMPT_MODES = [
     { id: 'guided_builder', label: 'Crie o seu saas do 0', icon: <Rocket size={16} />, desc: 'Crie o seu saas com apenas 1 prompt' },
     { id: 'landing_page', label: 'Landing Page', icon: <LayoutTemplate size={16} />, desc: 'Gere uma landing page inteira com apenas 1 prompt.' },
+    { id: 'extract_design', label: 'Extrair Design', icon: <ImagePlus size={16} />, desc: 'Extraia cores e estilos de uma imagem de referência.' },
     { id: 'design', label: 'Design (UI/UX)', icon: <Palette size={16} />, desc: 'Focado em interface, cores e componentes.' },
     { id: 'feature', label: 'Nova Funcionalidade', icon: <Code2 size={16} />, desc: 'Adicione novos recursos ao app existente.' },
     { id: 'logic', label: 'Lógica / Backend', icon: <Server size={16} />, desc: 'Schema de banco, rotas e arquitetura.' },
@@ -37,6 +38,8 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState('');
     const [copied, setCopied] = useState(false);
+
+    // Initial State
 
     // Initial State
     const [formData, setFormData] = useState<FormData>({
@@ -56,6 +59,33 @@ export default function DashboardPage() {
             }
         };
         checkUser();
+
+        // Check for extraction data from UDTE page
+        const extractedDesign = localStorage.getItem('promptly_extracted_design');
+        const designTokens = localStorage.getItem('promptly_design_tokens');
+
+        if (extractedDesign) {
+            try {
+                // Set the full report as context
+                updateField('context', extractedDesign);
+
+                // Try to get structured tokens for objective summary
+                let objectiveText = 'Criar uma interface seguindo o Design System extraído no contexto.';
+                if (designTokens) {
+                    const tokens = JSON.parse(designTokens);
+                    const primaryColor = tokens?.color?.brand?.primary?.value || tokens?.colors?.primary;
+                    const fontFamily = tokens?.typography?.fontFamily?.base?.value || tokens?.typography?.fontFamily;
+                    if (primaryColor || fontFamily) {
+                        objectiveText = `Criar uma interface seguindo RIGOROSAMENTE o Design System extraído (Cor Primária: ${primaryColor || 'ver contexto'}, Fonte: ${fontFamily || 'ver contexto'}).`;
+                    }
+                }
+                updateField('objective', objectiveText);
+
+                // Clear to avoid re-populating on refresh
+                localStorage.removeItem('promptly_extracted_design');
+                localStorage.removeItem('promptly_design_tokens');
+            } catch (e) { console.error('Error parsing extracted design', e); }
+        }
     }, [router]);
 
     // Handle Input Changes
@@ -116,6 +146,8 @@ export default function DashboardPage() {
         }
     };
 
+
+
     const handleCopy = async () => {
         if (!result) return;
         await navigator.clipboard.writeText(result);
@@ -133,6 +165,10 @@ export default function DashboardPage() {
         }
         if (mode === 'landing_page') {
             router.push('/landing-builder');
+            return;
+        }
+        if (mode === 'extract_design') {
+            router.push('/design-extractor');
             return;
         }
         updateField('promptMode', mode);
@@ -226,7 +262,7 @@ export default function DashboardPage() {
                         </div>
                     </div>
                 </ScrollReveal>
-            </div>
+            </div >
 
             <div className={styles.previewSection}>
                 <div className={styles.previewCard}>
@@ -243,6 +279,6 @@ export default function DashboardPage() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

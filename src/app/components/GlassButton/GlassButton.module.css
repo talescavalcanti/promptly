@@ -126,3 +126,23 @@
     opacity: 0;
     visibility: hidden;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .content {
+        padding: 10px 18px;
+        font-size: 0.9rem;
+    }
+
+    .buttonReset:hover {
+        transform: none;
+        /* Disable hover transform on touch devices */
+    }
+}
+
+@media (max-width: 480px) {
+    .content {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+    }
+}

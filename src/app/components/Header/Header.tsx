@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { useRouter, usePathname } from 'next/navigation';
 import { supabase } from '../../../lib/supabase';
 import styles from './Header.module.css';
@@ -15,24 +15,21 @@ export const Header = () => {
     const pathname = usePathname();
     const [user, setUser] = useState<User | null>(null);
     const [isVisible, setIsVisible] = useState(true);
-    const [lastScrollY, setLastScrollY] = useState(0);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [hoveredPath, setHoveredPath] = useState<string | null>(null);
+    const { scrollY } = useScroll();
 
-    useEffect(() => {
-        const handleScroll = () => {
-            const currentScrollY = window.scrollY;
-            if (isMenuOpen) return;
-            if (currentScrollY < lastScrollY || currentScrollY < 10) {
-                setIsVisible(true);
-            } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                setIsVisible(false);
-            }
-            setLastScrollY(currentScrollY);
-        };
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [lastScrollY, isMenuOpen]);
+    useMotionValueEvent(scrollY, "change", (latest) => {
+        if (isMenuOpen) return;
+
+        const previous = scrollY.getPrevious() ?? 0;
+
+        if (latest < previous || latest < 10) {
+            setIsVisible(true);
+        } else if (latest > previous && latest > 100) {
+            setIsVisible(false);
+        }
+    });
 
     useEffect(() => {
         setIsMenuOpen(false);

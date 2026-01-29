@@ -5,23 +5,41 @@ import { MacbookScroll } from "@/components/ui/macbook-scroll";
 export default function MacbookScrollDemo() {
     return (
         <div className="relative w-full overflow-hidden bg-black">
-            <MacbookScroll
-                title={
-                    <Typewriter
-                        text="O que você constrói com apenas um prompt. Sem esforço."
-                        speed={35}
-                        cursor="_"
-                        className="inline-block"
+            {/* Mobile Alternative - Simple Text */}
+            <div className="block sm:hidden py-16 px-4 text-center">
+                <h2 className="text-2xl font-bold text-white mb-4">
+                    O que você constrói com apenas um prompt.
+                </h2>
+                <p className="text-gray-400 text-base mb-6">Sem esforço.</p>
+                <div className="relative mx-auto max-w-[300px] rounded-xl overflow-hidden border border-white/10">
+                    <img
+                        src="/macbook-screen-v2.png"
+                        alt="Promptly Preview"
+                        className="w-full h-auto"
                     />
-                }
-                badge={
-                    <a href="https://peerlist.io/manuarora">
-                        <Badge className="h-10 w-10 -rotate-12 transform" />
-                    </a>
-                }
-                src={`/macbook-screen-v2.png`}
-                showGradient={true}
-            />
+                </div>
+            </div>
+
+            {/* Desktop MacBook Animation - Hidden on small mobile */}
+            <div className="hidden sm:block">
+                <MacbookScroll
+                    title={
+                        <Typewriter
+                            text="O que você constrói com apenas um prompt. Sem esforço."
+                            speed={35}
+                            cursor="_"
+                            className="inline-block"
+                        />
+                    }
+                    badge={
+                        <a href="https://peerlist.io/manuarora">
+                            <Badge className="h-10 w-10 -rotate-12 transform" />
+                        </a>
+                    }
+                    src={`/macbook-screen-v2.png`}
+                    showGradient={true}
+                />
+            </div>
             {/* The Fog: Global Transition Overlay */}
             <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-50 h-40 bg-gradient-to-t from-black via-black to-transparent" />
         </div >

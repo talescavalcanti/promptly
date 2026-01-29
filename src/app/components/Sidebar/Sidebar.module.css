@@ -131,3 +131,27 @@
 .upgradeBtn:hover {
     opacity: 0.9;
 }
+
+/* Mobile Responsiveness - Sidebar hidden on mobile, uses Header nav */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .sidebar {
+        width: 200px;
+        padding: 1rem;
+    }
+
+    .brand {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .item {
+        padding: 0.6rem 0.75rem;
+        font-size: 0.8rem;
+    }
+}

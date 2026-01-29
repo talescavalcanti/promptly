@@ -68,7 +68,7 @@ export const MacbookScroll = ({
     return (
         <div
             ref={ref}
-            className="flex min-h-[200vh] shrink-0 scale-[0.35] transform flex-col items-center justify-start py-0 [perspective:800px] sm:scale-50 md:scale-75 lg:scale-90 xl:scale-100 md:pt-40 md:pb-80"
+            className="flex min-h-[200vh] shrink-0 transform flex-col items-center justify-start py-0 [perspective:800px] scale-[0.30] sm:scale-[0.40] md:scale-[0.60] lg:scale-75 xl:scale-100 md:pt-40 md:pb-80"
         >
             <motion.h2
                 style={{

@@ -1,0 +1,356 @@
+.container {
+    min-height: 100vh;
+    padding: 2rem;
+    padding-top: 6rem;
+    position: relative;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+    background: linear-gradient(to right, #fff, #888);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Upload Section */
+.dropZone {
+    border: 2px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 4rem 2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.dropZone:hover {
+    border-color: #fff;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.dropZone.dragging {
+    border-color: #4ade80;
+    background: rgba(74, 222, 128, 0.05);
+}
+
+.iconWrapper {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: #fff;
+}
+
+.uploadTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.uploadDesc {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+}
+
+/* Results Container */
+.resultsContainer {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Tab Navigation */
+.tabNav {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.5rem;
+    overflow-x: auto;
+}
+
+.tabButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.tabButton:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+.tabButton.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* Tab Content */
+.tabContent {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Report View (Markdown) */
+.reportView,
+.guideView,
+.componentsView {
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.8;
+    font-size: 0.95rem;
+}
+
+.reportView h1,
+.guideView h1,
+.componentsView h1 {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.5rem;
+}
+
+.reportView h2,
+.guideView h2,
+.componentsView h2 {
+    font-size: 1.2rem;
+    color: #fff;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.reportView h3,
+.guideView h3,
+.componentsView h3 {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 1rem;
+}
+
+.reportView ul,
+.guideView ul,
+.componentsView ul {
+    padding-left: 1.5rem;
+    margin: 1rem 0;
+}
+
+.reportView li,
+.guideView li,
+.componentsView li {
+    margin-bottom: 0.5rem;
+}
+
+.reportView code,
+.guideView code,
+.componentsView code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.85rem;
+}
+
+.reportView pre,
+.guideView pre,
+.componentsView pre {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-size: 0.85rem;
+}
+
+/* Tokens View */
+.tokensView {
+    display: flex;
+    flex-direction: column;
+}
+
+.tokensHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.tokensHeader h3 {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.copyBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.copyBtn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.jsonBlock {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    overflow-x: auto;
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: #a5d6ff;
+    flex: 1;
+    max-height: 55vh;
+}
+
+/* Actions */
+.actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.actionButton {
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+}
+
+.btnPrimary {
+    background: #fff;
+    color: #000;
+    border: none;
+}
+
+.btnPrimary:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.btnSecondary {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.btnSecondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: #fff;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Scrollbar Styling */
+.tabContent::-webkit-scrollbar,
+.jsonBlock::-webkit-scrollbar {
+    width: 8px;
+}
+
+.tabContent::-webkit-scrollbar-track,
+.jsonBlock::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.tabContent::-webkit-scrollbar-thumb,
+.jsonBlock::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.tabContent::-webkit-scrollbar-thumb:hover,
+.jsonBlock::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+        padding-top: 5rem;
+    }
+
+    .title {
+        font-size: 1.75rem;
+    }
+
+    .tabContent {
+        padding: 1rem;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    .actionButton {
+        width: 100%;
+        justify-content: center;
+    }
+}

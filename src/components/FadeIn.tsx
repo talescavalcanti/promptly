@@ -45,7 +45,10 @@ export function FadeIn({
                 ease: [0.25, 0.1, 0.25, 1.0],
             }}
             className={className}
-            style={{ width: fullWidth ? '100%' : 'auto' }}
+            style={{
+                width: fullWidth ? '100%' : 'auto',
+                willChange: 'transform, opacity'
+            }}
         >
             {children}
         </motion.div>
