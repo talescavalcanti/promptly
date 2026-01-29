@@ -7,21 +7,28 @@ import { Button } from '../Button/Button';
 import { GlassButton } from '../GlassButton/GlassButton';
 import { FadeIn } from '@/components/FadeIn';
 import { Sparkles } from 'lucide-react';
+import { useInView } from 'framer-motion';
+import { useRef } from 'react';
 
 import DarkVeil from '@/components/ui/dark-veil';
 
 export const Hero = () => {
+    const ref = useRef(null);
+    const isInView = useInView(ref, { margin: "200px 0px 0px 0px" });
+
     return (
-        <section className={styles.section}>
+        <section className={styles.section} ref={ref}>
             <div className="absolute inset-0 -z-10 h-full w-full">
-                <DarkVeil
-                    hueShift={210}
-                    noiseIntensity={0.002}
-                    speed={0.2}
-                    scanlineIntensity={0}
-                    scanlineFrequency={0}
-                    warpAmount={0.5}
-                />
+                {isInView && (
+                    <DarkVeil
+                        hueShift={210}
+                        noiseIntensity={0.002}
+                        speed={0.2}
+                        scanlineIntensity={0}
+                        scanlineFrequency={0}
+                        warpAmount={0.5}
+                    />
+                )}
             </div>
             <div className={styles.vignette} />
             <div className={styles.contentContainer}>

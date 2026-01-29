@@ -68,14 +68,14 @@ export const MacbookScroll = ({
     return (
         <div
             ref={ref}
-            className="flex min-h-[200vh] shrink-0 scale-[0.35] transform flex-col items-center justify-start py-0 [perspective:800px] sm:scale-50 md:scale-100 md:py-80"
+            className="flex min-h-[200vh] shrink-0 scale-[0.35] transform flex-col items-center justify-start py-0 [perspective:800px] sm:scale-50 md:scale-75 lg:scale-90 xl:scale-100 md:pt-40 md:pb-80"
         >
             <motion.h2
                 style={{
                     translateY: textTransform,
                     opacity: textOpacity,
                 }}
-                className="mb-20 text-center text-3xl font-bold text-neutral-800 dark:text-white"
+                className="mb-10 text-center text-3xl font-bold text-neutral-800 dark:text-white"
             >
                 {title || (
                     <span>
@@ -183,7 +183,7 @@ export const Lid = ({
     );
 };
 
-export const Trackpad = () => {
+export const Trackpad = React.memo(() => {
     return (
         <div
             className="mx-auto my-1 h-32 w-[40%] rounded-xl"
@@ -192,9 +192,10 @@ export const Trackpad = () => {
             }}
         ></div>
     );
-};
+});
+Trackpad.displayName = "Trackpad";
 
-export const Keypad = () => {
+export const Keypad = React.memo(() => {
     return (
         <div className="mx-1 h-full [transform:translateZ(0)] rounded-md bg-[#050505] p-1 [will-change:transform]">
             {/* First Row */}
@@ -550,9 +551,10 @@ export const Keypad = () => {
             </div>
         </div>
     );
-};
+});
+Keypad.displayName = "Keypad";
 
-export const KBtn = ({
+const KBtn = React.memo(({
     className,
     children,
     childrenClassName,
@@ -592,9 +594,10 @@ export const KBtn = ({
             </div>
         </div>
     );
-};
+});
+KBtn.displayName = "KBtn";
 
-export const SpeakerGrid = () => {
+const SpeakerGrid = React.memo(() => {
     return (
         <div
             className="mt-2 flex h-40 gap-[2px] px-[0.5px]"
@@ -605,7 +608,8 @@ export const SpeakerGrid = () => {
             }}
         ></div>
     );
-};
+});
+SpeakerGrid.displayName = "SpeakerGrid";
 
 export const OptionKey = ({ className }: { className: string }) => {
     return (
