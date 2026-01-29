@@ -1,6 +1,6 @@
 .section {
     padding: 6rem 1rem;
-    background: var(--background);
+    /* background: var(--background); Removed for seamless Plasma */
 }
 
 .container {
@@ -60,21 +60,27 @@
     background: #080808;
     border: 1px solid #161616;
     border-radius: 1.25rem;
-    padding: 2.5rem;
+    padding: 1.25rem 1.75rem;
+    /* Aggressively reduced top/bottom padding */
     text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .ctaTitle {
     font-size: 1.35rem;
     font-weight: 600;
     color: #fff;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
+    /* Reduced from 0.75rem */
 }
 
 .ctaText {
     color: #666;
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
+    margin-bottom: 1.25rem;
+    /* Reduced from 1.5rem */
+    line-height: 1.5;
     font-size: 0.95rem;
 }
 

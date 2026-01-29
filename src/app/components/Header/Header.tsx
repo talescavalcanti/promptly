@@ -7,6 +7,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { supabase } from '../../../lib/supabase';
 import styles from './Header.module.css';
 import { Button } from '../Button/Button';
+import { GlassButton } from '../GlassButton/GlassButton';
 import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 export const Header = () => {
@@ -167,73 +168,77 @@ export const Header = () => {
                                     <Button variant="ghost">Entrar</Button>
                                 </Link>
                                 <Link href="/signup">
-                                    <Button variant="primary">Começar</Button>
+                                    <GlassButton style={{ height: '36px', padding: '0 20px', fontSize: '14px', borderRadius: '18px' }} glassBorderRadius={18}>
+                                        Começar
+                                    </GlassButton>
                                 </Link>
                             </>
                         )}
                     </div>
                 </div>
-            </header>
+            </header >
 
             {/* Mobile Menu Overlay - Right Sheet */}
             <AnimatePresence>
-                {isMenuOpen && (
-                    <>
-                        <motion.div
-                            className={styles.backdrop}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setIsMenuOpen(false)}
-                        />
-                        <motion.div
-                            className={styles.mobileMenu}
-                            initial={{ x: '100%' }}
-                            animate={{ x: 0 }}
-                            exit={{ x: '100%' }}
-                            transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-                        >
-                            <div className={styles.mobileNavHeader}>
-                                <span className={styles.mobileMenuTitle}>Menu</span>
-                                <button onClick={() => setIsMenuOpen(false)} className={styles.closeButton}>
-                                    ✕
-                                </button>
-                            </div>
+                {
+                    isMenuOpen && (
+                        <>
+                            <motion.div
+                                className={styles.backdrop}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => setIsMenuOpen(false)}
+                            />
+                            <motion.div
+                                className={styles.mobileMenu}
+                                initial={{ x: '100%' }}
+                                animate={{ x: 0 }}
+                                exit={{ x: '100%' }}
+                                transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+                            >
+                                <div className={styles.mobileNavHeader}>
+                                    <span className={styles.mobileMenuTitle}>Menu</span>
+                                    <button onClick={() => setIsMenuOpen(false)} className={styles.closeButton}>
+                                        ✕
+                                    </button>
+                                </div>
 
-                            <div className={styles.mobileNav}>
-                                {user ? (
-                                    <>
-                                        <div className={styles.mobileSection}>
-                                            <span className={styles.sectionTitle}>Navegação</span>
-                                            <Link href="/dashboard" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>Criar</Link>
-                                            <Link href="/projects" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>Meus Projetos</Link>
-                                            <Link href="/pricing" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>Planos</Link>
-                                        </div>
+                                <div className={styles.mobileNav}>
+                                    {user ? (
+                                        <>
+                                            <div className={styles.mobileSection}>
+                                                <span className={styles.sectionTitle}>Navegação</span>
+                                                <Link href="/dashboard" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>Criar</Link>
+                                                <Link href="/projects" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>Meus Projetos</Link>
+                                                <Link href="/pricing" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>Planos</Link>
+                                            </div>
 
-                                        <div className={styles.mobileSection}>
-                                            <span className={styles.sectionTitle}>Conta</span>
-                                            <Link href="/dashboard/settings" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>
-                                                Minha Conta
+                                            <div className={styles.mobileSection}>
+                                                <span className={styles.sectionTitle}>Conta</span>
+                                                <Link href="/dashboard/settings" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>
+                                                    Minha Conta
+                                                </Link>
+                                                <button onClick={handleLogout} className={styles.mobileLogout}>
+                                                    Sair da Conta
+                                                </button>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Link href="/login" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>Entrar</Link>
+                                            <Link href="/signup" className={styles.mobileButton} onClick={() => setIsMenuOpen(false)}>
+                                                Começar Agora
                                             </Link>
-                                            <button onClick={handleLogout} className={styles.mobileLogout}>
-                                                Sair da Conta
-                                            </button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Link href="/login" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>Entrar</Link>
-                                        <Link href="/signup" className={styles.mobileButton} onClick={() => setIsMenuOpen(false)}>
-                                            Começar Agora
-                                        </Link>
-                                        <Link href="/pricing" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>Planos</Link>
-                                    </>
-                                )}
-                            </div>
-                        </motion.div>
-                    </>
-                )}
-            </AnimatePresence>
+                                            <Link href="/pricing" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>Planos</Link>
+                                        </>
+                                    )}
+                                </div>
+                            </motion.div>
+                        </>
+                    )
+                }
+            </AnimatePresence >
         </>
     );
 };

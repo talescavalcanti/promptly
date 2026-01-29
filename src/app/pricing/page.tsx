@@ -7,6 +7,7 @@ import { Button } from '../components/Button/Button';
 import { Check } from 'lucide-react';
 import styles from './page.module.css';
 import { ScrollReveal } from '../components/ScrollReveal/ScrollReveal';
+import ElectricBorder from '../components/ElectricBorder/ElectricBorder';
 
 export default function PricingPage() {
     const [user, setUser] = React.useState<any>(null);
@@ -58,6 +59,7 @@ export default function PricingPage() {
                         <div className={styles.pricingGrid}>
                             {/* Free Plan */}
                             <div className={styles.card}>
+                                <ElectricBorder color="#F5A524" />
                                 <div className={styles.cardHeader}>
                                     <h2 className={styles.planName}>Free</h2>
                                     <div className={styles.price}>
@@ -89,6 +91,7 @@ export default function PricingPage() {
 
                             {/* Starter Plan */}
                             <div className={`${styles.card} ${styles.popular}`}>
+                                <ElectricBorder color="#F5A524" />
                                 <div className={styles.popularBadge}>Mais Popular</div>
                                 <div className={styles.cardHeader}>
                                     <h2 className={styles.planName}>Starter</h2>
@@ -123,6 +126,7 @@ export default function PricingPage() {
 
                             {/* Pro Plan */}
                             <div className={styles.card}>
+                                <ElectricBorder color="#F5A524" />
                                 <div className={styles.cardHeader}>
                                     <h2 className={styles.planName}>Pro</h2>
                                     <div className={styles.price}>

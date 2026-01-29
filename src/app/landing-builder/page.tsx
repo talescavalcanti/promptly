@@ -2,32 +2,38 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-    Briefcase, Target, Palette, Layout, FileText, Check, Copy, ChevronDown, ChevronUp, Bot, Sparkles, Lightbulb, Type, Layers, X, Zap, Sliders, Frame, Feather, Megaphone
-} from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
+import {
+    Briefcase, Target, Palette, Layout, FileText, Check, Copy, ChevronDown, ChevronUp, Bot, Sparkles, Lightbulb, Type, Layers, X, Zap, Sliders, Frame, Feather, Megaphone, ArrowUpRight
+} from 'lucide-react';
 import styles from './landing-builder.module.css'; // Reusing the copied/renamed styles
 import { ScrollReveal } from '../components/ScrollReveal/ScrollReveal';
 import { LANDING_PAGE_AGENT_V2_PROMPT } from './agentPrompts';
+import Plasma from '../components/Plasma/Plasma';
 
 // --- Types ---
 type LandingBuilderState = {
     mode: 'portfolio' | 'custom';
     niche: string;
     brandName: string;
-    targetAudience: string; // New
+    targetAudience: string;
     goal: 'portfolio' | 'leads' | 'sales';
-    style: 'modern' | 'minimal' | 'editorial' | 'bold';
-    primaryColor: string; // New
-    secondaryColor: string; // New
+    style: 'brutalist' | 'swiss' | 'glass' | 'editorial';
+    geometry: 'sharp' | 'soft' | 'mixed'; // New
+    layout: 'standard' | 'radical'; // New
+    primaryColor: string;
+    secondaryColor: string;
     typography: string;
-    fontWeight: 'light' | 'regular' | 'medium' | 'bold'; // New
-    useSingleFont: boolean; // New
+    fontWeight: 'light' | 'regular' | 'medium' | 'bold';
+    useSingleFont: boolean;
     sections: string[];
     mainOffer: string;
     contactInfo: string;
     tone: string;
+    targetPlatform: 'Lovable' | 'Google AI Studio' | 'Vercel' | 'Replit'; // New Step 8
 };
+const TOTAL_STEPS = 10;
 
 const INITIAL_STATE: LandingBuilderState = {
     mode: 'custom',
@@ -35,8 +41,10 @@ const INITIAL_STATE: LandingBuilderState = {
     brandName: '',
     targetAudience: '',
     goal: 'portfolio',
-    style: 'modern',
-    primaryColor: '#3b82f6', // Default Blue
+    style: 'swiss',
+    geometry: 'sharp',
+    layout: 'radical',
+    primaryColor: '#000000', // Default Black (Architect preference)
     secondaryColor: '#ffffff', // Default White
     typography: 'sans',
     fontWeight: 'regular',
@@ -44,7 +52,8 @@ const INITIAL_STATE: LandingBuilderState = {
     sections: ['Hero', 'ProofStrip', 'Services', 'HowItWorks', 'ResultsGallery', 'Differentials', 'Depoimentos', 'FAQ', 'Locations', 'Footer'],
     mainOffer: '',
     contactInfo: '',
-    tone: 'Profissional e Confiável'
+    tone: 'Profissional e Confiável',
+    targetPlatform: 'Google AI Studio' // Default per user preference
 };
 
 const GOALS = [
@@ -54,23 +63,32 @@ const GOALS = [
 ];
 
 const STYLES = [
-    { id: 'modern', label: 'Moderno & Tech', desc: 'Gradientes, Glassmorphism, Rounded', color: '#3b82f6' },
-    { id: 'minimal', label: 'Minimalista & Clean', desc: 'Muito espaço em branco, tipografia suíça', color: '#14b8a6' },
-    { id: 'editorial', label: 'Editorial & Elegante', desc: 'Fontes serifadas, fotos grandes, luxo', color: '#FFFFFF' },
-    { id: 'bold', label: 'Bold & Impactante', desc: 'Cores fortes, fontes grossas, contraste alto', color: '#ef4444' },
+    { id: 'swiss', label: 'Minimalismo Suíço', desc: 'Grid rígido, arrojado, tipografia forte.', color: '#ffffff' },
+    { id: 'brutalist', label: 'Neo-Brutalismo', desc: 'Contraste alto, bordas duras, impacto.', color: '#ef4444' },
+    { id: 'glass', label: 'Efeito Glass (Glassmorphism)', desc: 'Profundidade, blur real, camadas 3D.', color: '#3b82f6' },
+    { id: 'editorial', label: 'Luxo Editorial', desc: 'Elegância, serifa, layout de revista.', color: '#a8a29e' },
+];
+
+const GEOMETRIES = [
+    { id: 'sharp', label: 'Sharp (0px)', desc: 'Brutalista, Tech, Luxo. Transmite precisão e confiança.', visualClass: 'sharp' },
+    { id: 'soft', label: 'Soft (16px+)', desc: 'Amigável, Social, App. Reduz a carga cognitiva.', visualClass: 'soft' },
+    { id: 'mixed', label: 'Híbrido', desc: 'Estratégico. Mistura profissionalismo com acessibilidade.', visualClass: 'mixed' },
+];
+
+const LAYOUTS = [
+    { id: 'radical', label: 'Radical (Assimétrico)', desc: 'Quebra o grid. "Anti-Safe Harbor". Retém atenção pelo inesperado.', visualClass: 'radical' },
+    { id: 'standard', label: 'Estruturado (Grade)', desc: 'Clássico colunar. Seguro, mas previsível. Bom para corporativo.', visualClass: 'standard' },
 ];
 
 const COLORS = [
-    { id: 'blue', label: 'Azul Tech', color: '#3b82f6' },
-    { id: 'emerald', label: 'Verde Saúde', color: '#10b981' },
-    { id: 'purple', label: 'Roxo Criativo', color: '#8b5cf6' },
-    { id: 'orange', label: 'Laranja Vibrante', color: '#f97316' },
-    { id: 'red', label: 'Vermelho Bold', color: '#ef4444' },
-    { id: 'slate', label: 'Cinza Neutro', color: '#64748b' },
     { id: 'black', label: 'Preto Luxo', color: '#000000' },
     { id: 'white', label: 'Branco Clean', color: '#ffffff' },
-    { id: 'gold', label: 'Dourado Premium', color: '#d4af37' },
-    { id: 'teal', label: 'Teal Moderno', color: '#14b8a6' },
+    { id: 'blue', label: 'Royal Blue', color: '#2563eb' }, // Darker/Premium
+    { id: 'orange', label: 'Signal Orange', color: '#f97316' },
+    { id: 'red', label: 'Deep Red', color: '#dc2626' },
+    { id: 'emerald', label: 'Deep Emerald', color: '#059669' },
+    { id: 'slate', label: 'Cinza Tech', color: '#475569' },
+    { id: 'gold', label: 'Gold Metallic', color: '#ca8a04' },
 ];
 
 const FONT_WEIGHTS = [
@@ -81,19 +99,25 @@ const FONT_WEIGHTS = [
 ];
 
 const FONTS = [
-    { id: 'sans', label: 'Moderna (Inter/Plus Jakarta)', desc: 'Limpa e legível' },
-    { id: 'serif', label: 'Elegante (Playfair/Lora)', desc: 'Sofisticada e clássica' },
-    { id: 'tech', label: 'Tech (Space Grotesk/Inter)', desc: 'Futurista e digital' },
-    { id: 'condensed', label: 'Bold (Oswald/Roboto)', desc: 'Impactante e forte' },
+    { id: 'sans', label: 'Moderna (Inter/Plus Jakarta)', desc: 'Limpa e legível', value: 'Inter, sans-serif' },
+    { id: 'serif', label: 'Elegante (Playfair/Lora)', desc: 'Sofisticada e clássica', value: 'Playfair Display, serif' },
+    { id: 'tech', label: 'Tech (Space Grotesk/Mono)', desc: 'Futurista e digital', value: 'Space Grotesk, monospace' },
+    { id: 'display', label: 'Display (Oswald/Syne)', desc: 'Personalidade forte', value: 'Oswald, sans-serif' },
+    { id: 'minimal', label: 'Minimal (Urbanist)', desc: 'Geométrica e limpa', value: 'Urbanist, sans-serif' }, // New
+    { id: 'luxury', label: 'High Luxury (Cormorant)', desc: 'Serifa fina e alta', value: 'Cormorant Garamond, serif' }, // New
 ];
 
 const SINGLE_FONTS = [
-    { id: 'Inter', label: 'Inter', desc: 'A padrão da web moderna', style: 'sans-serif' },
-    { id: 'Roboto', label: 'Roboto', desc: 'Geométrica e amigável', style: 'sans-serif' },
-    { id: 'Poppins', label: 'Poppins', desc: 'Geométrica e carismática', style: 'sans-serif' },
-    { id: 'Playfair Display', label: 'Playfair', desc: 'Serifada de alto luxo', style: 'serif' },
-    { id: 'Montserrat', label: 'Montserrat', desc: 'Urbana e moderna', style: 'sans-serif' },
-    { id: 'Open Sans', label: 'Open Sans', desc: 'Legibilidade neutra', style: 'sans-serif' },
+    { id: 'Inter', label: 'Inter', desc: 'A padrão da web moderna', style: 'sans-serif', value: 'Inter, sans-serif' },
+    { id: 'Plus Jakarta Sans', label: 'Jakarta', desc: 'Geométrica moderna', style: 'sans-serif', value: '"Plus Jakarta Sans", sans-serif' },
+    { id: 'Space Grotesk', label: 'Space', desc: 'Tech brutalist', style: 'sans-serif', value: 'Space Grotesk, monospace' },
+    { id: 'Playfair Display', label: 'Playfair', desc: 'Serifada de alto luxo', style: 'serif', value: 'Playfair Display, serif' },
+    { id: 'Outfit', label: 'Outfit', desc: 'Clean e sofisticada', style: 'sans-serif', value: 'Outfit, sans-serif' },
+    { id: 'Syne', label: 'Syne', desc: 'Arística e única', style: 'sans-serif', value: 'Syne, sans-serif' },
+    { id: 'Urbanist', label: 'Urbanist', desc: 'Geométrica premium', style: 'sans-serif', value: 'Urbanist, sans-serif' }, // New
+    { id: 'IBM Plex Mono', label: 'IBM Mono', desc: 'Engenharia de dados', style: 'monospace', value: '"IBM Plex Mono", monospace' }, // New
+    { id: 'Unbounded', label: 'Unbounded', desc: 'Futurismo radical', style: 'sans-serif', value: 'Unbounded, sans-serif' }, // New
+    { id: 'Cormorant Garamond', label: 'Cormorant', desc: 'Elegância sublime', style: 'serif', value: 'Cormorant Garamond, serif' }, // New
 ];
 
 const SECTIONS_LIST = [
@@ -108,6 +132,46 @@ const SECTIONS_LIST = [
     { id: 'Testimonials', label: 'Depoimentos' },
     { id: 'FAQ', label: 'Perguntas Frequentes' },
     { id: 'Locations', label: 'Localização/Contato' },
+];
+
+const PLATFORMS = [
+    {
+        id: 'Lovable',
+        label: 'Lovable',
+        desc: 'Construtor AI Full-stack (Supabase + React).',
+        logo: '/platforms/lovable.png',
+        activeColor: '#ec4899', // Pink/Magenta for Lovable brand match
+        activeBg: 'linear-gradient(145deg, rgba(236, 72, 153, 0.1) 0%, rgba(236, 72, 153, 0.02) 100%)',
+        borderColor: '#ec4899',
+        recommended: true
+    },
+    {
+        id: 'Google AI Studio',
+        label: 'Google AI Studio',
+        desc: 'Gera prompts otimizados (Modelo 1.5 Pro).',
+        logo: '/platforms/google-ai.png',
+        activeColor: '#4285F4',
+        activeBg: 'rgba(66, 133, 244, 0.05)',
+        borderColor: '#4285F4'
+    },
+    {
+        id: 'Vercel',
+        label: 'Vercel v0',
+        desc: 'Prototipagem rápida de interfaces (UI).',
+        logo: '/platforms/vercel.svg',
+        activeColor: '#ffffff',
+        activeBg: 'rgba(255, 255, 255, 0.05)',
+        borderColor: '#ffffff'
+    },
+    {
+        id: 'Replit',
+        label: 'Replit Agent',
+        desc: 'Agente de codificação autônomo.',
+        logo: '/platforms/replit.png',
+        activeColor: '#F26207',
+        activeBg: 'rgba(242, 98, 7, 0.1)',
+        borderColor: '#F26207'
+    },
 ];
 
 export default function LandingBuilderPage() {
@@ -149,8 +213,11 @@ export default function LandingBuilderPage() {
             // 5: Design Details (NEW)
             // 6: Sections
             // 7: Content
-            // 8: Generate
-            if (step < 7) setStep(step + 1);
+            // 8: Platform (NEW)
+            // 9: Sections
+            // 10: Content
+            // 11: Generate
+            if (step < 10) setStep(step + 1);
             else handleGeneratePrompt();
         }
     };
@@ -160,7 +227,7 @@ export default function LandingBuilderPage() {
     };
 
     const handleGeneratePrompt = async () => {
-        setStep(8); // Result screen (Custom mode index)
+        setStep(11); // Result screen (Custom mode index + 3 new steps)
         setIsGenerating(true);
 
         try {
@@ -184,12 +251,19 @@ export default function LandingBuilderPage() {
                     fontWeight: state.mode === 'custom' ? state.fontWeight : undefined,
                     useSingleFont: state.mode === 'custom' ? state.useSingleFont : undefined,
 
+                    // New Architect Fields
+                    geometry: state.mode === 'custom' ? state.geometry : undefined,
+                    layout: state.mode === 'custom' ? state.layout : undefined,
+
                     voiceTone: state.mode === 'custom' ? state.tone : undefined,
                     problemSolved: state.mode === 'custom' ? state.mainOffer : undefined,
                     cta: state.mode === 'custom' ? state.contactInfo : undefined,
                     sections: state.mode === 'custom' ? state.sections : undefined,
 
-                    brandName: state.brandName
+                    brandName: state.brandName,
+
+                    // Critical: Target Platform for Backend Logic
+                    targetPlatform: state.targetPlatform
                 })
             });
 
@@ -346,152 +420,518 @@ export default function LandingBuilderPage() {
                     </>
                 );
 
-            case 4: // Visual Style
+            case 4: // Visual Style - ARCHITECT UPDATE
                 return (
                     <>
                         <div className={styles.stepHeader}>
-                            <h2 className={styles.stepTitle}>Estilo Visual</h2>
-                            <p className={styles.stepDescription}>Qual a estética desejada?</p>
+                            <h2 className={styles.stepTitle}>Direção de Arte</h2>
+                            <p className={styles.stepDescription}>
+                                "O estilo não é enfeite, é posicionamento."
+                                <br />
+                                <span style={{ opacity: 0.5, fontSize: '0.9em' }}>Escolha a estética que ressoa com o inconsciente do seu público.</span>
+                            </p>
                         </div>
-                        <div className={styles.grid2}>
+                        <div className={styles.grid2} style={{ marginBottom: '2.5rem' }}>
                             {STYLES.map(s => (
                                 <div
                                     key={s.id}
                                     className={`${styles.card} ${state.style === s.id ? styles.selected : ''}`}
                                     onClick={() => updateState('style', s.id)}
-                                    style={{ '--primary': s.color } as React.CSSProperties}
+                                    style={{
+                                        '--primary': s.color,
+                                        background: state.style === s.id ? `linear-gradient(145deg, rgba(255,255,255,0.05) 0%, ${s.color}22 100%)` : 'rgba(255,255,255,0.02)',
+                                        border: state.style === s.id ? `1px solid ${s.color}` : '1px solid rgba(255,255,255,0.08)',
+                                        transform: state.style === s.id ? 'translateY(-2px)' : 'none',
+                                        boxShadow: state.style === s.id ? `0 10px 30px -10px ${s.color}44` : 'none',
+                                        padding: '2rem 1.5rem',
+                                        alignItems: 'center',
+                                        textAlign: 'center',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'center'
+                                    } as React.CSSProperties}
                                 >
                                     <div
                                         className={styles.cardIcon}
                                         style={{
-                                            marginBottom: '0.5rem',
-                                            borderRadius: s.id === 'bold' ? '4px' : s.id === 'editorial' ? '50%' : '16px',
-                                            borderWidth: s.id === 'minimal' ? '1px' : s.id === 'bold' ? '2px' : '1px',
-                                            background: s.id === 'minimal' ? 'transparent' : undefined
+                                            marginBottom: '1rem',
+                                            borderRadius: '50%',
+                                            padding: '16px',
+                                            background: state.style === s.id ? s.color : 'rgba(255,255,255,0.05)',
+                                            color: state.style === s.id ? (s.id === 'swiss' ? 'black' : 'white') : 'rgba(255,255,255,0.7)',
+                                            transition: 'all 0.3s',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            width: '64px',
+                                            height: '64px'
                                         }}
                                     >
-                                        {s.id === 'modern' && <Layers size={24} />}
-                                        {s.id === 'minimal' && <Frame size={24} strokeWidth={1.5} />}
-                                        {s.id === 'editorial' && <Feather size={24} />}
-                                        {s.id === 'bold' && <Megaphone size={24} strokeWidth={2.5} />}
+                                        {s.id === 'swiss' && <Palette size={28} />}
+                                        {s.id === 'brutalist' && <Frame size={28} strokeWidth={2.5} />}
+                                        {s.id === 'glass' && <Layers size={28} />}
+                                        {s.id === 'editorial' && <Feather size={28} />}
                                     </div>
-                                    <span className={styles.cardTitle}>{s.label}</span>
-                                    <span className={styles.cardDesc} style={{ fontSize: '0.85rem', opacity: 0.7 }}>{s.desc}</span>
+                                    <span className={styles.cardTitle} style={{ fontSize: '1.2rem', marginBottom: '0.6rem' }}>{s.label}</span>
+                                    <span className={styles.cardDesc} style={{ fontSize: '0.9rem', opacity: 0.7, lineHeight: 1.5, maxWidth: '240px', margin: '0 auto' }}>{s.desc}</span>
                                 </div>
                             ))}
+                        </div>
+
+                        {/* Professional Expert Insight */}
+                        <div style={{
+                            marginTop: '1rem',
+                            padding: '1.25rem',
+                            background: 'linear-gradient(90deg, rgba(20,20,20,1) 0%, rgba(30,30,30,1) 100%)',
+                            borderRadius: '12px',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            display: 'flex',
+                            gap: '1.25rem',
+                            position: 'relative',
+                            overflow: 'hidden'
+                        }}>
+                            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: 'var(--primary)' }} />
+
+                            <div style={{
+                                background: 'rgba(245, 165, 36, 0.1)',
+                                padding: '10px',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: 'fit-content',
+                                alignSelf: 'flex-start'
+                            }}>
+                                <Sparkles size={24} style={{ color: 'var(--primary)' }} />
+                            </div>
+
+                            <div>
+                                <h4 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.5rem', color: 'white', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Expertise em Direção de Arte</h4>
+                                <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', margin: 0, lineHeight: 1.6, maxWidth: '650px' }}>
+                                    O <b>Minimalismo Suíço</b> transmite segurança corporativa, ideal para B2B.
+                                    Para disrupção visual (B2C/Gen-Z), o <b>Neo-Brutalismo</b> cria "fricção intencional" que aumenta a retenção.
+                                    <br />
+                                    <span style={{ opacity: 0.8, fontStyle: 'italic', marginTop: '4px', display: 'block' }}>Evite Glassmorphism para conteúdos densos; use apenas para "wow factor" pontual.</span>
+                                </p>
+                            </div>
                         </div>
                     </>
                 );
 
-            case 5: // Design Details (Advanced)
+            case 5: // ARCHITECTURE: Geometry & Layout
                 return (
                     <>
                         <div className={styles.stepHeader}>
-                            <h2 className={styles.stepTitle}>Refinamento Visual</h2>
-                            <p className={styles.stepDescription}>Personalize as cores e a tipografia em detalhes.</p>
+                            <h2 className={styles.stepTitle}>Física & Estrutura</h2>
+                            <p className={styles.stepDescription}>
+                                A "psicologia invisível" do seu design.
+                                <br />
+                                <span style={{ opacity: 0.5, fontSize: '0.9em' }}>Decisões de geometria afetam a confiança subconsciente do usuário em 50ms.</span>
+                            </p>
                         </div>
 
-                        {/* Colors */}
-                        <div className={styles.grid2} style={{ marginBottom: '2rem' }}>
+                        {/* Geometry Section */}
+                        <div style={{ marginBottom: '3rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.2rem' }}>
+                                <label className={styles.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1rem', color: 'white' }}>
+                                    <Frame size={18} style={{ color: 'var(--primary)' }} />
+                                    Geometria
+                                </label>
+                                <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>ACABAMENTO</span>
+                            </div>
+
+                            <div className={styles.grid3} style={{ gap: '1rem' }}>
+                                {GEOMETRIES.map(g => (
+                                    <div
+                                        key={g.id}
+                                        onClick={() => updateState('geometry', g.id)}
+                                        className={`${styles.card} ${state.geometry === g.id ? styles.selected : ''}`}
+                                        style={{
+                                            padding: '1.5rem',
+                                            textAlign: 'center',
+                                            gap: '1rem',
+                                            background: state.geometry === g.id ? 'rgba(245, 165, 36, 0.05)' : 'rgba(0,0,0,0.4)',
+                                            border: state.geometry === g.id ? '1px solid var(--primary)' : '1px solid rgba(255,255,255,0.08)',
+                                            alignItems: 'center'
+                                        }}
+                                    >
+                                        <div
+                                            style={{
+                                                width: '48px',
+                                                height: '48px',
+                                                background: state.geometry === g.id ? 'var(--primary)' : 'rgba(255,255,255,0.08)',
+                                                borderRadius: g.visualClass === 'soft' ? '50%' : g.visualClass === 'mixed' ? '0px 16px 0px 16px' : '0px',
+                                                margin: '0 auto',
+                                                transition: 'all 0.3s',
+                                                boxShadow: state.geometry === g.id ? '0 0 20px rgba(245, 165, 36, 0.4)' : 'none'
+                                            }}
+                                        />
+                                        <div>
+                                            <span className={styles.cardTitle} style={{ fontSize: '1rem', display: 'block', marginBottom: '0.4rem' }}>{g.label}</span>
+                                            <p className={styles.cardDesc} style={{ fontSize: '0.8rem', lineHeight: '1.4', opacity: 0.6 }}>{g.desc}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Layout Section */}
+                        <div style={{ marginBottom: '2.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.2rem' }}>
+                                <label className={styles.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1rem', color: 'white' }}>
+                                    <Layout size={18} style={{ color: 'var(--primary)' }} />
+                                    Topologia
+                                </label>
+                                <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>GRID SYSTEM</span>
+                            </div>
+
+                            <div className={styles.grid2} style={{ gap: '1rem' }}>
+                                {LAYOUTS.map(l => (
+                                    <div
+                                        key={l.id}
+                                        onClick={() => updateState('layout', l.id)}
+                                        className={`${styles.card} ${state.layout === l.id ? styles.selected : ''}`}
+                                        style={{
+                                            flexDirection: 'row',
+                                            textAlign: 'left',
+                                            alignItems: 'center',
+                                            padding: '1.5rem',
+                                            background: state.layout === l.id ? 'rgba(245, 165, 36, 0.05)' : 'rgba(0,0,0,0.4)',
+                                            border: state.layout === l.id ? '1px solid var(--primary)' : '1px solid rgba(255,255,255,0.08)'
+                                        }}
+                                    >
+                                        <div style={{
+                                            width: '56px',
+                                            height: '56px',
+                                            display: 'grid',
+                                            gridTemplateColumns: l.visualClass === 'radical' ? '1.5fr 1fr' : '1fr 1fr',
+                                            gridTemplateRows: l.visualClass === 'radical' ? '1fr 1.5fr' : '1fr 1fr',
+                                            gap: '4px',
+                                            flexShrink: 0,
+                                            padding: '4px',
+                                            background: 'rgba(255,255,255,0.03)',
+                                            borderRadius: '8px',
+                                            border: '1px solid rgba(255,255,255,0.05)'
+                                        }}>
+                                            <div style={{ background: state.layout === l.id ? 'var(--primary)' : 'rgba(255,255,255,0.4)', opacity: 0.9, borderRadius: 2 }}></div>
+                                            <div style={{ background: state.layout === l.id ? 'var(--primary)' : 'rgba(255,255,255,0.4)', opacity: 0.4, borderRadius: 2 }}></div>
+                                            <div style={{ background: state.layout === l.id ? 'var(--primary)' : 'rgba(255,255,255,0.4)', opacity: 0.2, borderRadius: 2 }}></div>
+                                            {l.visualClass === 'standard' && <div style={{ background: state.layout === l.id ? 'var(--primary)' : 'rgba(255,255,255,0.4)', opacity: 0.6, borderRadius: 2 }}></div>}
+                                        </div>
+
+                                        <div style={{ marginLeft: '1rem' }}>
+                                            <span className={styles.cardTitle} style={{ fontSize: '1rem', display: 'block', marginBottom: '0.2rem' }}>{l.label}</span>
+                                            <p className={styles.cardDesc} style={{ fontSize: '0.8rem', lineHeight: '1.4', opacity: 0.6 }}>{l.desc}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Professional Expert Insight */}
+                        <div style={{
+                            marginTop: '1rem',
+                            padding: '1.25rem',
+                            background: 'linear-gradient(90deg, rgba(20,20,20,1) 0%, rgba(30,30,30,1) 100%)',
+                            borderRadius: '12px',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            display: 'flex',
+                            gap: '1.25rem',
+                            position: 'relative',
+                            overflow: 'hidden'
+                        }}>
+                            {/* Decorative accent line */}
+                            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: 'var(--primary)' }} />
+
+                            <div style={{
+                                background: 'rgba(245, 165, 36, 0.1)',
+                                padding: '10px',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: 'fit-content'
+                            }}>
+                                <Lightbulb size={24} style={{ color: 'var(--primary)' }} />
+                            </div>
+
+                            <div>
+                                <h4 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.4rem', color: 'white', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Frontend Architect Insight</h4>
+                                <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', margin: 0, lineHeight: 1.6, maxWidth: '600px' }}>
+                                    Em 2025, a saturação de grids padrão (Bento) criou uma "cegueira de banner".
+                                    Layouts <b>Radicais</b> restauram a atenção do usuário através da <i style={{ color: 'white' }}>quebra de expectativa</i>.
+                                    Para marcas Premium, recomendamos <b>Sharp Geometry</b>.
+                                </p>
+                            </div>
+                        </div>
+                    </>
+                );
+
+            case 6: // ARCHITECTURE: Colors
+                return (
+                    <>
+                        <div className={styles.stepHeader}>
+                            <h2 className={styles.stepTitle}>Paleta Cromática</h2>
+                            <p className={styles.stepDescription}>
+                                "Cores são emoção codificada."
+                                <br />
+                                <span style={{ opacity: 0.5, fontSize: '0.9em' }}>Escolha contraste alto para retenção. Evite tons pastéis lavados ("SaaS Safe").</span>
+                            </p>
+                        </div>
+
+                        <div className={styles.grid2} style={{ marginBottom: '2.5rem' }}>
                             {/* Primary Color */}
                             <div>
-                                <label className={styles.label} style={{ marginBottom: '0.5rem', display: 'block' }}>Cor Primária (Destaques)</label>
-                                <div className={styles.featuresGrid} style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(40px, 1fr))', gap: '8px' }}>
+                                <label className={styles.label} style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1rem', color: 'white' }}>
+                                    <Palette size={18} style={{ color: 'var(--primary)' }} />
+                                    Cor Primária (Brand & CTA)
+                                </label>
+                                <div className={styles.featuresGrid} style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
                                     {COLORS.filter(c => c.id !== 'white').map(c => (
                                         <div
                                             key={`p-${c.id}`}
                                             onClick={() => updateState('primaryColor', c.color)}
                                             style={{
-                                                width: '40px', height: '40px', borderRadius: '10px', background: c.color, cursor: 'pointer',
-                                                border: state.primaryColor === c.color ? '2px solid white' : '1px solid rgba(255,255,255,0.1)',
-                                                boxShadow: state.primaryColor === c.color ? `0 0 10px ${c.color}` : 'none',
-                                                transition: 'all 0.2s'
+                                                height: '70px',
+                                                borderRadius: '12px',
+                                                background: c.color,
+                                                cursor: 'pointer',
+                                                border: state.primaryColor === c.color ? '3px solid white' : '1px solid rgba(255,255,255,0.1)',
+                                                boxShadow: state.primaryColor === c.color ? `0 0 20px ${c.color}66` : 'none',
+                                                transition: 'all 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+                                                position: 'relative',
+                                                transform: state.primaryColor === c.color ? 'scale(1.05)' : 'scale(1)',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                justifyContent: 'flex-end',
+                                                padding: '8px',
+                                                overflow: 'hidden'
                                             }}
                                             title={c.label}
-                                        />
+                                        >
+                                            {state.primaryColor === c.color && <div style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.3)', borderRadius: '50%', padding: 2 }}><Check size={14} color="white" /></div>}
+                                            <span style={{ fontSize: '0.7rem', fontWeight: 600, color: c.id === 'white' ? 'black' : 'rgba(255,255,255,0.9)', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{c.label}</span>
+                                        </div>
                                     ))}
                                 </div>
                             </div>
 
                             {/* Secondary Color */}
                             <div>
-                                <label className={styles.label} style={{ marginBottom: '0.5rem', display: 'block' }}>Cor Secundária (Fundo/Base)</label>
-                                <div className={styles.featuresGrid} style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(40px, 1fr))', gap: '8px' }}>
+                                <label className={styles.label} style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1rem', color: 'white' }}>
+                                    <Layers size={18} style={{ color: 'var(--primary)' }} />
+                                    Cor Base (Background)
+                                </label>
+                                <div className={styles.featuresGrid} style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
                                     {COLORS.map(c => (
                                         <div
                                             key={`s-${c.id}`}
                                             onClick={() => updateState('secondaryColor', c.color)}
                                             style={{
-                                                width: '40px', height: '40px', borderRadius: '10px', background: c.color, cursor: 'pointer',
-                                                border: state.secondaryColor === c.color ? '2px solid white' : '1px solid rgba(255,255,255,0.1)',
-                                                transform: state.secondaryColor === c.color ? 'scale(1.1)' : 'scale(1)',
-                                                transition: 'all 0.2s'
+                                                height: '70px',
+                                                borderRadius: '12px',
+                                                background: c.color,
+                                                cursor: 'pointer',
+                                                border: state.secondaryColor === c.color ? '3px solid white' : '1px solid rgba(255,255,255,0.1)',
+                                                transform: state.secondaryColor === c.color ? 'scale(1.05)' : 'scale(1)',
+                                                transition: 'all 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+                                                position: 'relative',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                justifyContent: 'flex-end',
+                                                padding: '8px',
+                                                overflow: 'hidden'
                                             }}
                                             title={c.label}
-                                        />
+                                        >
+                                            {state.secondaryColor === c.color && <div style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.3)', borderRadius: '50%', padding: 2 }}><Check size={14} color={c.id === 'black' || c.id === 'blue' || c.id === 'red' || c.id === 'emerald' ? 'white' : 'black'} /></div>}
+                                            <span style={{ fontSize: '0.7rem', fontWeight: 600, color: c.id === 'white' ? 'black' : 'rgba(255,255,255,0.9)', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{c.color}</span>
+                                        </div>
                                     ))}
                                 </div>
                             </div>
                         </div>
 
-                        <hr style={{ borderColor: 'rgba(255,255,255,0.05)', margin: '2rem 0' }} />
+                        {/* Professional Expert Insight */}
+                        <div style={{
+                            marginTop: '1rem',
+                            padding: '1.25rem',
+                            background: 'linear-gradient(90deg, rgba(20,20,20,1) 0%, rgba(30,30,30,1) 100%)',
+                            borderRadius: '12px',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            display: 'flex',
+                            gap: '1.25rem',
+                            position: 'relative',
+                            overflow: 'hidden'
+                        }}>
+                            {/* Decorative accent line - Red for Warning/Intensity */}
+                            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: '#ef4444' }} />
 
-                        {/* Typography */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                            <label className={styles.label}>Tipografia</label>
+                            <div style={{
+                                background: 'rgba(239, 68, 68, 0.1)',
+                                padding: '10px',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: 'fit-content'
+                            }}>
+                                <Zap size={24} style={{ color: '#ef4444' }} />
+                            </div>
+
+                            <div>
+                                <h4 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.4rem', color: 'white', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Alerta de Design: A Armadilha do Roxo</h4>
+                                <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', margin: 0, lineHeight: 1.6, maxWidth: '650px' }}>
+                                    O uso excessivo de <span style={{ color: '#c084fc', fontStyle: 'italic' }}>Violeta de IA</span> tornou-se um "porto seguro" genérico em 2025.
+                                    Para transmitir <b>Autoridade Real</b>, prefira o <span style={{ color: '#fff', fontWeight: 600 }}>Monocromático</span> ou tons de <span style={{ color: '#f97316', fontWeight: 600 }}>Alta Energia</span>. Diferenciação é a chave da conversão.
+                                </p>
+                            </div>
+                        </div>
+                    </>
+                );
+
+            case 7: // ARCHITECTURE: Typography
+                return (
+                    <>
+                        <div className={styles.stepHeader}>
+                            <h2 className={styles.stepTitle}>Tipografia</h2>
+                            <p className={styles.stepDescription}>
+                                "A voz textual do seu projeto."
+                                <br />
+                                <span style={{ opacity: 0.5, fontSize: '0.9em' }}>Legibilidade constrói confiança. Escolha com base na densidade de informação.</span>
+                            </p>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <Type size={20} style={{ color: 'var(--primary)' }} />
+                                <div>
+                                    <span style={{ display: 'block', fontSize: '0.95rem', fontWeight: 600, color: 'white' }}>Single Font Mode</span>
+                                    <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)' }}>Use a mesma fonte para títulos e corpo (Estilo Suíço/Minimalista)</span>
+                                </div>
+                            </div>
                             <button
                                 onClick={() => updateState('useSingleFont', !state.useSingleFont)}
-                                style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                                style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
                             >
-                                <div style={{ width: 36, height: 20, background: state.useSingleFont ? 'var(--primary)' : 'rgba(255,255,255,0.1)', borderRadius: 20, position: 'relative', transition: 'all 0.3s' }}>
-                                    <div style={{ width: 16, height: 16, background: 'white', borderRadius: '50%', position: 'absolute', top: 2, left: state.useSingleFont ? 18 : 2, transition: 'all 0.3s' }} />
+                                <div style={{ width: 44, height: 24, background: state.useSingleFont ? 'var(--primary)' : 'rgba(255,255,255,0.1)', borderRadius: 20, position: 'relative', transition: 'all 0.3s', boxShadow: state.useSingleFont ? '0 0 10px rgba(245, 165, 36, 0.4)' : 'none' }}>
+                                    <div style={{ width: 18, height: 18, background: 'white', borderRadius: '50%', position: 'absolute', top: 3, left: state.useSingleFont ? 23 : 3, transition: 'all 0.3s cubic-bezier(0.22, 1, 0.36, 1)' }} />
                                 </div>
-                                Usar apenas uma fonte
                             </button>
                         </div>
 
-                        <div className={styles.grid2} style={{ marginBottom: '1.5rem' }}>
+                        <div className={styles.grid2} style={{ marginBottom: '2.5rem' }}>
                             {(state.useSingleFont ? SINGLE_FONTS : FONTS).map(f => (
                                 <div
                                     key={f.id}
                                     className={`${styles.card} ${state.typography === f.id ? styles.selected : ''}`}
                                     onClick={() => updateState('typography', f.id)}
-                                    style={{ padding: '0.75rem 1rem', minHeight: 'auto', flexDirection: 'row', textAlign: 'left', gap: '1rem', borderLeft: 'none' } as any}
+                                    style={{
+                                        padding: '1.5rem',
+                                        flexDirection: 'row',
+                                        textAlign: 'left',
+                                        gap: '1.5rem',
+                                        alignItems: 'center',
+                                        background: state.typography === f.id ? 'rgba(245, 165, 36, 0.05)' : 'rgba(0,0,0,0.4)',
+                                        border: state.typography === f.id ? '1px solid var(--primary)' : '1px solid rgba(255,255,255,0.08)'
+                                    }}
                                 >
-                                    <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)', fontFamily: state.useSingleFont ? f.id : undefined }}>Aa</div>
+                                    <div style={{
+                                        fontSize: '2.5rem',
+                                        lineHeight: 1,
+                                        fontWeight: state.fontWeight === 'bold' ? 700 : state.fontWeight === 'medium' ? 500 : state.fontWeight === 'light' ? 300 : 400, // Dynamic Weight
+                                        color: state.typography === f.id ? 'var(--primary)' : 'rgba(255,255,255,0.8)',
+                                        fontFamily: f.value, // Using the actual font-family value for preview
+                                        background: state.typography === f.id ? 'rgba(245, 165, 36, 0.1)' : 'rgba(255,255,255,0.05)',
+                                        width: '64px',
+                                        height: '64px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        borderRadius: '12px',
+                                        border: '1px solid rgba(255,255,255,0.05)',
+                                        transition: 'all 0.3s'
+                                    }}>
+                                        Aa
+                                    </div>
                                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <span className={styles.cardTitle} style={{ fontSize: '0.9rem' }}>{f.label}</span>
-                                        <span className={styles.cardDesc} style={{ fontSize: '0.75rem' }}>{f.desc}</span>
+                                        <span className={styles.cardTitle} style={{ fontSize: '1.1rem', marginBottom: '0.3rem', fontFamily: f.value, fontWeight: state.fontWeight === 'bold' ? 700 : state.fontWeight === 'medium' ? 500 : state.fontWeight === 'light' ? 300 : 400 }}>{f.label}</span>
+                                        <span className={styles.cardDesc} style={{ fontSize: '0.8rem', opacity: 0.6 }}>{f.desc}</span>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
-                        {/* Font Weight */}
-                        <label className={styles.label} style={{ marginBottom: '1rem', display: 'block' }}>Espessura da Fonte (Heading)</label>
-                        <div className={`${styles.featuresGrid} ${styles.weightGrid}`} style={{ gap: '0.5rem' }}>
-                            {FONT_WEIGHTS.map(w => (
-                                <button
-                                    key={w.id}
-                                    onClick={() => updateState('fontWeight', w.id)}
-                                    className={styles.chip}
-                                    style={{
-                                        width: '100%',
-                                        justifyContent: 'center',
-                                        background: state.fontWeight === w.id ? 'var(--primary)' : 'rgba(255,255,255,0.03)',
-                                        color: state.fontWeight === w.id ? '#000' : 'rgba(255,255,255,0.6)',
-                                        borderColor: state.fontWeight === w.id ? 'var(--primary)' : 'transparent',
-                                        fontWeight: w.id === 'bold' ? 700 : w.id === 'medium' ? 500 : w.id === 'light' ? 300 : 400
-                                    }}
-                                >
-                                    {w.label}
-                                </button>
-                            ))}
+                        <div style={{ marginBottom: '2rem' }}>
+                            <label className={styles.label} style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1rem', color: 'white' }}>
+                                <ArrowUpRight size={18} style={{ color: 'var(--primary)' }} />
+                                Peso dos Títulos (Heading Weight)
+                            </label>
+                            <div className={`${styles.featuresGrid} ${styles.weightGrid}`} style={{ gap: '0.75rem' }}>
+                                {FONT_WEIGHTS.map(w => (
+                                    <button
+                                        key={w.id}
+                                        onClick={() => updateState('fontWeight', w.id)}
+                                        className={styles.chip}
+                                        style={{
+                                            width: '100%',
+                                            justifyContent: 'center',
+                                            padding: '0.8rem',
+                                            borderRadius: '10px',
+                                            background: state.fontWeight === w.id ? 'var(--primary)' : 'rgba(255,255,255,0.03)',
+                                            color: state.fontWeight === w.id ? '#000' : 'rgba(255,255,255,0.6)',
+                                            borderColor: state.fontWeight === w.id ? 'var(--primary)' : 'transparent',
+                                            fontWeight: w.id === 'bold' ? 700 : w.id === 'medium' ? 500 : w.id === 'light' ? 300 : 400,
+                                            fontSize: '0.9rem',
+                                            boxShadow: state.fontWeight === w.id ? '0 4px 12px rgba(245, 165, 36, 0.3)' : 'none'
+                                        }}
+                                    >
+                                        {w.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Professional Expert Insight */}
+                        <div style={{
+                            marginTop: '1rem',
+                            padding: '1.25rem',
+                            background: 'linear-gradient(90deg, rgba(20,20,20,1) 0%, rgba(30,30,30,1) 100%)',
+                            borderRadius: '12px',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            display: 'flex',
+                            gap: '1.25rem',
+                            position: 'relative',
+                            overflow: 'hidden'
+                        }}>
+                            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: 'var(--primary)' }} />
+
+                            <div style={{
+                                background: 'rgba(245, 165, 36, 0.1)',
+                                padding: '10px',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: 'fit-content'
+                            }}>
+                                <Type size={24} style={{ color: 'var(--primary)' }} />
+                            </div>
+
+                            <div>
+                                <h4 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.4rem', color: 'white', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Psicologia da Tipografia</h4>
+                                <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', margin: 0, lineHeight: 1.6, maxWidth: '650px' }}>
+                                    Fontes <b>Sans-Serif</b> (como Inter/Jakarta) projetam modernidade e eficiência tecnológica.
+                                    <b>Serifadas</b> (Playfair) evocam tradição, luxo e autoridade editorial.
+                                    <br />
+                                    <span style={{ opacity: 0.8, fontStyle: 'italic', fontSize: '0.8em' }}>Regra de Ouro: Nunca sacrifique legibilidade por estética.</span>
+                                </p>
+                            </div>
                         </div>
                     </>
                 );
 
-            case 6: // Sections
+            case 9: // Sections (shifted)
                 return (
                     <>
                         <div className={styles.stepHeader}>
@@ -515,7 +955,7 @@ export default function LandingBuilderPage() {
                     </>
                 );
 
-            case 7: // Content Details
+            case 10: // Content Details (shifted)
                 return (
                     <>
                         <div className={styles.stepHeader}>
@@ -555,6 +995,113 @@ export default function LandingBuilderPage() {
                         </div>
                     </>
                 );
+            case 8: // Platform Selection (NEW)
+                return (
+                    <>
+                        <div className={styles.stepHeader}>
+                            <h2 className={styles.stepTitle}>Plataforma de Construção</h2>
+                            <p className={styles.stepDescription}>
+                                Onde você vai buildar esse projeto?
+                                <br />
+                                <span style={{ opacity: 0.6, fontSize: '0.9em' }}>Otimizaremos o prompt especificamente para a "mente" da IA escolhida.</span>
+                            </p>
+                        </div>
+                        <div className={styles.grid2}>
+                            {PLATFORMS.map(p => (
+                                <div
+                                    key={p.id}
+                                    className={`${styles.card} ${state.targetPlatform === p.id ? styles.selected : ''}`}
+                                    onClick={() => updateState('targetPlatform', p.id)}
+                                    style={{
+                                        padding: '1.5rem',
+                                        alignItems: 'center', // Center align for stronger visual
+                                        textAlign: 'center', // Center text 
+                                        gap: '1.2rem',
+                                        background: state.targetPlatform === p.id ? p.activeBg : 'rgba(255,255,255,0.02)',
+                                        borderColor: state.targetPlatform === p.id ? p.borderColor : 'rgba(255,255,255,0.08)',
+                                        boxShadow: state.targetPlatform === p.id ? `0 0 40px ${p.activeColor}33` : 'none', // Stronger glow
+                                        position: 'relative',
+                                        overflow: 'visible', // Allow glow/badge to pop
+                                        transform: state.targetPlatform === p.id ? 'scale(1.02)' : 'scale(1)',
+                                        transition: 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)'
+                                    }}
+                                >
+                                    {/* Recommended Badge */}
+                                    {p.recommended && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: '-10px',
+                                            right: '12px',
+                                            background: 'linear-gradient(90deg, #ec4899, #8b5cf6)', // Pink to Purple gradient
+                                            padding: '6px 12px',
+                                            borderRadius: '20px',
+                                            fontSize: '0.7rem',
+                                            fontWeight: 800,
+                                            color: 'white',
+                                            letterSpacing: '0.8px',
+                                            textTransform: 'uppercase',
+                                            boxShadow: '0 4px 15px rgba(236, 72, 153, 0.4)',
+                                            zIndex: 10
+                                        }}>
+                                            Recomendado
+                                        </div>
+                                    )}
+
+                                    <div className={styles.cardIcon} style={{
+                                        background: state.targetPlatform === p.id ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
+                                        padding: '16px',
+                                        borderRadius: '16px',
+                                        width: '80px',
+                                        height: '80px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        transition: 'all 0.3s',
+                                        border: state.targetPlatform === p.id ? `1px solid ${p.activeColor}44` : '1px solid rgba(255,255,255,0.05)'
+                                    }}>
+                                        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                                            <Image
+                                                src={p.logo}
+                                                alt={p.label}
+                                                fill
+                                                style={{
+                                                    objectFit: 'contain',
+                                                    // High visibility mode: Minimal grayscale, high opacity
+                                                    filter: state.targetPlatform === p.id ? 'none' : 'grayscale(20%) opacity(0.9)',
+                                                    transition: 'all 0.4s ease'
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div style={{ marginTop: '0.5rem', marginBottom: '0.5rem' }}>
+                                        <span className={styles.cardTitle} style={{ fontSize: '1.2rem', display: 'block', marginBottom: '0.4rem', fontWeight: 600 }}>{p.label}</span>
+                                        <span className={styles.cardDesc} style={{ fontSize: '0.85rem', opacity: 0.6, lineHeight: 1.5, maxWidth: '220px', margin: '0 auto' }}>{p.desc}</span>
+                                    </div>
+
+                                    {/* Refined Selection Indicator - Integrated Ring */}
+                                    <div style={{
+                                        marginTop: 'auto',
+                                        width: '24px',
+                                        height: '24px',
+                                        borderRadius: '50%',
+                                        border: state.targetPlatform === p.id ? 'none' : '2px solid rgba(255,255,255,0.2)',
+                                        background: state.targetPlatform === p.id ? p.activeColor : 'transparent',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        transition: 'all 0.3s ease',
+                                        boxShadow: state.targetPlatform === p.id ? `0 2px 8px ${p.activeColor}66` : 'none'
+                                    }}>
+                                        {state.targetPlatform === p.id && (
+                                            <Check size={14} color={p.activeColor === '#ffffff' ? 'black' : 'white'} strokeWidth={3} />
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                );
+
             default:
                 return null;
         }
@@ -562,10 +1109,13 @@ export default function LandingBuilderPage() {
 
     return (
         <div className={styles.container}>
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, opacity: 0.4 }}>
+                <Plasma color="#F5A524" speed={0.5} scale={1.2} />
+            </div>
             <Link href="/dashboard" className={styles.closeButton} aria-label="Voltar para o Dashboard">
                 <X size={24} />
             </Link>
-            {step < 8 ? (
+            {step <= 10 ? (
                 <div className={styles.wizardCard}>
                     {/* Progress Bar (Dynamic based on mode) */}
                     <div className={styles.progressBar}>
@@ -574,13 +1124,13 @@ export default function LandingBuilderPage() {
                             style={{
                                 width: state.mode === 'portfolio'
                                     ? step === 0 ? '5%' : '50%'
-                                    : `${(step / 7) * 100}%`
+                                    : `${(step / 10) * 100}%`
                             }}
                         />
                     </div>
 
                     <div className={styles.stepIndicator}>
-                        {state.mode === 'portfolio' && step > 0 ? 'Passo Rápido' : `Passo ${step === 0 ? 'Inicial' : step} de ${state.mode === 'portfolio' ? 1 : 7}`}
+                        {state.mode === 'portfolio' && step > 0 ? 'Passo Rápido' : `Passo ${step === 0 ? 'Inicial' : step} de ${state.mode === 'portfolio' ? 1 : 10}`}
                     </div>
 
                     <div className={styles.contentArea}>
@@ -614,7 +1164,7 @@ export default function LandingBuilderPage() {
                             disabled={isNextDisabled()}
                             style={{ opacity: isNextDisabled() ? 0.5 : 1 }}
                         >
-                            {(state.mode === 'portfolio' && step === 1) || step === 7
+                            {(state.mode === 'portfolio' && step === 1) || step === 10
                                 ? 'Gerar Mágica'
                                 : <>Próximo <ChevronDown style={{ transform: 'rotate(-90deg)' }} size={20} /></>
                             }
@@ -625,14 +1175,14 @@ export default function LandingBuilderPage() {
                 <div className={styles.resultCard} style={{ background: 'transparent', border: 'none', boxShadow: 'none' }}>
                     <div className={styles.resultHeader}>
                         <h2 className={styles.resultTitle}>Seu Prompt está Pronto</h2>
-                        <p className={styles.resultDesc}>Agora é só copiar e colar no <b>{state.mode === 'portfolio' ? 'Lovable' : 'Lovable'}</b>.</p>
+                        <p className={styles.resultDesc}>Agora é só copiar e colar no <b>{state.targetPlatform}</b>.</p>
                     </div>
 
                     {isGenerating ? (
                         <div className={styles.loadingOverlay} style={{ position: 'relative', height: '300px', background: 'transparent' }}>
                             <div className={styles.spinner} />
                             <span>
-                                {state.mode === 'portfolio' ? 'A IA está imaginando seu portfólio completo...' : 'Otimizando especificações técnicas...'}
+                                {state.mode === 'portfolio' ? 'A IA está imaginando seu portfólio completo...' : `Otimizando especificações para ${state.targetPlatform}...`}
                             </span>
                         </div>
                     ) : (
@@ -645,7 +1195,7 @@ export default function LandingBuilderPage() {
                                 </div>
                                 <span className={styles.fileName}>prompt_landing_page.md</span>
                                 <div style={{ flex: 1 }} />
-                                <div className={styles.badge}>Lovable Mode</div>
+                                <div className={styles.badge}>{state.targetPlatform} Mode</div>
                             </div>
 
                             <div className={styles.editorBody}>

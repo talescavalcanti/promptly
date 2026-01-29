@@ -77,35 +77,32 @@ export default function ProjectsPage() {
                         </div>
                     </ScrollReveal>
                 ) : (
-                    <ScrollReveal delay={0.1}>
-                        <div className={styles.grid}>
-                            {projects.map((project) => (
-                                <Link href={`/projects/${project.id}`} key={project.id} style={{ textDecoration: 'none' }}>
-                                    <div
-                                        className={styles.card}
-                                        onMouseMove={handleMouseMove}
-                                    >
+                    <div className={styles.grid}>
+                        {projects.map((project) => (
+                            <Link href={`/projects/${project.id}`} key={project.id} className={styles.projectLink}>
+                                <div className={styles.card}>
+                                    <div className={styles.cardHeader}>
                                         <h3 className={styles.cardTitle}>
-                                            {project.title || 'Projeto sem título'}
+                                            {project.title || 'Projeto Sem Título'}
                                         </h3>
                                         <p className={styles.cardDesc}>
                                             {project.inputs?.objective || 'Sem descrição'}
                                         </p>
-
-                                        <div className={styles.cardFooter}>
-                                            <span className={styles.date}>
-                                                <Clock size={14} />
-                                                {new Date(project.created_at).toLocaleDateString()}
-                                            </span>
-                                            <span className={styles.openLink}>
-                                                Abrir <ArrowRight size={16} />
-                                            </span>
-                                        </div>
                                     </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </ScrollReveal>
+
+                                    <div className={styles.cardFooter}>
+                                        <span className={styles.date}>
+                                            <Clock size={14} />
+                                            {new Date(project.created_at).toLocaleDateString()}
+                                        </span>
+                                        <span className={styles.status}>
+                                            {project.status === 'completed' ? 'Pronto' : 'Rascunho'}
+                                        </span>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
                 )}
             </main>
         </div>

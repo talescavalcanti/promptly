@@ -1,68 +1,60 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-radius: var(--radius);
+}
+
 :root {
-  /* Brand Colors */
-  --primary: #F5A524;
-  /* Gold/Orange */
-  --primary-foreground: #000000;
-  --secondary: #1a1a1a;
-  /* Dark Gray */
-  --secondary-foreground: #ffffff;
-  --accent: #F5A524;
-  --accent-foreground: #000000;
-
-  /* Neutral Colors (Dark Mode Default) */
+  /* Apple Design Palette */
   --background: #000000;
-  /* Pure Black */
-  --foreground: #ffffff;
-  --muted: #111111;
-  /* Slightly lighter black */
-  --muted-foreground: #888888;
-  /* Gray text */
-  --border: #222222;
-  --input: #1a1a1a;
+  --foreground: #F5F5F7;
+
+  --primary: #F5A524;
+  /* Brand Gold */
+  --primary-foreground: #000000;
+
+  --secondary: #1C1C1E;
+  /* Apple System Gray 6 (Dark) */
+  --secondary-foreground: #F5F5F7;
+
+  --muted: #1C1C1E;
+  --muted-foreground: #86868B;
+
+  --accent: #2C2C2E;
+  --accent-foreground: #F5A524;
+
+  --border: #38383A;
+  --input: #1C1C1E;
   --ring: #F5A524;
-  --apple-ease: cubic-bezier(0.32, 0.72, 0, 1);
-  --apple-blur: blur(12px);
 
-  /* Radius */
-  --radius: 2rem;
-  /* Fully rounded buttons */
+  --radius: 1.5rem;
 
-  /* Typography */
-  --font-sans: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-display: var(--font-sans);
+  /* Typography - Switched to Inter (Apple Style) */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-  /* Motion Tokens (Apple-like) */
-  --motion-ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --motion-ease-out: cubic-bezier(0.33, 1, 0.68, 1);
-  --motion-duration-fast: 200ms;
-  --motion-duration-normal: 400ms;
-  --motion-duration-slow: 600ms;
-
-  /* Surface Tokens */
-  --surface-glass: rgba(20, 20, 20, 0.6);
-  --surface-glass-heavy: rgba(10, 10, 10, 0.8);
-  --surface-border: rgba(255, 255, 255, 0.08);
-  --surface-highlight: rgba(255, 255, 255, 0.05);
-
-  /* Glassmorphism Tokens (Refined) */
-  --glass-background: rgba(0, 0, 0, 0.65);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  --blur-amount: 20px;
-
-
-
-
+  /* Glassmorphism Refined */
+  --glass-bg: rgba(28, 28, 30, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
 }
 
-
-
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* Global Grain Texture - Removed */
+/* Spotlights - Removed */
 
 body {
   color: var(--foreground);
@@ -71,7 +63,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  width: 100vw;
+  width: 100%;
+  min-height: 100vh;
+  scroll-behavior: smooth;
+  position: relative;
 }
 
 button,
@@ -80,7 +75,6 @@ textarea,
 select {
   font-family: inherit;
 }
-
 
 a {
   color: inherit;
@@ -95,111 +89,57 @@ a {
   padding: 0 1.5rem;
 }
 
-/* Updated Poppins Classes from User Request */
-.poppins-thin {
-  font-family: "Poppins", sans-serif;
+/* Updated Typography Classes - Inter Global */
+.inter-thin {
+  font-family: "Inter", sans-serif;
   font-weight: 100;
   font-style: normal;
 }
 
-.poppins-extralight {
-  font-family: "Poppins", sans-serif;
+.inter-extralight {
+  font-family: "Inter", sans-serif;
   font-weight: 200;
   font-style: normal;
 }
 
-.poppins-light {
-  font-family: "Poppins", sans-serif;
+.inter-light {
+  font-family: "Inter", sans-serif;
   font-weight: 300;
   font-style: normal;
 }
 
-.poppins-regular {
-  font-family: "Poppins", sans-serif;
+.inter-regular {
+  font-family: "Inter", sans-serif;
   font-weight: 400;
   font-style: normal;
 }
 
-.poppins-medium {
-  font-family: "Poppins", sans-serif;
+.inter-medium {
+  font-family: "Inter", sans-serif;
   font-weight: 500;
   font-style: normal;
 }
 
-.poppins-semibold {
-  font-family: "Poppins", sans-serif;
+.inter-semibold {
+  font-family: "Inter", sans-serif;
   font-weight: 600;
   font-style: normal;
 }
 
-.poppins-bold {
-  font-family: "Poppins", sans-serif;
+.inter-bold {
+  font-family: "Inter", sans-serif;
   font-weight: 700;
   font-style: normal;
 }
 
-.poppins-extrabold {
-  font-family: "Poppins", sans-serif;
+.inter-extrabold {
+  font-family: "Inter", sans-serif;
   font-weight: 800;
   font-style: normal;
 }
 
-.poppins-black {
-  font-family: "Poppins", sans-serif;
+.inter-black {
+  font-family: "Inter", sans-serif;
   font-weight: 900;
   font-style: normal;
-}
-
-.poppins-thin-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 100;
-  font-style: italic;
-}
-
-.poppins-extralight-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 200;
-  font-style: italic;
-}
-
-.poppins-light-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 300;
-  font-style: italic;
-}
-
-.poppins-regular-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 400;
-  font-style: italic;
-}
-
-.poppins-medium-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 500;
-  font-style: italic;
-}
-
-.poppins-semibold-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 600;
-  font-style: italic;
-}
-
-.poppins-bold-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 700;
-  font-style: italic;
-}
-
-.poppins-extrabold-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 800;
-  font-style: italic;
-}
-
-.poppins-black-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 900;
-  font-style: italic;
 }

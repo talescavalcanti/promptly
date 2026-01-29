@@ -6,11 +6,13 @@ import { HowItWorks } from './components/HowItWorks/HowItWorks';
 import { Footer } from './components/Footer/Footer';
 import { PageTransition } from './components/PageTransition/PageTransition';
 import { ScrollReveal } from './components/ScrollReveal/ScrollReveal';
+import MacbookScrollDemo from '@/components/macbook-scroll-demo';
+
 
 export default function Home() {
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <main style={{ flex: 1, marginTop: '2rem' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflowX: 'hidden' }}>
+      <main style={{ flex: 1, position: 'relative', zIndex: 1, background: 'transparent' }}>
         <PageTransition>
           <ScrollReveal>
             <Hero />
@@ -18,6 +20,10 @@ export default function Home() {
 
           <ScrollReveal delay={0.1}>
             <PreviewSection />
+          </ScrollReveal>
+
+          <ScrollReveal delay={0.1}>
+            <MacbookScrollDemo />
           </ScrollReveal>
 
           <ScrollReveal delay={0.1}>

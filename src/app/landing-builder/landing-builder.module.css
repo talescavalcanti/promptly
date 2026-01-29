@@ -5,7 +5,7 @@
     --primary-hover: #D98E15;
 
     font-family: var(--font-sans);
-    /* Use Global Font (Poppins) */
+    /* Use Global Font (Inter) */
     background: var(--background);
     min-height: 100vh;
     display: flex;

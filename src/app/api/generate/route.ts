@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { SAAS_PROMPTS_V2 } from '../../builder/saas-prompts-v2';
-import { LANDING_PAGE_AGENT_V2_PROMPT } from '../../landing-builder/agentPrompts';
+import { LANDING_PAGE_AGENT_V2_PROMPT, LANDING_PAGE_GOOGLE_STUDIO_PROMPT } from '../../landing-builder/agentPrompts';
 
 export const dynamic = 'force-dynamic';
 
@@ -96,7 +96,7 @@ export async function POST(req: Request) {
             'pro': 400
         };
 
-        // Map database value (STARTER/PRO) to limit keys (Fixed: removed duplicate declaration)
+        // Map database value (STARTER/PRO) to limit keys
         const userPlan = profile.plano_ativo ? profile.plano_ativo.toLowerCase() : 'free';
 
         const limit = PLAN_LIMITS[userPlan] || 5;
@@ -114,7 +114,6 @@ export async function POST(req: Request) {
             // Common
             promptMode, objective, context, targetPlatform,
             // SaaS Wizard Specifics
-            // SaaS Wizard Specifics
             saasName, saasColor, saasFont, logoStyle, voiceTone,
             saasNiche, businessModel, chargingModel, planNames,
             coreEntity, coreView, dataInputType,
@@ -123,7 +122,8 @@ export async function POST(req: Request) {
             problemSolved, marketingHeadline, cta,
             // Landing Builder Specifics
             targetAudience, colorPalette, typography,
-            primaryColor, secondaryColor, fontWeight, useSingleFont
+            primaryColor, secondaryColor, fontWeight, useSingleFont,
+            geometry, layout, brandName, sections, wizardMode
         } = body;
 
         const apiKey = process.env.GEMINI_API_KEY?.trim();
@@ -133,8 +133,6 @@ export async function POST(req: Request) {
         }
 
         let prompt = "";
-
-        // Prompt already imported statically
 
         if (promptMode === 'suggest_saas_details') {
             prompt = `
@@ -299,91 +297,83 @@ Act as a ** Senior Frontend Engineer & Component Architect ** specialized in ${t
                 - Assume the API exists or tell the user to mock it.
             `;
         } else if (promptMode === 'landing_page') {
-            if (promptMode === 'landing_page') {
-                const wizardMode = body.wizardMode || 'custom';
+            if (targetPlatform === 'Google AI Studio') {
+                prompt = `
+                ${LANDING_PAGE_GOOGLE_STUDIO_PROMPT}
 
-                // --- DATA PREPARATION ---
-                // Ensure strict fallbacks for "Portfolio Mode" logic
-                const safeNiche = saasNiche || 'Serviço Premium';
-                const safeBrand = body.brandName || '(Invente um Nome Premium)';
+                ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                *** COMANDO DE EXECUÇÃO: GERAR PROMPT FINAL ***
+                ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-                // Design System Injection
-                const designSystemPrompt = `
-                ### 5. SISTEMA DE DESIGN & UI(Rigidamente Definido pelo Usuário)
-                Você DEVE seguir estas diretrizes visuais exatas:
+                CONTEXTO DO PROJETO (INPUT DO USUÁRIO):
                 
-                - ** Cor Primária(Destaque / CTA / Brand) **: ${primaryColor || '#000000'}
-                - ** Cor Secundária(Base / Fundo / Contraste) **: ${secondaryColor || '#ffffff'}
-                - ** Tipografia **: ${typography || 'Inter'}
-                - ** Peso da Fonte(Headings) **: ${fontWeight || 'Regular'}
-                - ** Modo de Fonte **: ${useSingleFont ? 'USAR APENAS ESSA FONTE (Single Font Mode).' : 'Usar par com font-sans padrão para corpo.'}
-                - ** Estilo Geral **: ${logoStyle || 'Premium Moderno'}
+                1. IDENTIDADE DO PROJETO:
+                   - Nome da Marca: ${brandName || 'Projeto SaaS (Nome a definir)'}
+                   - Nicho de Mercado: ${saasNiche || 'Não especificado (Inferir o mais rentável compatível)'}
+                   - Objetivo Principal: ${objective || 'Conversão e Credibilidade'}
+                   - Público-Alvo: ${targetAudience || 'Geral/B2B'}
+
+                2. DIRETRIZES DE DESIGN APONTADAS:
+                   - Estilo Arquitetural: ${logoStyle || 'Premium Modern (Clean & Bold)'}
+                   - Geometria (Bordas): ${geometry || 'Mixed (Estratégico)'}
+                   - Layout (Grid): ${layout || 'Standard (Com ritmo visual)'}
+                   - Paleta de Cores: 
+                     * Primária (Brand): ${primaryColor}
+                     * Secundária (Fundo): ${secondaryColor}
+                   - Tipografia: ${typography} (Peso: ${fontWeight})
+                   - Modo Fonte Única: ${useSingleFont ? 'ATIVADO (Use a mesma fonte para tudo)' : 'DESATIVADO (Use paring recomendado)'}
+
+                3. TOM E CONTEÚDO:
+                   - Tom de Voz: ${voiceTone || 'Profissional, Confidente e Técnico'}
+                   - Oferta / Problema: ${problemSolved || 'Inferir headline de alto impacto'}
+                   - Call-to-Action (CTA): ${cta || 'Começar Agora'}
+
+                4. ARQUITETURA DE SEÇÕES SOLICITADA:
+                   ${sections ? sections.map((s: string) => `- ${s}`).join('\n                   ') : '- (Defina a estrutura ideal para alta conversão)'}
+
+                ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                SUA MISSÃO AGORA:
                 
-                * Instrução de Implementação *:
-1. Crie variáveis CSS ou config do Tailwind que reflitam essas cores exatas.
-                2. Use a cor primária para botões, ícones de destaque e bordas ativas.
-                3. Use a cor secundária para fundos de seções alternadas e contrastes.
+                Atue como o Senior Prompt Engineer definido acima e gere o "PROMPT FINAL ÚNICO" para este projeto específico.
+                
+                REGRAS RÍGIDAS DE SAÍDA (OVERRIDE TOTAL):
+                1. O usuário quer COPIAR E COLAR. Não entregue "Especificações", "Dicas" ou "Análises".
+                2. Entregue APENAS o TEXTO DO PROMPT.
+                3. O prompt gerado deve ser LONGO, TÉCNICO e EXAUSTIVO, seguindo seu template de "Qualidade Premium".
+                4. Garanta que o prompt gerado proíba explicitamente o "Vibe Coding" (design genérico).
+
+                [INÍCIO DO PROMPT GERADO]
+                `;
+            } else {
+                // Nova lógica simplificada e inteligente usando o "Master Architect" Prompt (Lovable/Default)
+                prompt = `
+                ${LANDING_PAGE_AGENT_V2_PROMPT}
+
+            AGORA, GERE A LANDING PAGE PARA O SEGUINTE PROJETO:
+
+            1. NICHO: ${saasNiche || 'Geral'}
+            2. NOME DA MARCA: ${brandName || '(Invente um nome tech/moderno)'}
+            3. OBJETIVO: ${objective || 'Conversão'}
+            4. PÚBLICO ALVO: ${targetAudience || 'Geral'}
+            
+            DIRETRIZES VISUAIS (RIGOROSAS):
+            - ESTILO ARQUITETURAL: ${logoStyle || 'Premium Modern'}
+            - GEOMETRIA (BORDAS): ${geometry || 'Mixed'}
+            - LAYOUT (GRID): ${layout || 'Standard'}
+            - COR PRIMÁRIA: ${primaryColor || '#000000'}
+            - COR SECUNDÁRIA (FUNDO): ${secondaryColor || '#ffffff'}
+            - TIPOGRAFIA: ${typography || 'Sans'} (Peso: ${fontWeight || 'Regular'}) ${useSingleFont ? '(USAR APENAS UMA FONTE PARA TUDO)' : ''}
+
+            CONTEÚDO E TOM:
+            - TOM DE VOZ: ${voiceTone || 'Profissional e Direto'}
+            - OFERTA PRINCIPAL: ${problemSolved || 'Resolver o problema do cliente'}
+            - CTA: ${cta || 'Agendar Agora'}
+
+            SEÇÕES OBRIGATÓRIAS (NA ORDEM):
+            ${sections ? sections.join(', ') : 'Hero, Proof, Features, Testimonials, FAQ, Footer'}
+            
+            (Se o usuário não pediu alguma seção essencial como Hero ou Footer, inclua mesmo assim para integridade).
             `;
-
-                // Content Injection
-                const contentPrompt = `
-                ### 6. DADOS ESPECÍFICOS DO PROJETO
-    - ** Nicho **: ${safeNiche}
-                - ** Marca **: ${safeBrand}
-                - ** Público Alvo **: ${targetAudience || 'Clientes exigentes que buscam qualidade.'}
-                - ** Objetivo **: ${objective || 'Converter visitantes em agendamentos/leads.'}
-                - ** Tom de Voz **: ${voiceTone || 'Profissional, acolhedor e autoritário.'}
-                - ** Oferta Principal **: ${problemSolved || '(Invente uma oferta irresistível baseada no nicho)'}
-                - ** Contato **: ${cta || '(Invente dados críveis)'}
-                - ** Seções Solicitadas **: ${body.sections?.join(', ') || 'Todas as seções padrão do Template V2.'}
-`;
-
-                if (wizardMode === 'portfolio') {
-                    prompt = `
-                    ${LANDING_PAGE_AGENT_V2_PROMPT}
-
-                    ════════════════════════════════════════════
-                    ORDEM DE EXECUÇÃO: MODO PORTFÓLIO(FLASH)
-                    ════════════════════════════════════════════
-                    O usuário quer gerar um PORTFÓLIO IMPRESSIONANTE para o nicho "${safeNiche}" em segundos.
-                    
-                    SUA MISSÃO - O "DIRETOR CRIATIVO":
-1. ** INVENTE TUDO **: Nome da marca, slogan, dores, benefícios, ofertas, preços, depoimentos e FAQ.
-                    2. ** VIBE **: Crie uma estética visualmente rica e comercialmente viável.
-                    3. ** DADOS **: Preencha o arquivo 'constants.ts' com esses dados inventados(devem parecer ultra - reais).
-
-    ${designSystemPrompt}
-                    
-                    ** OBRIGATÓRIO **:
-- Siga a ARQUITETURA DE ARQUIVOS da V2(pages, components, lib).
-                    - Implemente o "UI KIT MÍNIMO OBRIGATÓRIO"(Button, Card, Section, Badge, etc.).
-                    - Entregue o código pronto para rodar.
-                `;
-                } else {
-                    // CUSTOM MODE
-                    prompt = `
-                    ${LANDING_PAGE_AGENT_V2_PROMPT}
-
-                    ════════════════════════════════════════════
-                    ORDEM DE EXECUÇÃO: MODO PERSONALIZADO(CIRÚRGICO)
-                    ════════════════════════════════════════════
-                    O usuário definiu especificações exatas.Você é o engenheiro responsável por trazê - las à vida.
-
-    ${contentPrompt}
-                    
-                    ${designSystemPrompt}
-
-                    ** INSTRUÇÕES CRÍTICAS DE "VIBE-CODING" **:
-1. ** Mini Design System **: Implemente as cores (${primaryColor}, ${secondaryColor}) e fontes(${typography}) como a alma do site.
-                    2. ** Copywriting **: Use o Tom de Voz "${voiceTone}" para adaptar * todos * os textos(Headlines, CTAs, Descrições).Escreva para o Público "${targetAudience}".
-                    3. ** Conteúdo **: Para o que o usuário não preencheu(ex: texto exato do "Sobre"), use sua criatividade para gerar lero - lero premium e convincente alinhado ao nicho.
-                    
-                    ** OBRIGATÓRIO **:
-- Siga a ARQUITETURA DE ARQUIVOS da V2 rigorosamente.
-                    - Mantenha a "Lei do CTA Único" e a "Lei do Ritmo" descritas na sua base de conhecimento.
-                    - Não explique nada.Apenas gere o código dos arquivos.
-                `;
-                }
             }
 
         } else {
@@ -396,8 +386,6 @@ Act as a ** Senior Frontend Engineer & Component Architect ** specialized in ${t
 
         // Modelos identificados na lista do usuário
         const modelsToTry = [
-            "gemini-3-pro-preview",   // ID CORRETO (Gemini 3 Pro)
-            "gemini-3-flash-preview", // ID CORRETO (Gemini 3 Flash)
             "gemini-2.0-flash",       // Fallback Rápido (Top Tier)
             "gemini-2.0-flash-001",   // Variação disponível
             "gemini-flash-latest",    // Alias disponível
@@ -411,6 +399,8 @@ Act as a ** Senior Frontend Engineer & Component Architect ** specialized in ${t
             try {
                 console.log(`Tentando modelo identificado: ${modelId} `);
                 const model = genAI.getGenerativeModel({ model: modelId });
+                console.log(`[DEBUG] Prompt Length for ${modelId}:`, prompt.length);
+
                 const result = await model.generateContent(prompt);
                 const response = await result.response;
                 const text = response.text();

@@ -1,105 +1,149 @@
 .section {
-    padding: 4rem 1rem;
+    padding: 0 1.5rem 8rem;
     display: flex;
     justify-content: center;
-    background: var(--background);
+    perspective: 1000px;
+    /* Enable 3D space */
+    position: relative;
+    z-index: 10;
 }
 
 .container {
     width: 100%;
-    max-width: 800px;
+    max-width: 1000px;
+    position: relative;
 }
 
+/* 3D Floating Effect */
 .card {
-    border: 1px solid rgba(245, 165, 36, 0.15);
-    border-radius: 1.25rem;
-    padding: 2.5rem;
-    background: #080808;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(18, 18, 18, 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: 1.5rem;
+    padding: 3rem;
     position: relative;
     overflow: hidden;
+    box-shadow:
+        0 20px 50px -10px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+
+    transform: rotateX(2deg) translateY(0);
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.container:hover .card {
+    transform: rotateX(0deg) translateY(-10px);
+    box-shadow:
+        0 30px 60px -12px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Inner Glow */
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    opacity: 0.5;
 }
 
 .header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 2rem;
-    border-bottom: 1px solid #222;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     padding-bottom: 1.5rem;
 }
 
 .headerContent h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #fff;
-    margin-bottom: 0.4rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #F5F5F7;
+    margin-bottom: 0.2rem;
+    letter-spacing: -0.01em;
 }
 
 .headerContent p {
-    color: #666;
+    color: #86868B;
     font-size: 0.9rem;
-    line-height: 1.5;
-    max-width: 400px;
 }
 
-.badge {
-    background: #1a1a1a;
-    border: 1px solid #333;
-    color: #ccc;
-    font-size: 0.75rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 999px;
-    font-weight: 500;
+.controls {
+    display: flex;
+    gap: 8px;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #333;
+}
+
+.dot.red {
+    background: #FF5F56;
+}
+
+.dot.yellow {
+    background: #FFBD2E;
+}
+
+.dot.green {
+    background: #27C93F;
 }
 
 .codeBlock {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 0.9rem;
-    line-height: 1.8;
-    color: #ccc;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: #E0E0E0;
 }
 
 .line {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.2rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.lineNumber {
+    color: #444;
+    user-select: none;
+    min-width: 24px;
+    text-align: right;
+}
+
+.content {
+    flex: 1;
 }
 
 .key {
-    color: var(--primary);
+    color: #F5A524;
+    /* Brand Gold */
     font-weight: 600;
 }
 
 .value {
-    color: #ccc;
+    color: #A1A1AA;
 }
 
 /* Responsiveness */
 @media (max-width: 768px) {
     .section {
-        padding: 3rem 1rem;
+        padding: 0 1rem 5rem;
+        perspective: none;
     }
 
     .card {
         padding: 1.5rem;
-        border-radius: 1rem;
-    }
-
-    .header {
-        flex-direction: column;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-    }
-
-    .headerContent h3 {
-        font-size: 1.1rem;
-    }
-
-    .headerContent p {
-        font-size: 0.85rem;
+        transform: none !important;
     }
 
     .codeBlock {
-        font-size: 0.8rem;
-        line-height: 1.6;
+        font-size: 0.85rem;
     }
 }

@@ -1,0 +1,23 @@
+{
+    "promptMode": "landing_page",
+    "wizardMode": "custom",
+    "saasNiche": "Testing",
+    "targetPlatform": "Google AI Studio",
+    "saasName": "TestApp",
+    "objective": "Debug Empty Prompt",
+    "logoStyle": "Modern",
+    "targetAudience": "Devs",
+    "primaryColor": "#000000",
+    "secondaryColor": "#ffffff",
+    "typography": "Inter",
+    "fontWeight": "Regular",
+    "geometry": "Mixed",
+    "layout": "Standard",
+    "voiceTone": "Professional",
+    "problemSolved": "Testing API",
+    "cta": "Sign Up",
+    "sections": [
+        "Hero",
+        "Footer"
+    ]
+}

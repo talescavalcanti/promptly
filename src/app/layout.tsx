@@ -20,7 +20,7 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..800&family=Lora:ital,wght@0,400..700;1,400..700&family=Merriweather:wght@300;400;700;900&family=Montserrat:wght@100..900&family=Nunito:wght@400;600;700&family=Open+Sans:wght@300..800&family=Oswald:wght@200..700&family=Playfair+Display:wght@400..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100..900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..800&family=Lora:ital,wght@0,400..700;1,400..700&family=Merriweather:wght@300;400;700;900&family=Montserrat:wght@100..900&family=Nunito:wght@400;600;700&family=Open+Sans:wght@300..800&family=Oswald:wght@200..700&family=Playfair+Display:wght@400..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100..900&family=Roboto:wght@100;300;400;500;700;900&family=Space+Grotesk:wght@300..700&family=Plus+Jakarta+Sans:wght@200..800&family=Outfit:wght@100..900&family=Syne:wght@400..800&family=Urbanist:wght@100..900&family=Cormorant+Garamond:wght@300..700&family=IBM+Plex+Mono:wght@100..700&family=Unbounded:wght@200..900&display=swap" rel="stylesheet" />
       </head>
       <body>
         <Header />

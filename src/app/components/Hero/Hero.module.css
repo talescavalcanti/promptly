@@ -1,62 +1,122 @@
 .section {
-    padding: 8rem 1rem 5rem;
+    padding: 14rem 1.5rem 8rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     justify-content: center;
-    background: var(--background);
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.contentContainer {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Apple-style background glow - Removed per user request */
+.section::before {
+    display: none;
+}
+
+/* Cinematic Vignette */
+.vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    background: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.8) 100%);
 }
 
 .engineBadge {
     display: inline-flex;
     align-items: center;
-    padding: 0.35rem 1rem;
+    padding: 0.5rem 1.25rem;
     border-radius: 9999px;
-    background: transparent;
-    border: 1px solid rgba(245, 165, 36, 0.2);
-    color: var(--primary);
+    background: rgba(28, 28, 30, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    color: #F5A524;
     font-size: 0.75rem;
-    font-weight: 500;
-    margin-bottom: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.4);
+    animation: pulse-gold 4s ease-in-out infinite;
 }
 
-.siteSubtitle {
-    color: #888;
-    font-size: 0.95rem;
-    font-weight: 400;
-    margin-bottom: 2rem;
+@keyframes pulse-gold {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.4);
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    50% {
+        box-shadow: 0 0 15px rgba(245, 165, 36, 0.15), 0 0 0 1px rgba(245, 165, 36, 0.2);
+        border-color: rgba(245, 165, 36, 0.3);
+    }
 }
+
+/* Icon removed per user request */
+
+/* Sparkle Animation Removed - Using static focused icon for professional look */
 
 .title {
-    font-size: 3.75rem;
+    font-size: 4.5rem;
     line-height: 1.1;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    margin-bottom: 1.5rem;
-    max-width: 900px;
-    color: #fff;
-}
-
-.capsSubtitle {
-    color: var(--primary);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.2em;
+    font-weight: 700;
+    letter-spacing: -0.04em;
     margin-bottom: 2rem;
-    max-width: 800px;
+    max-width: 1400px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #b4b4b4 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: #FFFFFF;
+    /* Fallback */
+    padding-bottom: 0.1em;
+    /* Prevent descender clipping */
+    text-shadow: 0 0 100px rgba(255, 255, 255, 0.1);
+    /* Spotlight Glow */
 }
 
 .highlight {
-    color: var(--primary);
-    display: block;
+    background: linear-gradient(90deg, #F5A524 0%, #FDD283 50%, #F5A524 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: #F5A524;
+    animation: shimmer 5s linear infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 200% 50%;
+    }
 }
 
 .description {
-    max-width: 800px;
-    margin-bottom: 4rem;
+    max-width: 700px;
+    margin-bottom: 3.5rem;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: #86868B;
     font-weight: 400;
 }
 
@@ -68,69 +128,45 @@
 }
 
 .secondaryCta {
-    color: #fff;
+    color: #F5F5F7;
     text-decoration: none;
-    font-size: 0.8125rem;
-    padding: 0.4rem 1rem;
-    border: 1px solid #333;
-    border-radius: var(--radius);
-    transition: all 0.2s;
-    background: #0f0f0f;
-    width: fit-content;
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: opacity 0.2s;
 }
 
 .secondaryCta:hover {
-    border-color: #666;
-    background: #1a1a1a;
+    opacity: 0.8;
 }
 
 /* Responsiveness */
 @media (max-width: 768px) {
     .section {
-        padding: 6rem 1rem 3rem;
+        padding: 8rem 1.5rem 6rem;
     }
 
     .title {
-        font-size: 2.1rem;
-        line-height: 1.2;
-        margin-bottom: 1rem;
-    }
-
-    .siteSubtitle {
-        font-size: 0.85rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .capsSubtitle {
-        font-size: 0.7rem;
-        letter-spacing: 0.15em;
-        margin-bottom: 1.5rem;
+        font-size: 3rem;
+        letter-spacing: -0.02em;
     }
 
     .description {
-        font-size: 0.95rem;
-        margin-bottom: 3.1rem;
+        font-size: 1.1rem;
+        margin-bottom: 3rem;
     }
 
     .ctaGroup {
         flex-direction: column;
         width: 100%;
-        gap: 0.75rem;
+        gap: 1rem;
     }
 
-    /* Only the first link (CTA Principal) should be full width on mobile */
-    .ctaGroup a:first-child {
+    .ctaGroup a {
         width: 100%;
     }
 
-    /* Secondary button should stay compact */
     .secondaryCta {
-        width: fit-content !important;
-        margin: 0 auto;
-        padding: 0.4rem 1rem !important;
-        font-size: 0.75rem !important;
-        background: transparent;
-        border-color: transparent;
-        color: rgba(255, 255, 255, 0.4);
+        text-align: center;
     }
 }
