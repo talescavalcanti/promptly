@@ -11,6 +11,7 @@ import styles from './landing-builder.module.css'; // Reusing the copied/renamed
 import { ScrollReveal } from '../components/ScrollReveal/ScrollReveal';
 import { LANDING_PAGE_AGENT_V2_PROMPT } from './agentPrompts';
 import Plasma from '../components/Plasma/Plasma';
+import { TextShimmer } from '@/components/ui/text-shimmer';
 
 // --- Types ---
 type LandingBuilderState = {
@@ -1179,11 +1180,13 @@ export default function LandingBuilderPage() {
                     </div>
 
                     {isGenerating ? (
-                        <div className={styles.loadingOverlay} style={{ position: 'relative', height: '300px', background: 'transparent' }}>
-                            <div className={styles.spinner} />
-                            <span>
+                        <div className={styles.loadingOverlay} style={{ position: 'relative', height: '300px', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                            <TextShimmer
+                                className="text-lg font-medium text-center [--base-color:theme(colors.zinc.500)] [--base-gradient-color:theme(colors.white)]"
+                                duration={1.5}
+                            >
                                 {state.mode === 'portfolio' ? 'A IA está imaginando seu portfólio completo...' : `Otimizando especificações para ${state.targetPlatform}...`}
-                            </span>
+                            </TextShimmer>
                         </div>
                     ) : (
                         <div className={styles.editorWindow}>

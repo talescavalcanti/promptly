@@ -165,7 +165,7 @@ export const Header = () => {
                                     <Button variant="ghost">Entrar</Button>
                                 </Link>
                                 <Link href="/signup">
-                                    <GlassButton style={{ height: '36px', padding: '0 20px', fontSize: '14px', borderRadius: '18px' }} glassBorderRadius={18}>
+                                    <GlassButton style={{ height: '36px', fontSize: '14px', borderRadius: '18px' }} glassBorderRadius={18}>
                                         Começar
                                     </GlassButton>
                                 </Link>

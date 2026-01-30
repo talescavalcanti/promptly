@@ -6,6 +6,7 @@ import { HowItWorks } from './components/HowItWorks/HowItWorks';
 import { Footer } from './components/Footer/Footer';
 import { PageTransition } from './components/PageTransition/PageTransition';
 import { ScrollReveal } from './components/ScrollReveal/ScrollReveal';
+import { LogoTicker } from './components/LogoTicker/LogoTicker';
 import MacbookScrollDemo from '@/components/macbook-scroll-demo';
 
 
@@ -20,6 +21,10 @@ export default function Home() {
 
           <ScrollReveal delay={0.1}>
             <PreviewSection />
+          </ScrollReveal>
+
+          <ScrollReveal delay={0.1}>
+            <LogoTicker />
           </ScrollReveal>
 
           <ScrollReveal delay={0.1}>

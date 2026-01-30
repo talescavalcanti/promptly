@@ -1,660 +1,729 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-    Rocket, Target, Zap, Layout, Check, Copy, ChevronDown, ChevronUp, Bot, Sparkles, Lightbulb, Layers, X, Feather, Smartphone, Globe, Palette, Type, Briefcase, Monitor
-} from 'lucide-react';
-import Link from 'next/link';
+import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, ArrowRight, Wand2, Calculator, Check, X, Plus, Trash2, Settings, Palette, Target, Fingerprint, LayoutGrid } from 'lucide-react';
 import styles from './saas-builder.module.css';
-import { TARGET_PLATFORMS } from '../../lib/saas_constants';
-import Image from 'next/image';
+import { TextShimmer } from '@/components/ui/text-shimmer';
 
-// --- Types ---
-type SaasBuilderState = {
-    appName: string;
-    niche: string;
-    targetAudience: string;
-    features: string[];
-    visualStyle: string;
-    primaryColor: string;
-    secondaryColor: string;
-    typography: string;
-    typographyWeight: number;
-    targetPlatform: string;
+import { CheckBox } from '@/components/ui/checkbox';
+import { motion, AnimatePresence } from 'framer-motion';
+import { SAAS_BUILDER_V3_TEMPLATE, SaasBuilderState, generateSaasV3Prompt } from './saas-prompts-v3';
+
+// --- Constants ---
+const TONES = [
+    { value: 'pragmatic', label: 'Direto', desc: 'Objetivo e sem rodeios' },
+    { value: 'executive', label: 'Sofisticado', desc: 'Premium e exclusivo' },
+    { value: 'empathetic', label: 'Amigável', desc: 'Próximo e acolhedor' },
+    { value: 'technical', label: 'Técnico', desc: 'Especialista e detalhado' },
+];
+
+const MOODS = [
+    { value: 'clean', label: 'Minimalista', desc: 'Clean e focado no essencial' },
+    { value: 'luxury', label: 'Dark Mode', desc: 'Visual noturno e elegante' },
+    { value: 'futurist', label: 'Futurista', desc: 'Moderno e tecnológico' },
+    { value: 'classic', label: 'Editorial', desc: 'Tipografia elegante e clássica' },
+];
+
+const PAYMENT_PROVIDERS = [
+    { value: 'demo', label: 'Modo Demo (Simulação)' },
+    { value: 'stripe', label: 'Stripe' },
+    { value: 'mercadopago', label: 'Mercado Pago' },
+    { value: 'other', label: 'Outro' },
+];
+
+
+
+const STEPS = [
+    { id: 1, title: 'Identidade', icon: Fingerprint, desc: 'Nome, Nicho e Alma do Produto' },
+    { id: 2, title: 'Estratégia', icon: Target, desc: 'Persona, Dor e Sucesso' },
+    { id: 3, title: 'Escopo', icon: LayoutGrid, desc: 'Features e Integrações' },
+    { id: 4, title: 'Visual', icon: Palette, desc: 'Branding e Estilo' },
+    { id: 5, title: 'Revisão', icon: Check, desc: 'Confirme antes de gerar' }
+];
+
+const FONT_OPTIONS = [
+    { name: 'Poppins', weights: 'Regular, Medium, SemiBold' },
+    { name: 'Inter', weights: 'Light, Regular, Medium, Bold' },
+    { name: 'Plus Jakarta Sans', weights: 'Medium, SemiBold, Bold' },
+    { name: 'Outfit', weights: 'Regular, Medium, Bold' },
+    { name: 'DM Sans', weights: 'Regular, Medium, Bold' },
+    { name: 'Manrope', weights: 'Medium, SemiBold, Bold' },
+    { name: 'Raleway', weights: 'Regular, SemiBold, Bold' },
+    { name: 'Playfair Display', weights: 'Regular, SemiBold, Bold' },
+    { name: 'Space Grotesk', weights: 'Light, Regular, Medium, Bold' },
+    { name: 'Public Sans', weights: 'Regular, Medium, SemiBold' }
+];
+
+const WEIGHT_OPTIONS = [
+    { value: 'Light', label: 'Light', weight: 300 },
+    { value: 'Regular', label: 'Regular', weight: 400 },
+    { value: 'Medium', label: 'Medium', weight: 500 },
+    { value: 'SemiBold', label: 'SemiBold', weight: 600 },
+    { value: 'Bold', label: 'Bold', weight: 700 },
+];
+
+// Optimized Font Loader Component
+// Optimized Font Loader Component
+const FontLoader = ({ font, fontWeight }: { font: string, fontWeight: string }) => {
+    // Load selected font with specific weight for the preview
+    useEffect(() => {
+        const weightValue = WEIGHT_OPTIONS.find(w => w.value === fontWeight)?.weight || 400;
+        const fontName = font.replace(/ /g, '+');
+
+        const link = document.createElement('link');
+        link.href = `https://fonts.googleapis.com/css2?family=${fontName}:wght@${weightValue}&display=swap`;
+        link.rel = 'stylesheet';
+        document.head.appendChild(link);
+
+        return () => {
+            document.head.removeChild(link);
+        };
+    }, [font, fontWeight]);
+
+    // Preload all options (Batched Request)
+    useEffect(() => {
+        // Check if already loaded to avoid duplicate requests
+        if (document.querySelector(`link[data-font-batch="true"]`)) return;
+
+        const families = FONT_OPTIONS.map(f => `family=${f.name.replace(/ /g, '+')}:wght@400;700`).join('&');
+        const link = document.createElement('link');
+        link.href = `https://fonts.googleapis.com/css2?${families}&display=swap`;
+        link.rel = 'stylesheet';
+        link.dataset.fontBatch = "true";
+        document.head.appendChild(link);
+    }, []);
+
+    return null;
 };
 
-const INITIAL_STATE: SaasBuilderState = {
-    appName: '',
-    niche: '',
-    targetAudience: '',
-    features: [],
-    visualStyle: 'Moderno & Clean',
-    primaryColor: '#3b82f6',
-    secondaryColor: '#ffffff',
-    typography: 'Inter',
-    typographyWeight: 400,
-    targetPlatform: 'Lovable',
-};
-
-const STYLES = [
-    { id: 'modern', label: 'Moderno & Clean', desc: 'Minimalista, muito espaço em branco, foco no conteúdo.', icon: Layout, color: '#3b82f6' }, // Blue
-    { id: 'corporate', label: 'Corporativo & Sério', desc: 'Cores sóbrias, tipografia densa, dados confiáveis.', icon: Briefcase, color: '#64748b' }, // Slate
-    { id: 'creative', label: 'Criativo & Vibrante', desc: 'Gradientes, cores fortes e formas orgânicas.', icon: Zap, color: '#ec4899' }, // Pink
-    { id: 'tech', label: 'Tech & Dark Mode', desc: 'Fundo escuro, neon, futurista e high-tech.', icon: Monitor, color: '#10b981' }, // Emerald
-];
-
-const COLORS = [
-    { id: 'blue', label: 'Azul Tech', color: '#3b82f6' },
-    { id: 'emerald', label: 'Verde Saúde', color: '#10b981' },
-    { id: 'purple', label: 'Roxo Criativo', color: '#8b5cf6' },
-    { id: 'orange', label: 'Laranja Vibrante', color: '#f97316' },
-    { id: 'red', label: 'Vermelho Bold', color: '#ef4444' },
-    { id: 'slate', label: 'Cinza Neutro', color: '#64748b' },
-    { id: 'black', label: 'Preto Luxo', color: '#000000' },
-    { id: 'white', label: 'Branco Clean', color: '#ffffff' },
-    { id: 'gold', label: 'Dourado Premium', color: '#d4af37' },
-    { id: 'teal', label: 'Teal Moderno', color: '#14b8a6' },
-];
-
-const FONTS = [
-    { id: 'Inter', label: 'Inter', category: 'Sans-Serif' },
-    { id: 'Poppins', label: 'Poppins', category: 'Sans-Serif' },
-    { id: 'Roboto', label: 'Roboto', category: 'Sans-Serif' },
-    { id: 'Open Sans', label: 'Open Sans', category: 'Sans-Serif' },
-    { id: 'Montserrat', label: 'Montserrat', category: 'Sans-Serif' },
-    { id: 'Playfair Display', label: 'Playfair', category: 'Serif' },
-    { id: 'Lora', label: 'Lora', category: 'Serif' },
-    { id: 'Merriweather', label: 'Merriweather', category: 'Serif' },
-    { id: 'JetBrains Mono', label: 'JetBrains', category: 'Monospace' },
-    { id: 'Oswald', label: 'Oswald', category: 'Condensed' },
-];
 
 export default function SaasBuilderPage() {
-    const [step, setStep] = useState(0);
+    const router = useRouter();
+    const [currentStep, setCurrentStep] = useState(1);
     const [state, setState] = useState<SaasBuilderState>({
-        ...INITIAL_STATE,
-        secondaryColor: '#ffffff',
-        typography: 'Inter',
-        targetPlatform: 'Lovable'
+        identity: { name: '', niche: '', oneLiner: '', tone: 'premium', visualMood: 'premium, dark mode, gold accents, luxury' },
+        audience: { persona: '', pain: '', keyAction: '', successMetric: '' },
+        scope: {
+            featuresRequired: [],
+            featuresOut: [],
+            routes: ['/dashboard', '/profile'],
+            adminEnabled: true,
+            payments: { enabled: false, provider: 'demo' },
+            storage: false
+        },
+        branding: {
+            font: 'Poppins',
+            fontWeight: 'Regular',
+            colors: { primary: '#F5A524', bg: '#09090b', text: '#ffffff', border: '#27272a' }
+        }
     });
-    const [generatedPrompt, setGeneratedPrompt] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
-    const [isSuggesting, setIsSuggesting] = useState(false);
-    const [copied, setCopied] = useState(false);
-    const [featureInput, setFeatureInput] = useState('');
+    const [generatedPrompt, setGeneratedPrompt] = useState('');
+    const [isCopied, setIsCopied] = useState(false);
 
-    const updateState = (key: keyof SaasBuilderState, value: string | string[] | number) => {
-        setState(prev => ({ ...prev, [key]: value }));
+    // AI Suggestion Simulation
+    const [isSuggesting, setIsSuggesting] = useState(false);
+
+    // --- Actions ---
+    const handleNext = () => {
+        if (currentStep < 6) setCurrentStep(curr => curr + 1);
     };
 
-    const toggleFeature = (feat: string) => {
+    const handleBack = () => {
+        if (currentStep > 1) setCurrentStep(curr => curr - 1);
+        else router.push('/dashboard');
+    };
+
+    const handleGenerate = async () => {
+        setIsGenerating(true);
+        // Simulate "Processing" time for effect
+        setTimeout(() => {
+            const prompt = generateSaasV3Prompt(state);
+            setGeneratedPrompt(prompt);
+            setIsGenerating(false);
+            setCurrentStep(6); // Show Result
+        }, 2000);
+    };
+
+    const copyToClipboard = () => {
+        navigator.clipboard.writeText(generatedPrompt);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+    };
+
+    // Generic Update Helper
+    const updateState = (section: keyof SaasBuilderState, field: string, value: any) => {
         setState(prev => ({
             ...prev,
-            features: prev.features.includes(feat)
-                ? prev.features.filter(f => f !== feat)
-                : [...prev.features, feat]
+            [section]: {
+                ...prev[section],
+                [field]: value
+            }
         }));
     };
 
-    const addFeature = () => {
-        if (featureInput.trim()) {
-            if (!state.features.includes(featureInput.trim())) {
-                toggleFeature(featureInput.trim());
+    const updateDeepState = (section: keyof SaasBuilderState, subSection: string, field: string, value: any) => {
+        setState(prev => ({
+            ...prev,
+            [section]: {
+                ...prev[section] as any,
+                [subSection]: {
+                    ...(prev[section] as any)[subSection],
+                    [field]: value
+                }
             }
-            setFeatureInput('');
-        }
+        }));
     };
 
-    const nextStep = () => {
-        if (step < 6) setStep(step + 1); // Updated for new step count (0-6)
-        else handleGeneratePrompt();
-    };
-
-    const prevStep = () => {
-        if (step > 0) setStep(step - 1);
-    };
-
-    // --- AI Suggestion Logic ---
-    const handleMagicSuggest = async () => {
-        if (!state.appName) return;
+    // --- AI Suggestion Logic (Mocked for speed/demo) ---
+    const suggestIdentity = () => {
         setIsSuggesting(true);
-        try {
-            const response = await fetch('/api/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    promptMode: 'suggest_saas_details',
-                    saasName: state.appName,
-                    saasNiche: state.niche
-                }),
-            });
-
-            if (!response.ok) throw new Error('Erro na sugestão IA');
-            const data = await response.json();
-
-            // Clean markdown if present - more robust regex
-            const jsonMatch = data.result.match(/```json\n?([\s\S]*?)\n?```/) || data.result.match(/(\{[\s\S]*\})/);
-            const cleanJson = jsonMatch ? jsonMatch[1] : data.result.trim();
-            const suggestions = JSON.parse(cleanJson);
-
+        setTimeout(() => {
             setState(prev => ({
                 ...prev,
-                niche: suggestions.niche || prev.niche,
-                targetAudience: suggestions.targetAudience || prev.targetAudience,
-                features: [...prev.features, ...(suggestions.features || [])],
-                primaryColor: suggestions.primaryColor || prev.primaryColor,
-                secondaryColor: suggestions.secondaryColor || prev.secondaryColor,
-                typography: suggestions.typography || prev.typography,
-                visualStyle: suggestions.visualStyle || prev.visualStyle
+                identity: {
+                    ...prev.identity,
+                    niche: 'Micro-SaaS para Freelancers',
+                    oneLiner: 'Gestão simplificada de projetos e faturas para quem trabalha sozinho.',
+                    tone: 'direto',
+                    visualMood: 'minimalista, clean, whitespace, crisp'
+                },
+                audience: {
+                    persona: 'Designers e Devs Freelancers',
+                    pain: 'Perder tempo cobrando clientes e organizando tarefas.',
+                    keyAction: 'Criar Fatura',
+                    successMetric: 'Faturas pagas'
+                }
             }));
-
-        } catch (error) {
-            console.error("Magic Suggest Error:", error);
-            // Optional: Show toast
-        } finally {
             setIsSuggesting(false);
-        }
-    };
-
-    const handleGeneratePrompt = async () => {
-        setStep(7); // Result screen
-        setIsGenerating(true);
-        setGeneratedPrompt('');
-
-        try {
-            const response = await fetch('/api/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    promptMode: 'saas_builder',
-                    saasName: state.appName,
-                    saasNiche: state.niche,
-                    targetAudience: state.targetAudience,
-                    features: state.features,
-                    saasColor: state.primaryColor,
-                    secondaryColor: state.secondaryColor,
-                    typography: `${state.typography} (Weight: ${state.typographyWeight})`,
-                    targetPlatform: state.targetPlatform,
-                    logoStyle: state.visualStyle,
-                    voiceTone: 'Profissional e Persuasivo'
-                }),
-            });
-
-            if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(errData.error || 'Erro ao gerar prompt');
-            }
-
-            const data = await response.json();
-            setGeneratedPrompt(data.result);
-
-        } catch (error: unknown) {
-            const err = error as Error;
-            console.error(err);
-            setGeneratedPrompt(`Erro: ${err.message || 'Falha na conexão'}. Tente novamente.`);
-        } finally {
-            setIsGenerating(false);
-        }
-    };
-
-    const handleCopy = () => {
-        navigator.clipboard.writeText(generatedPrompt);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        }, 1500);
     };
 
     // --- Render Steps ---
-    const renderStepContent = () => {
-        switch (step) {
-            case 0: // App Name & Platform
-                return (
-                    <>
-                        <div className={styles.stepHeader}>
-                            <h2 className={styles.stepTitle}>Identidade do Projeto</h2>
-                            <p className={styles.stepDescription}>Comece definindo o nome e onde você vai construir.</p>
-                        </div>
+    const renderStep1_Identity = () => (
+        <div className={styles.contentArea}>
+            <div className={styles.stepHeader}>
+                <h2 className={styles.stepTitle}>Identidade do Produto</h2>
+                <p className={styles.stepDescription}>Comece pelo básico. Quem é o seu SaaS?</p>
+                <div className="flex justify-start mt-4">
+                    <button onClick={suggestIdentity} className={styles.suggestionpill} disabled={isSuggesting}>
+                        {isSuggesting ? 'Pensando...' : 'Preencher com IA'}
+                    </button>
+                </div>
+            </div>
 
-                        <div className={styles.formGroup}>
-                            <label className={styles.label} style={{ width: '100%', textAlign: 'center', display: 'block' }}>
-                                Plataforma de IA (Onde você vai colar o prompt?)
-                            </label>
-                            <div className={styles.platformGrid}>
-                                {TARGET_PLATFORMS.map(platform => {
-                                    return (
-                                        <div
-                                            key={platform.id}
-                                            className={`${styles.platformCard} ${state.targetPlatform === platform.id ? styles.active : ''}`}
-                                            onClick={() => updateState('targetPlatform', platform.id)}
-                                        >
-                                            <div className={styles.platformIcon}>
-                                                <img
-                                                    src={platform.logo}
-                                                    alt={platform.label}
-                                                    className={styles.platformLogoImg}
-                                                />
-                                            </div>
-                                            <div className={styles.platformInfo}>
-                                                <span className={styles.platformName}>{platform.label}</span>
-                                                <span className={styles.platformDomain}>{platform.value}</span>
-                                            </div>
-                                            {state.targetPlatform === platform.id && (
-                                                <motion.div
-                                                    layoutId="active-platform"
-                                                    className={styles.platformActiveIndicator}
-                                                    initial={{ opacity: 0 }}
-                                                    animate={{ opacity: 1 }}
-                                                />
-                                            )}
-                                        </div>
-                                    );
-                                })}
+            <div className={styles.inputGroup}>
+                <label className={styles.label}>Nome do App</label>
+                <input
+                    className={styles.input}
+                    value={state.identity.name}
+                    onChange={e => updateState('identity', 'name', e.target.value)}
+                    placeholder="Ex: InvoiceHero"
+                    autoFocus
+                />
+            </div>
+
+            <div className={styles.grid2}>
+                <div className={styles.inputGroup}>
+                    <label className={styles.label}>Nicho de Mercado</label>
+                    <input
+                        className={styles.input}
+                        value={state.identity.niche}
+                        onChange={e => updateState('identity', 'niche', e.target.value)}
+                        placeholder="Ex: Gestão para Freelancers"
+                    />
+                </div>
+                <div className={styles.inputGroup}>
+                    <label className={styles.label}>One-Liner (Slogan)</label>
+                    <input
+                        className={styles.input}
+                        value={state.identity.oneLiner}
+                        onChange={e => updateState('identity', 'oneLiner', e.target.value)}
+                        placeholder="O que ele faz em uma frase curta"
+                    />
+                </div>
+            </div>
+
+            <div className={styles.grid2}>
+                <div className={styles.inputGroup}>
+                    <label className={styles.label}>Tom de Voz</label>
+                    <div className={styles.selectionGrid}>
+                        {TONES.map(t => (
+                            <div
+                                key={t.value}
+                                className={`${styles.selectionCard} ${state.identity.tone === t.value ? styles.active : ''}`}
+                                onClick={() => updateState('identity', 'tone', t.value)}
+                            >
+                                <div className={styles.selectionTitle}>{t.label}</div>
+                                <div className={styles.selectionDesc}>{t.desc}</div>
                             </div>
-                        </div>
-
-                        <div className={styles.formGroup} style={{ marginTop: '2rem' }}>
-                            <label className={styles.label}>Nome do SaaS</label>
-                            <input
-                                className={styles.input}
-                                placeholder="Ex: TaskFlow, FinanceAI..."
-                                value={state.appName}
-                                onChange={(e) => updateState('appName', e.target.value)}
-                                autoFocus
-                            />
-                        </div>
-
-                        <div className={styles.navButtons}>
-                            <button className={styles.backButton} style={{ visibility: 'hidden' }}>Voltar</button>
-                            <button className={styles.nextButton} onClick={nextStep} disabled={!state.appName.trim()}>
-                                Próximo <ChevronDown style={{ transform: 'rotate(-90deg)' }} size={20} />
-                            </button>
-                        </div>
-                    </>
-                );
-            case 1: // Niche & AI Magic
-                return (
-                    <>
-                        <div className={styles.stepHeader} style={{ marginBottom: '1rem' }}>
-                            <div className="flex flex-col md:flex-row justify-between items-start gap-8">
-                                <div>
-                                    <h2 className={styles.stepTitle}>Nicho e Público</h2>
-                                    <p className={styles.stepDescription}>Defina o mercado. Ou deixe a IA sugerir.</p>
-                                </div>
-                                <button
-                                    className={styles.copyActionResult}
-                                    onClick={handleMagicSuggest}
-                                    disabled={isSuggesting || !state.appName}
-                                >
-                                    {isSuggesting && (
-                                        <div className={styles.spinner} style={{ width: 16, height: 16, borderWidth: 2 }} />
-                                    )}
-                                    {isSuggesting ? 'Pensando...' : 'Preencher com IA'}
-                                </button>
+                        ))}
+                    </div>
+                </div>
+                <div className={styles.inputGroup}>
+                    <label className={styles.label}>Personalidade Visual</label>
+                    <div className={styles.selectionGrid}>
+                        {MOODS.map(m => (
+                            <div
+                                key={m.value}
+                                className={`${styles.selectionCard} ${state.identity.visualMood === m.value ? styles.active : ''}`}
+                                onClick={() => updateState('identity', 'visualMood', m.value)}
+                            >
+                                <div className={styles.selectionTitle}>{m.label}</div>
+                                <div className={styles.selectionDesc}>{m.desc}</div>
                             </div>
-                        </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>Nicho de Mercado</label>
-                            <input
-                                className={styles.input}
-                                placeholder="Ex: Gestão e Projetos..."
-                                value={state.niche}
-                                onChange={(e) => updateState('niche', e.target.value)}
-                            />
-                        </div>
-                        <div className={styles.formGroup} style={{ marginTop: '1.5rem' }}>
-                            <label className={styles.label}>Público Alvo</label>
-                            <input
-                                className={styles.input}
-                                placeholder="Ex: Freelancers, Startups..."
-                                value={state.targetAudience}
-                                onChange={(e) => updateState('targetAudience', e.target.value)}
-                            />
-                        </div>
-                        <div className={styles.navButtons}>
-                            <button className={styles.backButton} onClick={prevStep}>Voltar</button>
-                            <button className={styles.nextButton} onClick={nextStep}>
-                                Próximo <ChevronDown style={{ transform: 'rotate(-90deg)' }} size={20} />
-                            </button>
-                        </div>
-                    </>
-                );
-            case 2: // Features
-                return (
-                    <>
-                        <div className={styles.stepHeader}>
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <h2 className={styles.stepTitle}>Funcionalidades</h2>
-                                    <p className={styles.stepDescription}>O que seu app vai fazer?</p>
-                                </div>
-                                {!state.features.length && state.appName && (
-                                    <button
-                                        className={styles.backButton}
-                                        style={{ fontSize: '0.8rem', padding: '0.4rem 1rem' }}
-                                        onClick={handleMagicSuggest}
-                                        disabled={isSuggesting}
-                                    >
-                                        <Bot size={16} className="mr-2" /> Sugerir Features
-                                    </button>
-                                )}
+    const renderStep2_Strategy = () => (
+        <div className={styles.contentArea}>
+            <div className={styles.stepHeader}>
+                <h2 className={styles.stepTitle}>Estratégia e Público</h2>
+                <p className={styles.stepDescription}>Para quem você está construindo e qual o objetivo?</p>
+            </div>
+
+            <div className={styles.inputGroup}>
+                <label className={styles.label}>Persona Principal</label>
+                <input
+                    className={styles.input}
+                    value={state.audience.persona}
+                    onChange={e => updateState('audience', 'persona', e.target.value)}
+                    placeholder="Ex: Gerentes de Marketing sobrecarregados"
+                />
+            </div>
+
+            <div className={styles.inputGroup}>
+                <label className={styles.label}>Dor Principal (Pain)</label>
+                <textarea
+                    className={styles.textarea}
+                    rows={2}
+                    value={state.audience.pain}
+                    onChange={e => updateState('audience', 'pain', e.target.value)}
+                    placeholder="Ex: Dificuldade em provar ROI das campanhas."
+                />
+            </div>
+
+            <div className={styles.grid2}>
+                <div className={styles.inputGroup}>
+                    <label className={styles.label}>Ação Principal</label>
+                    <input
+                        className={styles.input}
+                        value={state.audience.keyAction}
+                        onChange={e => updateState('audience', 'keyAction', e.target.value)}
+                        placeholder="Ex: Gerar Relatório PDF"
+                    />
+                </div>
+                <div className={styles.inputGroup}>
+                    <label className={styles.label}>Resultado Esperado</label>
+                    <input
+                        className={styles.input}
+                        value={state.audience.successMetric}
+                        onChange={e => updateState('audience', 'successMetric', e.target.value)}
+                        placeholder="Ex: Relatórios gerados por semana"
+                    />
+                </div>
+            </div>
+        </div>
+    );
+
+
+
+
+
+    const renderStep4_Scope = () => {
+        const toggleFeature = (feat: string, type: 'required' | 'out') => {
+            const listKey = type === 'required' ? 'featuresRequired' : 'featuresOut';
+            const current = state.scope[listKey];
+            const exists = current.includes(feat);
+            if (exists) {
+                updateState('scope', listKey, current.filter(f => f !== feat));
+            } else {
+                updateState('scope', listKey, [...current, feat]);
+            }
+        };
+
+        const TagInput = ({ list, onChange, placeholder }: any) => {
+            const [val, setVal] = useState('');
+            const add = () => {
+                if (val.trim()) {
+                    onChange([...list, val.trim()]);
+                    setVal('');
+                }
+            };
+            return (
+                <div className="space-y-3">
+                    <div className="flex gap-2">
+                        <input
+                            className={styles.input}
+                            value={val}
+                            onChange={e => setVal(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && add()}
+                            placeholder={placeholder}
+                        />
+                        <button onClick={add} className={styles.addButton}><Plus /></button>
+                    </div>
+                    <div className={styles.chipGrid}>
+                        {list.map((item: string, i: number) => (
+                            <div key={i} className={`${styles.chip} active`} onClick={() => onChange(list.filter((_: any, idx: number) => idx !== i))}>
+                                {item} <span className="ml-2 opacity-50">×</span>
                             </div>
-                        </div>
-                        <div className={styles.inputWithButton}>
-                            <input
-                                className={styles.input}
-                                placeholder="Digite uma feature..."
-                                value={featureInput}
-                                onChange={(e) => setFeatureInput(e.target.value)}
-                                onKeyDown={(e) => { if (e.key === 'Enter') addFeature(); }}
-                            />
-                            <button className={styles.addButton} onClick={addFeature}>+</button>
-                        </div>
-                        <div className={styles.chipGrid}>
-                            {state.features.map((feat, idx) => (
-                                <div key={idx} className={styles.chip} onClick={() => toggleFeature(feat)}>
-                                    {feat} <X size={14} style={{ marginLeft: 6 }} />
-                                </div>
-                            ))}
-                        </div>
-                        <div className={styles.suggestionsGrid}>
-                            {['Auth', 'Dashboard', 'Pagamentos', 'Admin', 'Relatórios'].map(sug => (
-                                <div key={sug} className={styles.suggestionpill} onClick={() => {
-                                    if (!state.features.includes(sug)) toggleFeature(sug);
-                                }}>+ {sug}</div>
-                            ))}
-                        </div>
-                        <div className={styles.navButtons}>
-                            <button className={styles.backButton} onClick={prevStep}>Voltar</button>
-                            <button className={styles.nextButton} onClick={nextStep}>
-                                Próximo <ChevronDown style={{ transform: 'rotate(-90deg)' }} size={20} />
-                            </button>
-                        </div>
-                    </>
-                );
-            case 3: // Visual Style Only
-                return (
-                    <>
-                        <div className={styles.stepHeader}>
-                            <h2 className={styles.stepTitle}>Estilo Visual</h2>
-                            <p className={styles.stepDescription}>Qual a "vibe" do seu SaaS?</p>
-                        </div>
-                        <div className={styles.grid2} style={{ marginTop: '1rem' }}>
-                            {STYLES.map(s => (
-                                <div
-                                    key={s.id}
-                                    className={`${styles.card} ${state.visualStyle === s.label ? styles.selected : ''}`}
-                                    onClick={() => updateState('visualStyle', s.label)}
-                                    style={{ '--primary': s.color } as React.CSSProperties}
-                                >
-                                    <div className={styles.cardIcon}><s.icon size={24} /></div>
-                                    <span className={styles.cardTitle}>{s.label}</span>
-                                </div>
-                            ))}
-                        </div>
-                        <div className={styles.navButtons}>
-                            <button className={styles.backButton} onClick={prevStep}>Voltar</button>
-                            <button className={styles.nextButton} onClick={nextStep}>
-                                Próximo <ChevronDown style={{ transform: 'rotate(-90deg)' }} size={20} />
-                            </button>
-                        </div>
-                    </>
-                );
-            case 4: // Colors Only (Synced with Landing Builder)
-                return (
-                    <>
-                        <div className={styles.stepHeader}>
-                            <h2 className={styles.stepTitle}>Paleta de Cores</h2>
-                            <p className={styles.stepDescription}>Defina as cores da sua marca.</p>
-                        </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
 
-                        {/* Colors */}
-                        <div className={styles.grid2} style={{ marginBottom: '2rem' }}>
-                            {/* Primary Color */}
-                            <div>
-                                <label className={styles.label} style={{ marginBottom: '0.5rem', display: 'block' }}>Cor Primária (Destaques)</label>
-                                <div className={styles.featuresGrid} style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(40px, 1fr))', gap: '8px' }}>
-                                    {COLORS.filter(c => c.id !== 'white').map(c => (
-                                        <div
-                                            key={`p-${c.id}`}
-                                            onClick={() => updateState('primaryColor', c.color)}
-                                            style={{
-                                                width: '40px', height: '40px', borderRadius: '10px', background: c.color, cursor: 'pointer',
-                                                border: state.primaryColor === c.color ? '2px solid white' : '1px solid rgba(255,255,255,0.1)',
-                                                boxShadow: state.primaryColor === c.color ? `0 0 10px ${c.color}` : 'none',
-                                                transition: 'all 0.2s'
-                                            }}
-                                            title={c.label}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
+        return (
+            <div className={styles.contentArea}>
+                <div className={styles.stepHeader}>
+                    <h2 className={styles.stepTitle}>Escopo e Tecnologia</h2>
+                    <p className={styles.stepDescription}>O que entra no MVP e configurações técnicas.</p>
+                </div>
 
-                            {/* Secondary Color */}
-                            <div>
-                                <label className={styles.label} style={{ marginBottom: '0.5rem', display: 'block' }}>Cor Secundária (Fundo/Base)</label>
-                                <div className={styles.featuresGrid} style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(40px, 1fr))', gap: '8px' }}>
-                                    {COLORS.map(c => (
-                                        <div
-                                            key={`s-${c.id}`}
-                                            onClick={() => updateState('secondaryColor', c.color)}
-                                            style={{
-                                                width: '40px', height: '40px', borderRadius: '10px', background: c.color, cursor: 'pointer',
-                                                border: state.secondaryColor === c.color ? '2px solid white' : '1px solid rgba(255,255,255,0.1)',
-                                                transform: state.secondaryColor === c.color ? 'scale(1.1)' : 'scale(1)',
-                                                transition: 'all 0.2s'
-                                            }}
-                                            title={c.label}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
+                <div className="grid grid-cols-1 gap-8">
+                    <div className={styles.inputGroup}>
+                        <label className={styles.label}>Features Obrigatórias (MVP)</label>
+                        <TagInput
+                            list={state.scope.featuresRequired}
+                            onChange={(l: string[]) => updateState('scope', 'featuresRequired', l)}
+                            placeholder="Ex: Dashboard de métricas, Exportação PDF..."
+                        />
+                    </div>
+
+                    <div className={styles.toggleWrapper} onClick={() => updateState('scope', 'adminEnabled', !state.scope.adminEnabled)}>
+                        <div className={styles.toggleLabel}>
+                            <span className={styles.toggleTitle}>Painel Admin</span>
+                            <span className={styles.toggleDesc}>Criar área /admin para gestão global?</span>
                         </div>
+                        <CheckBox
+                            checked={state.scope.adminEnabled}
+                            onClick={() => { }} // Handled by wrapper
+                            color="#F5A524"
+                        />
+                    </div>
 
-                        {/* Live Preview (Kept as it adds value and fits the structure) */}
-                        <div className={styles.mockPreview}>
-                            <h3 className={styles.mockHeading} style={{ color: state.primaryColor }}>Preview do seu SaaS</h3>
-                            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', textAlign: 'center' }}>
-                                A percepção de valor aumenta com cores consistentes.
-                            </p>
-                            <button className={styles.mockButton} style={{ background: state.primaryColor, color: state.secondaryColor === '#ffffff' || state.secondaryColor.startsWith('#f') ? '#000' : '#fff' }}>
-                                Botão de Ação
-                            </button>
+                    <div className={styles.toggleWrapper} onClick={() => updateDeepState('scope', 'payments', 'enabled', !state.scope.payments.enabled)}>
+                        <div className={styles.toggleLabel}>
+                            <span className={styles.toggleTitle}>Pagamentos</span>
+                            <span className={styles.toggleDesc}>Habilitar checkout e planos?</span>
                         </div>
+                        <CheckBox
+                            checked={state.scope.payments.enabled}
+                            onClick={() => { }} // Handled by wrapper
+                            color="#F5A524"
+                        />
+                    </div>
 
-
-                        <div className={styles.navButtons}>
-                            <button className={styles.backButton} onClick={prevStep}>Voltar</button>
-                            <button className={styles.nextButton} onClick={nextStep}>
-                                Próximo <ChevronDown style={{ transform: 'rotate(-90deg)' }} size={20} />
-                            </button>
-                        </div>
-                    </>
-                );
-            case 5: // Typography & Weight
-                return (
-                    <>
-                        <div className={styles.stepHeader}>
-                            <h2 className={styles.stepTitle}>Tipografia</h2>
-                            <p className={styles.stepDescription}>A voz visual da sua marca.</p>
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>Família da Fonte</label>
-                            <div className="grid grid-cols-2 gap-3 mt-2" style={{ maxHeight: '360px', overflowY: 'auto', paddingRight: '5px' }}>
-                                {FONTS.map(font => (
+                    {state.scope.payments.enabled && (
+                        <div className={styles.inputGroup}>
+                            <label className={styles.label}>Provedor de Pagamento</label>
+                            <div className={styles.selectionGrid}>
+                                {PAYMENT_PROVIDERS.map(p => (
                                     <div
-                                        key={font.id}
-                                        className={`${styles.fontCard} ${state.typography === font.id ? styles.active : ''}`}
-                                        onClick={() => updateState('typography', font.id)}
-                                        style={{ fontFamily: font.id }}
+                                        key={p.value}
+                                        className={`${styles.selectionCard} ${state.scope.payments.provider === p.value ? styles.active : ''}`}
+                                        onClick={() => updateDeepState('scope', 'payments', 'provider', p.value)}
                                     >
-                                        <div className={styles.fontPreviewAa}>Aa</div>
-                                        <div className={styles.fontInfo}>
-                                            <span className={styles.fontName}>{font.label}</span>
-                                            <span className={styles.fontCat} style={{ fontFamily: 'var(--font-heading)' }}>{font.category}</span>
-                                        </div>
+                                        <div className={styles.selectionTitle}>{p.label}</div>
                                     </div>
                                 ))}
                             </div>
                         </div>
+                    )}
 
-                        <div className={styles.formGroup} style={{ marginTop: '2rem' }}>
-                            <div className="flex justify-between items-center mb-2">
-                                <label className={styles.label}>Espessura (Peso): <span style={{ color: 'var(--primary)' }}>{state.typographyWeight}</span></label>
-                            </div>
-                            <input
-                                type="range"
-                                min="100"
-                                max="900"
-                                step="100"
-                                value={state.typographyWeight}
-                                onChange={(e) => updateState('typographyWeight', parseInt(e.target.value))}
-                                className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-orange-500"
-                                style={{ accentColor: 'var(--primary)' }}
-                            />
-
-                            {/* Live Preview Box */}
-                            <div style={{
-                                marginTop: '1.5rem',
-                                padding: '2rem',
-                                background: 'rgba(0,0,0,0.3)',
-                                borderRadius: 16,
-                                border: '1px solid rgba(255,255,255,0.05)',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '0.5rem',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                minHeight: '120px'
-                            }}>
-                                <p style={{
-                                    fontFamily: state.typography,
-                                    fontWeight: state.typographyWeight,
-                                    fontSize: '1.8rem',
-                                    color: 'white',
-                                    textAlign: 'center',
-                                    lineHeight: 1.2
-                                }}>
-                                    Promptly SaaS
-                                </p>
-                                <p style={{
-                                    fontFamily: state.typography,
-                                    fontWeight: 400, // Contrast with body text
-                                    fontSize: '1rem',
-                                    color: 'rgba(255,255,255,0.6)',
-                                    textAlign: 'center'
-                                }}>
-                                    The quick brown fox jumps over the lazy dog.
-                                </p>
-                            </div>
+                    <div className={styles.toggleWrapper} onClick={() => updateState('scope', 'storage', !state.scope.storage)}>
+                        <div className={styles.toggleLabel}>
+                            <span className={styles.toggleTitle}>Storage (Uploads)</span>
+                            <span className={styles.toggleDesc}>Usuários podem fazer upload de arquivos?</span>
                         </div>
-
-                        <div className={styles.navButtons}>
-                            <button className={styles.backButton} onClick={prevStep}>Voltar</button>
-                            <button className={styles.nextButton} onClick={nextStep}>
-                                Revisar <ChevronDown style={{ transform: 'rotate(-90deg)' }} size={20} />
-                            </button>
-                        </div>
-                    </>
-                );
-            case 6: // Review
-                return (
-                    <>
-                        <div className={styles.stepHeader}>
-                            <h2 className={styles.stepTitle}>Revisão Final</h2>
-                            <p className={styles.stepDescription}>Plataforma Alvo: <span style={{ color: 'var(--primary)' }}>{state.targetPlatform}</span></p>
-                        </div>
-                        <div className={styles.reviewCard}>
-                            <div className={styles.reviewItem}> <span className={styles.reviewLabel}>App:</span> <span className={styles.reviewValue}>{state.appName}</span> </div>
-                            <div className={styles.reviewItem}> <span className={styles.reviewLabel}>Nicho:</span> <span className={styles.reviewValue}>{state.niche}</span> </div>
-                            <div className={styles.reviewItem}> <span className={styles.reviewLabel}>Estilo:</span> <span className={styles.reviewValue}>{state.visualStyle}</span> </div>
-                            <div className={styles.reviewItem}> <span className={styles.reviewLabel}>Stack:</span> <span className={styles.reviewValue}>{state.targetPlatform} + {state.typography} ({state.typographyWeight})</span> </div>
-                            <div className={styles.reviewItem}> <span className={styles.reviewLabel}>Features:</span> <span className={styles.reviewValue}>{state.features.length} funcionais</span> </div>
-                        </div>
-
-                        <div className={styles.navButtons}>
-                            <button className={styles.backButton} onClick={prevStep}>Voltar</button>
-                            <button className={styles.nextButton} onClick={handleGeneratePrompt}>Gerar Mágica</button>
-                        </div>
-                    </>
-                );
-            default: return null;
-        }
+                        <CheckBox
+                            checked={state.scope.storage}
+                            onClick={() => { }} // Handled by wrapper
+                            color="#F5A524"
+                        />
+                    </div>
+                </div>
+            </div>
+        );
     };
 
-    // --- Result Screen ---
-    if (step === 7) {
-        return (
-            <div className={styles.container}>
-                <Link href="/dashboard" className={styles.closeButton}><X size={24} /></Link>
-                <div className={styles.resultContainer}>
-                    <div className={styles.stepHeader}>
-                        <h2 className={styles.stepTitle}>Seu Prompt está Pronto</h2>
-                        <p className={styles.stepDescription}>Agora é só copiar e colar no <b>{state.targetPlatform}</b>.</p>
-                    </div>
-                    {isGenerating ? (
-                        <div className={styles.loadingState}>
-                            <div className={styles.spinner}></div>
-                            <p>Otimizando arquitetura para {state.targetPlatform}...</p>
+    const renderStep5_Visuals = () => (
+        <div className={styles.contentArea}>
+            <div className={styles.stepHeader}>
+                <h2 className={styles.stepTitle}>Visual & Branding</h2>
+                <p className={styles.stepDescription}>Defina as cores e a tipografia do seu SaaS.</p>
+            </div>
+
+            <div className={styles.inputGroup}>
+                <label className={styles.label}>Fonte Principal</label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {FONT_OPTIONS.map((font) => (
+                        <div
+                            key={font.name}
+                            onClick={() => updateState('branding', 'font', font.name)}
+                            className={`p-4 rounded-xl border cursor-pointer transition-all ${state.branding.font === font.name
+                                ? 'bg-[rgba(245,165,36,0.15)] border-[#F5A524] text-[#F5A524]'
+                                : 'bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.05)] text-white/60 hover:bg-[rgba(255,255,255,0.06)]'
+                                }`}
+                        >
+                            <div className="font-medium text-sm mb-1" style={{ fontFamily: font.name }}>{font.name}</div>
+                            <div className="text-[10px] opacity-60 text-current">{font.weights}</div>
                         </div>
-                    ) : (
+                    ))}
+                </div>
+            </div>
+
+            {/* Dynamic Font Loader (Preview) */}
+            <FontLoader font={state.branding.font} fontWeight={state.branding.fontWeight} />
+
+            <div className={styles.inputGroup}>
+                <label className={styles.label}>Espessura da Fonte</label>
+                <div className="flex gap-3 flex-wrap">
+                    {WEIGHT_OPTIONS.map((w) => (
+                        <div
+                            key={w.value}
+                            onClick={() => updateState('branding', 'fontWeight', w.value)}
+                            className={`px-4 py-2 rounded-lg border cursor-pointer text-sm font-medium transition-all ${state.branding.fontWeight === w.value
+                                ? 'bg-[rgba(245,165,36,0.15)] border-[#F5A524] text-[#F5A524]'
+                                : 'bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.05)] text-white/60 hover:bg-[rgba(255,255,255,0.06)]'
+                                }`}
+                        >
+                            {w.label}
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <h3 className="text-white font-medium mb-4 mt-8">Paleta de Cores</h3>
+            <div className="space-y-4">
+                <div className={styles.colorRow}>
+                    <div className={styles.colorLabel}>Primary Color</div>
+                    <div className={styles.colorInputWrapper} style={{ backgroundColor: state.branding.colors.primary }}>
+                        <input type="color" className={styles.colorInput} value={state.branding.colors.primary} onChange={e => updateDeepState('branding', 'colors', 'primary', e.target.value)} />
+                    </div>
+                </div>
+                <div className={styles.colorRow}>
+                    <div className={styles.colorLabel}>Background Color</div>
+                    <div className={styles.colorInputWrapper} style={{ backgroundColor: state.branding.colors.bg }}>
+                        <input type="color" className={styles.colorInput} value={state.branding.colors.bg} onChange={e => updateDeepState('branding', 'colors', 'bg', e.target.value)} />
+                    </div>
+                </div>
+                <div className={styles.colorRow}>
+                    <div className={styles.colorLabel}>Text Color</div>
+                    <div className={styles.colorInputWrapper} style={{ backgroundColor: state.branding.colors.text }}>
+                        <input type="color" className={styles.colorInput} value={state.branding.colors.text} onChange={e => updateDeepState('branding', 'colors', 'text', e.target.value)} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
+    const renderStep6_Review = () => (
+        <div className={styles.contentArea}>
+            <div className={styles.stepHeader} style={{ textAlign: 'center' }}>
+                <h2 className={styles.stepTitle}>Tudo pronto!</h2>
+                <p className={styles.stepDescription}>Revise os dados antes de gerar o prompt.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div className={styles.reviewCard}>
+                    <div className={styles.reviewItem}>
+                        <span className={styles.reviewLabel}>Nome</span>
+                        <span className={styles.reviewValue}>{state.identity.name}</span>
+                    </div>
+                    <div className={styles.reviewItem}>
+                        <span className={styles.reviewLabel}>Nicho</span>
+                        <span className={styles.reviewValue}>{state.identity.niche}</span>
+                    </div>
+                    <div className={styles.reviewItem}>
+                        <span className={styles.reviewLabel}>Persona</span>
+                        <span className={styles.reviewValue}>{state.audience.persona}</span>
+                    </div>
+                </div>
+                <div className={styles.reviewCard}>
+                    <div className={styles.reviewItem}>
+                        <span className={styles.reviewLabel}>Pagamentos</span>
+                        <span className={styles.reviewValue}>{state.scope.payments.enabled ? 'Sim' : 'Não'}</span>
+                    </div>
+                    <div className={styles.reviewItem}>
+                        <span className={styles.reviewLabel}>Admin</span>
+                        <span className={styles.reviewValue}>{state.scope.adminEnabled ? 'Sim' : 'Não'}</span>
+                    </div>
+                    <div className={styles.reviewItem}>
+                        <span className={styles.reviewLabel}>Features</span>
+                        <span className={styles.reviewValue}>{state.scope.featuresRequired.length} items</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
+    // --- Main Render ---
+    if (currentStep === 6) {
+        // Result View
+        return (
+
+            <div className={styles.container}>
+                {isGenerating ? (
+                    <div className="flex flex-col items-center gap-6 py-20">
+                        <TextShimmer className="text-2xl font-bold font-heading text-center" duration={1.5}>
+                            Arquitetando seu SaaS Premium...
+                        </TextShimmer>
+                        <p className="text-white/50 text-center max-w-md">Criando tabelas, definindo RLS, desenhando UI e escrevendo a documentação.</p>
+                    </div>
+                ) : (
+                    <div className="w-full max-w-4xl animate-in fade-in zoom-in duration-500">
+                        <div className="text-center mb-8">
+                            <h2 className="text-3xl font-bold text-white mb-2">Seu Prompt está Pronto</h2>
+                            <p className="text-white/40">Copie o código abaixo e cole na Lovable.</p>
+                        </div>
+
+                        {/* Integration Logos Slider (CSS Marquee) */}
+                        <div className="w-full mb-8 relative fade-in-up delay-200">
+                            <div className={styles.marqueeContainer}>
+                                <div className={styles.marqueeContent}>
+                                    <img src="/logos/lovable.png" alt="Lovable" />
+                                    <img src="/logos/vercel.png" alt="Vercel" />
+                                    <img src="/logos/bolt.png" alt="Bolt" />
+                                    <img src="/logos/replit.png" alt="Replit" />
+                                    <img src="/logos/google_ai.png" alt="Google AI Studio" />
+                                    {/* Duplicate for infinite loop */}
+                                    <img src="/logos/lovable.png" alt="Lovable" />
+                                    <img src="/logos/vercel.png" alt="Vercel" />
+                                    <img src="/logos/bolt.png" alt="Bolt" />
+                                    <img src="/logos/replit.png" alt="Replit" />
+                                    <img src="/logos/google_ai.png" alt="Google AI Studio" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* MacBook Editor Window */}
                         <div className={styles.editorWindow}>
+                            {/* Window Header */}
                             <div className={styles.editorHeader}>
                                 <div className={styles.windowControls}>
-                                    <div className={styles.controlDot} style={{ background: '#FF5F56' }} />
-                                    <div className={styles.controlDot} style={{ background: '#FFBD2E' }} />
-                                    <div className={styles.controlDot} style={{ background: '#27C93F' }} />
+                                    <Link href="/dashboard" className={`${styles.controlDot} bg-[#FF5F56] hover:brightness-75 transition-all cursor-pointer`} title="Sair do Builder" />
+                                    <div className={`${styles.controlDot} bg-[#FFBD2E]`} />
+                                    <div className={`${styles.controlDot} bg-[#27C93F]`} />
                                 </div>
-                                <span className={styles.fileName}>prompt_gerado.md</span>
-                                <div style={{ flex: 1 }} />
-                                <div className={styles.badge}>{state.targetPlatform} Mode</div>
+                                <div className="flex-1 text-center mr-16"> {/* mr-16 balances the dots */}
+                                    <span className={styles.fileName}>prompt-v3.md</span>
+                                </div>
                             </div>
 
+                            {/* Editor Body */}
                             <div className={styles.editorBody}>
                                 <pre className={styles.promptContent}>{generatedPrompt}</pre>
                             </div>
 
+                            {/* Editor Footer (Actions) */}
                             <div className={styles.editorFooter}>
-                                <button className={styles.copyActionResult} onClick={handleCopy}>
-                                    {copied ? <Check size={18} /> : <Copy size={18} />}
-                                    {copied ? 'Copiado!' : 'Copiar Prompt'}
+                                <button
+                                    className={styles.backButton}
+                                    onClick={() => setCurrentStep(1)}
+                                    style={{ border: 'none', paddingLeft: 0, paddingRight: 0 }}
+                                >
+                                    Criar Outro
                                 </button>
-                                <button className={styles.secondaryAction} onClick={() => setStep(0)}>
-                                    Criar Novo
-                                </button>
+
+                                <div className="flex gap-4">
+                                    <Link
+                                        href="/dashboard"
+                                        className={styles.backButton}
+                                        style={{ border: 'none', textDecoration: 'none' }}
+                                    >
+                                        Sair
+                                    </Link>
+                                    <button
+                                        className={styles.copyActionResult}
+                                        onClick={copyToClipboard}
+                                    >
+                                        {isCopied ? <Check size={18} /> : null}
+                                        {isCopied ? 'Copiado!' : 'Copiar Código'}
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
+
+                {/* Global Close Button (Top Right) */}
+                <Link href="/dashboard" className={styles.closeButton}>
+                    <X size={24} />
+                </Link>
             </div>
         );
     }
 
+    // Wizard View
     return (
         <div className={styles.container}>
-            <Link href="/dashboard" className={styles.closeButton}><X size={24} /></Link>
-            <div className={styles.wizardCard}>
-                <div className={styles.progressContainer}>
-                    <div className={styles.progressBar}>
-                        <div className={styles.progressFill} style={{ width: `${((step + 1) / 7) * 100}%` }} />
-                    </div>
+            <button className={styles.closeButton} onClick={() => router.push('/dashboard')}>
+                <X size={20} />
+            </button>
+
+            <motion.div
+                className={styles.wizardCard}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
+                {/* Progress */}
+                <div className={styles.progressBar}>
+                    <div
+                        className={styles.progressFill}
+                        style={{ width: `${(currentStep / 5) * 100}%` }}
+                    />
                 </div>
-                <div className={styles.contentArea}>
-                    <AnimatePresence mode='wait'>
-                        <motion.div
-                            key={step}
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            transition={{ duration: 0.3 }}
-                            style={{ width: '100%' }}
-                        >
-                            {renderStepContent()}
-                        </motion.div>
-                    </AnimatePresence>
+
+                {/* Header Info */}
+                <div className={styles.stepIndicator}>
+                    Passo {currentStep} de 5 • {STEPS[currentStep - 1].title}
                 </div>
-            </div>
+
+                {/* Step Content */}
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={currentStep}
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ duration: 0.3 }}
+                        className="flex-1 flex flex-col"
+                    >
+                        {currentStep === 1 && renderStep1_Identity()}
+                        {currentStep === 2 && renderStep2_Strategy()}
+                        {currentStep === 3 && renderStep4_Scope()}
+                        {currentStep === 4 && renderStep5_Visuals()}
+                        {currentStep === 5 && renderStep6_Review()}
+                    </motion.div>
+                </AnimatePresence>
+
+                {/* Footer Nav */}
+                <div className={styles.actions}>
+                    <button
+                        className={styles.backButton}
+                        onClick={handleBack}
+                    >
+                        {currentStep === 1 ? 'Cancelar' : 'Voltar'}
+                    </button>
+
+                    {currentStep < 5 ? (
+                        <button className={styles.nextButton} onClick={handleNext}>
+                            Próximo <ArrowRight size={18} />
+                        </button>
+                    ) : (
+                        <button className={styles.nextButton} onClick={handleGenerate}>
+                            Gerar Mágica
+                        </button>
+                    )}
+                </div>
+            </motion.div>
         </div>
     );
 }

@@ -11,59 +11,61 @@
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    transition: transform 0.1s ease, filter 0.2s ease;
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), filter 0.6s cubic-bezier(0.23, 1, 0.32, 1);
     user-select: none;
     /* Ensure the button takes the shape of the glsss surface content */
 }
 
 /* Living Border Effect */
+/* refined premium border */
 .buttonReset::before {
     content: '';
     position: absolute;
-    inset: -1px;
+    inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(245, 165, 36, 0.3), rgba(255, 255, 255, 0.1));
+    /* Border width */
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.02));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
-    opacity: 0.5;
-    transition: opacity 0.3s ease;
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
     z-index: 1;
     pointer-events: none;
 }
 
-/* Hover effects to make it feel "active" */
+/* Outer Glow (Subtle) */
+.buttonReset::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    box-shadow: 0 0 20px rgba(245, 165, 36, 0.15), inset 0 0 10px rgba(245, 165, 36, 0.05);
+    z-index: 0;
+    opacity: 0.6;
+    transition: opacity 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
 .buttonReset:hover {
-    transform: scale(1.02);
-    filter: brightness(1.1);
+    transform: scale(1.04);
 }
 
 .buttonReset:hover::before {
-    opacity: 1;
-    background: linear-gradient(45deg, rgba(245, 165, 36, 0.1), rgba(245, 165, 36, 0.8), rgba(245, 165, 36, 0.1));
-    background-size: 200% 200%;
-    animation: borderFlow 3s linear infinite;
+    background: linear-gradient(180deg, rgba(245, 165, 36, 0.9), rgba(245, 165, 36, 0.4));
+    transition-duration: 0.4s;
 }
 
-@keyframes borderFlow {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
+.buttonReset:hover::after {
+    opacity: 1;
+    box-shadow: 0 0 40px rgba(245, 165, 36, 0.4), inset 0 0 25px rgba(245, 165, 36, 0.2);
+    transition-duration: 0.4s;
 }
 
 .buttonReset:active {
-    transform: scale(0.98);
-    filter: brightness(0.95);
+    transform: scale(0.96);
+    filter: brightness(0.9);
+    transition-duration: 0.1s;
 }
 
 .buttonReset:disabled {
