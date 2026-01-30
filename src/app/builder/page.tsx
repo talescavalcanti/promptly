@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Wand2, Calculator, Check, X, Plus, Trash2, Settings, Palette, Target, Fingerprint, LayoutGrid } from 'lucide-react';
 import styles from './saas-builder.module.css';
 import { TextShimmer } from '@/components/ui/text-shimmer';
