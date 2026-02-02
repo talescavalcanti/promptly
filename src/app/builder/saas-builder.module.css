@@ -75,6 +75,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    min-height: auto;
 }
 
 /* --- Progress Bar --- */
@@ -120,7 +121,7 @@
     /* Matching Dashboard Title Size approximately */
     font-weight: 700;
     color: #fff;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.1rem;
     letter-spacing: -0.03em;
 }
 
@@ -129,6 +130,7 @@
     color: rgba(255, 255, 255, 0.4);
     /* Matching Dashboard .stepDesc */
     line-height: 1.5;
+    max-width: 90%;
 }
 
 /* --- Components: Inputs & Chips --- */
@@ -365,29 +367,20 @@
 }
 
 .suggestionpill {
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    border: 1px solid rgba(245, 165, 36, 0.3);
-    background: rgba(245, 165, 36, 0.05);
-    /* Very subtle gold tint */
-    color: var(--primary);
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    padding: 0.4rem 1rem;
+    border-radius: 99px;
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.02);
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.85rem;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    transition: all 0.2s;
 }
 
 .suggestionpill:hover {
-    background: var(--primary);
-    color: #000;
     border-color: var(--primary);
-    box-shadow: 0 0 15px rgba(245, 165, 36, 0.3);
-    transform: translateY(-1px);
+    color: var(--primary);
+    background: rgba(245, 165, 36, 0.05);
 }
 
 .suggestionpill.active,
@@ -670,31 +663,37 @@
 .nextButton {
     position: relative;
     overflow: hidden;
+    /* For shimmer */
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 0.75rem;
     background: var(--primary);
-    color: #1a1a1a;
+    color: #000;
     font-weight: 600;
-    font-size: 0.95rem;
-    padding: 0.8rem 2.5rem;
+    /* Increased weight for premium feel */
+    font-size: 1rem;
+    padding: 0.85rem 2.8rem;
     border-radius: 50px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    /* Reverting to Pill to match AI Button */
+    border: none;
     cursor: pointer;
     z-index: 10;
-    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* Exact Clone of "Preencher com IA" Shadow */
     box-shadow:
-        0 4px 12px rgba(245, 165, 36, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        0 4px 14px rgba(255, 176, 32, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    /* Top highlight */
 }
 
 .nextButton:hover {
     background: #FFB020;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
     box-shadow:
-        0 6px 16px rgba(245, 165, 36, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        0 8px 20px rgba(245, 165, 36, 0.35),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.1);
 }
 
 .nextButton:active {
@@ -862,7 +861,7 @@
 /* --- Mock UI Preview --- */
 .mockPreview {
     margin-top: 2rem;
-    padding: 1.5rem;
+    padding: 0;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -1026,11 +1025,26 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    height: 65vh;
+    height: 50vh;
     /* Fixed height for scroll */
-    max-height: 600px;
+    max-height: 450px;
     margin-top: 1rem;
     animation: slideUp 0.4s ease-out;
+}
+
+.resultContainer {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.resultContainer .stepHeader {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .editorHeader {
@@ -1212,269 +1226,4 @@
         width: 100%;
         justify-content: center;
     }
-}
-
-/* --- Toggle Switch --- */
-.toggleWrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 1rem 1.25rem;
-    border-radius: 16px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.toggleWrapper:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.1);
-}
-
-.toggleLabel {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-}
-
-.toggleTitle {
-    font-weight: 500;
-    color: white;
-    font-size: 1rem;
-}
-
-.toggleDesc {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.4);
-}
-
-.toggleSwitch {
-    width: 44px;
-    height: 24px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 99px;
-    position: relative;
-    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-    flex-shrink: 0;
-}
-
-.toggleSwitch::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 20px;
-    height: 20px;
-    background: white;
-    border-radius: 50%;
-    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.toggleWrapper.active .toggleSwitch {
-    background: var(--primary);
-}
-
-.toggleWrapper.active .toggleSwitch::after {
-    transform: translateX(20px);
-}
-
-/* --- Field Builder Row --- */
-.fieldRow {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-    animation: fadeIn 0.3s ease-out;
-}
-
-.removeFieldButton {
-    width: 40px;
-    height: 48px;
-    /* Match input height roughly */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 50, 50, 0.1);
-    border: 1px solid rgba(255, 50, 50, 0.2);
-    border-radius: 12px;
-    color: #ff4d4d;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.removeFieldButton:hover {
-    background: rgba(255, 50, 50, 0.2);
-    color: white;
-}
-
-.addFieldButton {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--primary);
-    background: rgba(245, 165, 36, 0.1);
-    border: 1px dashed var(--primary);
-    padding: 0.75rem 1rem;
-    border-radius: 12px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    width: 100%;
-    justify-content: center;
-    margin-top: 0.5rem;
-}
-
-.addFieldButton:hover {
-    background: rgba(245, 165, 36, 0.15);
-    transform: translateY(-1px);
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(5px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* --- Color Picker Row --- */
-.colorRow {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 0.75rem 1rem;
-    border-radius: 12px;
-    margin-bottom: 0.75rem;
-}
-
-.colorLabel {
-    font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.colorInputWrapper {
-    position: relative;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    cursor: pointer;
-}
-
-.colorInput {
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    cursor: pointer;
-    border: none;
-    padding: 0;
-    margin: 0;
-}
-
-/* --- Selection Grid (Replacement for Select) --- */
-.selectionGrid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-    width: 100%;
-}
-
-.selectionCard {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 1rem;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    height: 80px;
-}
-
-.selectionCard:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
-}
-
-.selectionCard.active {
-    background: rgba(245, 165, 36, 0.08);
-    border-color: var(--primary);
-    box-shadow: 0 4px 12px rgba(245, 165, 36, 0.1);
-}
-
-.selectionTitle {
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 0.25rem;
-}
-
-.selectionCard.active .selectionTitle {
-    color: var(--primary);
-}
-
-.selectionDesc {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.4);
-    line-height: 1.3;
-}
-
-/* --- Marquee Animation --- */
-@keyframes marquee {
-    0% {
-        transform: translateX(0);
-    }
-
-    100% {
-        transform: translateX(-50%);
-    }
-}
-
-.marqueeContainer {
-    display: flex;
-    overflow: hidden;
-    user-select: none;
-    gap: 2rem;
-    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-    height: 4rem;
-    /* Force height */
-    align-items: center;
-    width: 100%;
-}
-
-.marqueeContent {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    gap: 4rem;
-    min-width: 100%;
-    animation: marquee 30s linear infinite;
-}
-
-.marqueeContent img {
-    height: 2rem;
-    width: auto;
-    opacity: 0.4;
-    filter: grayscale(100%);
-    transition: all 0.3s ease;
-}
-
-.marqueeContent img:hover {
-    opacity: 1;
-    filter: grayscale(0%);
 }

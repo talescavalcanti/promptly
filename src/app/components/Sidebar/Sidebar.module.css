@@ -85,51 +85,78 @@
 }
 
 /* Usage Stats */
+/* Usage Stats - Strict Pill Badge */
 .usage {
-    margin-top: 1rem;
-    padding: 0 0.5rem;
+    margin-top: auto;
+    margin-bottom: 2rem;
+    padding: 0.85rem 1.5rem;
+    background: #18181b;
+    /* Zinc-900 */
+    border: 1px solid #27272a;
+    /* Zinc-800 */
+    border-radius: 999px;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    transition: all 0.2s ease;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    min-width: 140px;
+}
+
+.usage:hover {
+    border-color: #3f3f46;
+    background: #27272a;
 }
 
 .usageHeader {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.75rem;
-    color: var(--muted-foreground);
-}
-
-.progressBar {
+    justify-content: center;
     width: 100%;
-    height: 6px;
-    background: var(--border);
-    border-radius: 99px;
-    overflow: hidden;
 }
 
-.progressFill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary) 0%, #8b5cf6 100%);
-    border-radius: 99px;
-    transition: width 0.5s ease-out;
+.planLabel {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    color: #71717a;
+    /* Muted Gray */
+    font-family: var(--font-sans);
 }
 
-.upgradeBtn {
-    font-size: 0.75rem;
-    color: white;
-    background: var(--primary);
-    text-align: center;
-    padding: 0.4rem;
-    border-radius: var(--radius);
-    font-weight: 500;
-    margin-top: 0.25rem;
-    transition: opacity 0.2s;
+.usageMain {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
 }
 
-.upgradeBtn:hover {
-    opacity: 0.9;
+.usageValue {
+    font-family: var(--font-sans);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+}
+
+.usageTotal {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+}
+
+/* Hide unused elements from previous designs */
+.limitLabel,
+.progressContainer,
+.glowBlob,
+.upgradeBtn,
+.progressBackground {
+    display: none;
 }
 
 /* Mobile Responsiveness - Sidebar hidden on mobile, uses Header nav */

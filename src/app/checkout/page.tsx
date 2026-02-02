@@ -142,19 +142,28 @@ function CheckoutContent() {
                 cardDetails: paymentMethod === 'CREDIT_CARD' ? cardDetails : undefined
             };
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/process-payment`, {
+            const response = await fetch('/api/checkout/process', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session.access_token}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(payload)
             });
 
-            const data = await response.json();
+            let data = null;
+
+            // Parse response safely
+            try {
+                data = await response.json();
+            } catch (e) {
+                console.error("Failed to parse response JSON", e);
+                console.error(e);
+                throw new Error(`Erro de comunicação com o servidor (Status ${response.status})`);
+            }
 
             if (!response.ok) {
                 console.error('Payment Error Data:', data);
+                // Simple error throw, valid session is handled by Middleware/Server
                 throw new Error(data.error || `Erro desconhecido: ${JSON.stringify(data)}` || 'Erro ao processar pagamento');
             }
 
@@ -172,7 +181,8 @@ function CheckoutContent() {
             }
 
         } catch (err: any) {
-            setError(err.message);
+            console.error(err);
+            setError(err.message || "Ocorreu um erro ao processar o pagamento.");
             setLoading(false);
         }
     };

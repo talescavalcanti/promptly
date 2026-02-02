@@ -11,9 +11,10 @@ interface PixPaymentProps {
     pixCopyPaste: string;
     paymentId: string;
     onSuccess: () => void;
+    environment?: string;
 }
 
-export function PixPayment({ pixQrCodeBase64, pixCopyPaste, paymentId, onSuccess }: PixPaymentProps) {
+export function PixPayment({ pixQrCodeBase64, pixCopyPaste, paymentId, onSuccess, environment }: PixPaymentProps) {
     const [copied, setCopied] = useState(false);
 
     // Polling logic
@@ -92,6 +93,14 @@ export function PixPayment({ pixQrCodeBase64, pixCopyPaste, paymentId, onSuccess
             <div className="animate-pulse" style={{ color: '#0070f3', fontSize: '0.9rem', marginTop: '1rem' }}>
                 Aguardando pagamento...
             </div>
+
+            {environment === 'sandbox' && (
+                <div style={{ marginTop: '1rem', padding: '10px', background: '#fffbeb', color: '#b45309', borderRadius: '8px', fontSize: '0.85rem', textAlign: 'center', border: '1px solid #fcd34d' }}>
+                    ⚠️ <b>Modo Sandbox (Teste)</b><br />
+                    Este QR Code <u>não funcionará</u> em apps de banco reais.<br />
+                    Use o <a href="https://sandbox.asaas.com" target="_blank" className="underline">Painel do Asaas Sandbox</a> para simular o pagamento.
+                </div>
+            )}
         </div>
     );
 }

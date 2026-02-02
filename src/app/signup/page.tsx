@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
-import styles from '../login/auth.module.css'; // Reuse styles
+import styles from './signup.module.css';
 import { Button } from '../components/Button/Button';
 import { Eye, EyeOff, CheckCircle2, Circle } from 'lucide-react';
 
@@ -39,12 +39,23 @@ export default function SignupPage() {
                     data: {
                         full_name: fullName,
                     },
+                    emailRedirectTo: `${window.location.origin}/auth/callback`,
                 },
             });
 
             if (signupError) throw signupError;
 
             if (data.user) {
+                // Send custom welcome email via Resend
+                await fetch('/api/emails/welcome', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email,
+                        name: fullName
+                    })
+                });
+
                 // Redirect to verify email page
                 router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
             }
@@ -129,13 +140,7 @@ export default function SignupPage() {
                     <Button
                         variant="primary"
                         type="submit"
-                        style={{
-                            width: '100%',
-                            borderRadius: '50px',
-                            padding: '1.1rem',
-                            fontSize: '1rem',
-                            fontWeight: '600'
-                        }}
+                        className={styles.submitButton}
                         loading={loading}
                     >
                         {loading ? 'Criando conta...' : 'Criar Conta'}

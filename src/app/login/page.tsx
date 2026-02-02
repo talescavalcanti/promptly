@@ -41,7 +41,7 @@ export default function LoginPage() {
 
     return (
         <div className={styles.container}>
-            <div className={`${styles.card} animate-fade-blur`}>
+            <div className={styles.card}>
                 <div className={styles.header}>
                     <Link href="/" className={styles.brand}>
                         <span className={styles.brandName}>Promptly</span>
@@ -84,17 +84,14 @@ export default function LoginPage() {
                                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                             </button>
                         </div>
+                        <Link href="/forgot-password" className={styles.forgotLink}>
+                            Esqueceu sua senha?
+                        </Link>
                     </div>
                     <Button
                         variant="primary"
                         type="submit"
-                        style={{
-                            width: '100%',
-                            borderRadius: '50px',
-                            padding: '1.1rem',
-                            fontSize: '1rem',
-                            fontWeight: '600'
-                        }}
+                        className={styles.submitButton}
                         loading={loading}
                     >
                         {loading ? 'Entrando...' : 'Entrar'}

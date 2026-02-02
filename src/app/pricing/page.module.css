@@ -102,46 +102,26 @@
 /* BADGE ON TOP BORDER (CENTERED) - REFINED */
 .popularBadge {
     position: absolute;
-    top: 0;
-    /* Align with top border */
+    top: -12px;
+    /* Overlap the border */
     left: 50%;
-    transform: translate(-50%, -50%);
-    /* Center and pull up 50% */
+    transform: translateX(-50%);
 
-    /* Gold Accent Style */
-    background: #000;
-    /* Solid Black Background to cover border line */
-    border: 1px solid #F5A524;
-    /* Solid Gold border */
-    color: #F5A524;
-    /* Gold Text */
-
-    /* Font & Visuals */
-    font-size: 0.7rem;
-    /* Slightly smaller for elegance */
+    background: linear-gradient(135deg, #FF9F0A 0%, #FFB340 100%);
+    /* Gold Gradient */
+    color: #000000;
+    font-size: 0.75rem;
     font-weight: 800;
-    /* Extra bold for readability */
-    padding: 0.3rem 1rem;
-    /* Tighter padding */
-    border-radius: 999px;
-    /* Full pill */
+    padding: 0.4rem 1.25rem;
+    border-radius: 20px;
+    border: none;
+
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    /* Increased spacing for premium look */
-
-    /* Layout Logic */
+    letter-spacing: 0.05em;
     width: max-content;
-    /* Ensure it hugs content strictly */
-    max-width: 90%;
-    /* Safety against overflow */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
     z-index: 20;
-    /* High z-index to sit on top of electric border */
-    box-shadow: 0 0 15px rgba(245, 165, 36, 0.25);
-    /* Slightly stronger glow */
+    box-shadow: 0 4px 12px rgba(255, 159, 10, 0.4);
+    /* Stronger glow */
 }
 
 /* Push header down to clear badge */
@@ -229,7 +209,7 @@
 
 /* Button Refinements */
 .cardFooter button {
-    border-radius: 12px;
+    border-radius: 50px;
     padding: 1rem !important;
     font-size: 1rem !important;
     font-weight: 600 !important;
@@ -237,15 +217,23 @@
 }
 
 /* Primary Button Style Override (Black on White) */
+/* Primary Button Style Override (Brand Yellow on Black) */
 .popular .cardFooter button {
-    background: #fff !important;
+    background: linear-gradient(135deg, #FF9F0A 0%, #FFB340 100%) !important;
     color: #000 !important;
     border: none !important;
+    border-radius: 50px !important;
+    /* Fully rounded */
+    font-weight: 700 !important;
+    box-shadow: 0 4px 12px rgba(255, 159, 10, 0.3);
 }
 
 .popular .cardFooter button:hover {
-    background: #e0e0e0 !important;
+    background: linear-gradient(135deg, #FF9F0A 0%, #FFB340 100%) !important;
+    color: #000 !important;
     transform: scale(1.02);
+    box-shadow: 0 6px 16px rgba(255, 159, 10, 0.4);
+    opacity: 0.95;
 }
 
 /* Secondary Button Style Override (Just Outline) */

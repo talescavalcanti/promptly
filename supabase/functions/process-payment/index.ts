@@ -196,9 +196,20 @@ serve(async (req) => {
 
         if (dbError) throw dbError
 
-        // 5. Grant access immediately if active or confirmed
+        // 5. Grant access Logic
+        // For PIX: We DO NOT grant access immediately. We wait for webhook/polling (RECEIVED/CONFIRMED).
+        // For CREDIT_CARD: If subscription is ACTIVE, it usually means authorized.
+
+        let shouldGrantAccess = false;
+
         const validStatuses = ['ACTIVE', 'CONFIRMED', 'RECEIVED'];
-        if (validStatuses.includes(subData.status)) {
+
+        if (method === 'CREDIT_CARD' && validStatuses.includes(subData.status)) {
+            shouldGrantAccess = true;
+        }
+        // For PIX, we assume it's PENDING until paid. 
+
+        if (shouldGrantAccess) {
             const expirationDate = new Date()
             expirationDate.setMonth(expirationDate.getMonth() + 1)
 
@@ -209,7 +220,7 @@ serve(async (req) => {
                     email: user.email,
                     status: 'ativo',
                     plano_ativo: plan, // STARTER or PRO
-                    prompts_used: 0, // Reset or init prompts used
+                    prompts_used: 0,
                     data_expiracao: expirationDate.toISOString()
                 }, { onConflict: 'id' })
                 .eq('id', user.id)
@@ -224,13 +235,14 @@ serve(async (req) => {
                 paymentId,
                 pixQrCodeBase64: pixQrCode,
                 pixCopyPaste: pixQRCodeText,
-                debugStatus: subData.status // Return status for debugging
+                debugStatus: subData.status,
+                environment: ASAAS_BASE_URL.includes('sandbox') ? 'sandbox' : 'production'
             }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
 
     } catch (error: any) {
-        console.error(error)
+        console.error('Full Error Object:', error)
         return new Response(
             JSON.stringify({
                 error: error.message || 'An error occurred',

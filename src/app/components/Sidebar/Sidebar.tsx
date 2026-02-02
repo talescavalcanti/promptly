@@ -117,23 +117,16 @@ export const Sidebar = () => {
                         {isDeveloper ? 'Developer' : `${currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)} Plan`}
                     </span>
 
-                    {/* Usage Stats */}
+                    {/* Usage Stats - Strict Pill Badge */}
                     <div className={styles.usage}>
                         <div className={styles.usageHeader}>
-                            <span>{used} / {isDeveloper ? '∞' : limit}</span>
-                            <span>{Math.round(percent)}%</span>
+                            <span className={styles.planLabel}>{currentPlan} PLAN</span>
                         </div>
-                        <div className={styles.progressBar}>
-                            <div
-                                className={styles.progressFill}
-                                style={{ width: `${percent}%` }}
-                            />
+
+                        <div className={styles.usageMain}>
+                            <span className={styles.usageValue}>{used}</span>
+                            <span className={styles.usageTotal}>/ {isDeveloper ? '∞' : limit}</span>
                         </div>
-                        {(isFree || percent >= 80) && !isDeveloper && (
-                            <Link href="/pricing" className={styles.upgradeBtn}>
-                                ⚡ Fazer Upgrade
-                            </Link>
-                        )}
                     </div>
                 </div>
             </div>

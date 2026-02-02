@@ -1,25 +1,25 @@
 .section {
-    padding: 14rem 1.5rem 8rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
     position: relative;
     width: 100%;
     min-height: 100vh;
-    overflow: hidden;
-}
-
-.contentContainer {
-    width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 10;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    /* overflow: hidden; Removed to allow scroll effects if needed, but ContainerScroll handles its own height */
+}
+
+.contentContainer {
+    position: relative;
+    z-index: 10;
+    max-width: 900px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: 0 auto;
 }
 
 /* Apple-style background glow - Removed per user request */
@@ -74,31 +74,20 @@
 
 .title {
     font-size: 4.5rem;
-    line-height: 1.1;
+    line-height: 1.05;
     font-weight: 700;
     letter-spacing: -0.04em;
     margin-bottom: 2rem;
     max-width: 1400px;
-    background: linear-gradient(180deg, #FFFFFF 0%, #b4b4b4 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
     color: #FFFFFF;
-    /* Fallback */
-    padding-bottom: 0.1em;
-    /* Prevent descender clipping */
-    text-shadow: 0 0 100px rgba(255, 255, 255, 0.1);
-    /* Spotlight Glow */
+    text-shadow: 0 0 80px rgba(255, 255, 255, 0.15);
+    /* Softer glow */
 }
 
 .highlight {
-    background: linear-gradient(90deg, #F5A524 0%, #FDD283 50%, #F5A524 100%);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
     color: #F5A524;
-    animation: shimmer 5s linear infinite;
+    /* Solid Gold */
+    /* Removed gradients/animations for cleaner look */
 }
 
 @keyframes shimmer {
@@ -124,7 +113,9 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
     gap: 1.5rem;
+    margin-top: 2rem;
 }
 
 .secondaryCta {

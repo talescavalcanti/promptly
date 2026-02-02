@@ -157,37 +157,53 @@ export async function POST(req: Request) {
             const platformTarget = targetPlatform || 'Lovable';
 
             prompt = `
-                ATUE COMO UM ENGENHEIRO DE PROMPTS ELITE E PRODUCT MANAGER SÊNIOR PARA A PLATAFORMA ${platformTarget.toUpperCase()}.
-                
+                ATUE COMO UM ENGENHEIRO DE PROMPTS ELITE E PRODUCT MANAGER SÊNIOR (TOP 1% MUNDIAL).
+
                 SEU OBJETIVO:
-                Preparar o "Input Perfeito" para um Agente de IA construtor de SaaS na plataforma ${platformTarget}.
-                Você deve pegar as ideias iniciais do usuário, expandi-las com detalhes técnicos e de produto de alto nível, e formatar tudo dentro do template "ULTIMATE ONE-PROMPT SAAS BUILDER".
+                Gerar o "Input Perfeito" e EXAUSTIVAMENTE DETALHADO para um Agente de IA construtor de SaaS na plataforma ${platformTarget} (Lovable/Bolt/v0).
+                Você deve preencher TUDO que o usuário não forneceu.
 
-                DADOS DO USUÁRIO & PERSONALIZAÇÃO:
-                - Nome do App: ${saasName || 'A definir'}
-                - Plataforma de Build: ${platformTarget}
-                - Nicho: ${saasNiche || 'Inferir baseado no nome'}
-                - Público: ${body.targetAudience || 'Inferir'}
-                - Features: ${body.features ? body.features.join(', ') : 'Inferir as essenciais para um MVP Premium'}
-                - Estilo Visual: ${logoStyle} | ${voiceTone}
-                - Cores: Primária ${saasColor}, Secundária ${body.secondaryColor || 'Inferir'}
-                - Tipografia: ${body.typography || 'Poppins (Padrão)'}
+                ---
+                DADOS PARCIAIS DO USUÁRIO (Preencha as lacunas com sua criatividade técnica):
+                - Nome do App: ${saasName || 'A definir (Crie um nome incrível)'}
+                - Plataforma Destino: ${platformTarget}
+                - Nicho Base: ${saasNiche || 'INFERIR o mais lucrativo possível'}
+                - Público Alvo: ${body.targetAudience || 'INFERIR Persona detalhada'}
+                - Features Iniciais: ${body.features && body.features.length > 0 ? body.features.join(', ') : 'INFERIR 6-8 features essenciais para um MVP Premium'}
+                
+                - DESIGN VISUAL (ESTRITO - Siga estas escolhas):
+                  * Estilo: ${logoStyle}
+                  * Cor Primária: ${saasColor} (Use exatamente este HEX)
+                  * Cor Secundária: ${body.secondaryColor || 'INFERIR (Buscando contraste ideal)'}
+                  * Tipografia: ${body.typography || 'Poppins'} (Peso preferido: ${body.typographyWeight || 'Padrão'})
 
-                TEMPLATE OBRIGATÓRIO (MODIFICAR REGRAS SE NECESSÁRIO PARA CUSTOMIZAÇÃO):
+                ---
+                TEMPLATE OBRIGATÓRIO DE SAÍDA:
+                Você deve retornar APENAS o prompt final, seguindo a estrutura exata do texto abaixo. 
+                NÃO MUDE A ESTRUTURA DO TEMPLATE. APENAS PREENCHA O CONTEÚDO "INTELIGENTE" DENTRO DELE.
+
                 ${SAAS_PROMPTS_V2}
 
-                SUA TAREFA:
-                1. Analise o "Nome do App" e os dados parciais.
-                2. Infira um Nicho Lucrativo, uma Persona Clara e 6 Features Indispensáveis para um MVP.
-                3. Defina um Estilo Visual Premium respeitando as cores e fontes do usuário.
-                4. GERE O PROMPT FINAL COMBINANDO:
-                   - O Conteúdo Rico que você inferiu (preenchendo a seção "ENTRADA DO USUÁRIO").
-                   - Todas as Regras/Seções do TEMPLATE original.
-                   - **IMPORTANTÍSSIMO**: Se o usuário definiu uma TIPOGRAFIA ou CORES, adicione uma instrução explícita no final do prompt gerado para SOBRESCREVER as regras padrões do Agente (ex: "OVERRIDE: Use font X instead of Poppins").
-                
-                SAÍDA ESPERADA:
-                Apenas o texto do prompt completo pronto para ser copiado e colado. Sem introduções.
+                ---
+                SUAS INSTRUÇÕES DE PREENCHIMENTO (Siga rigorosamente):
+
+                1. **Seção "ENTRADA DO USUÁRIO"**: Preencha com os dados acima. Se faltar algo, INVENTE algo coerente e profissional.
+                2. **Seção "INFERÊNCIA DO PRODUTO"**:
+                   - Defina explicitamente qual é o Nicho, Problema, "Key Action" e Entidades (Core + Secundaria) baseadas no nome/nicho.
+                   - NÃO deixe genérico. Ex: Se for "TaskApp", defina Entidade="Task", Secundária="Subtask/Comment".
+                3. **Seção "DESIGN SYSTEM"**:
+                   - No prompt gerado, escreva uma regra explícita: "OVERRIDE TIPOGRAFIA: Usar fonte ${body.typography || 'Poppins'} em todo o projeto."
+                   - "OVERRIDE CORES: Primária ${saasColor}, Secundária ${body.secondaryColor}".
+                4. **Seção "DADOS E BANCO"**:
+                   - ESCREVA um esboço do schema SQL para as entidades inferidas (tabela, colunas principais).
+                5. **DETALHES FINAIS**:
+                   - Garanta que o prompt gerado tenha pelo menos 1000 palavras de instruções técnicas ricas.
+                   - NÃO coloque placeholders como "[Inserir aqui]". VOCÊ É A IA QUE INSERE.
+
+                SAÍDA:
+                Apenas o texto final do prompt. Pronto para copiar e colar na Lovable/Bolt.
             `;
+
         } else if (promptMode === 'optimize_prompt') {
             prompt = `
                 Atue como um ** Engenheiro de Prompts Sênior ** especializado em desenvolvimento de software com IA para ${targetPlatform || 'Lovable, GPT-Engineer, v0'}.

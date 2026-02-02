@@ -5,34 +5,47 @@ const ASAAS_WEBHOOK_TOKEN = "promptly_secure_8x92mK3n4P";
 
 serve(async (req) => {
     try {
-        // 1. Validar Token de Autenticação
-        const authHeader = req.headers.get('authentication-token');
+        // Log de Debug para entender o que está chegando
+        console.log("------------------------------------------------");
+        console.log(`[Webhook] Novo Request recebido: ${req.method} ${req.url}`);
 
-        if (authHeader !== ASAAS_WEBHOOK_TOKEN) {
-            console.error('Token inválido:', authHeader);
-            return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        const allHeaders: Record<string, string> = {};
+        req.headers.forEach((value, key) => {
+            allHeaders[key] = value;
+        });
+        console.log("[Webhook] Headers:", JSON.stringify(allHeaders, null, 2));
+
+        // 1. Validar Token de Autenticação (Case Insensitive)
+        // O Asaas envia o token que configuramos no campo "authentication-token"
+        const receivedToken = req.headers.get('authentication-token') || req.headers.get('Authentication-Token');
+
+        if (receivedToken !== ASAAS_WEBHOOK_TOKEN) {
+            console.error(`[Webhook] Acesso Negado via Token.`);
+            console.error(`Esperado: ${ASAAS_WEBHOOK_TOKEN}`);
+            console.error(`Recebido: ${receivedToken}`);
+
+            return new Response(JSON.stringify({ error: 'Unauthorized', debug: 'Token mismatch' }), {
                 status: 401,
                 headers: { "Content-Type": "application/json" }
             });
         }
 
+        console.log("[Webhook] Autenticação Sucesso!");
+
         // 2. Processar Evento
         const body = await req.json();
-        console.log('Evento Asaas Recebido:', JSON.stringify(body, null, 2));
+        console.log('[Webhook] Body Recebido:', JSON.stringify(body, null, 2));
 
-        // Lógica de Validação de Saque
-        // O Asaas espera um retorno 200 OK.
-        // Se for validação de saque síncrona, confirme a documentação se precisa de um JSON específico.
-        // Por padrão, responder 200 OK valida o recebimento.
+        // Aqui você pode adicionar lógica específica para salvar no banco de dados
+        // Ex: Atualizar status da transação na tabela 'transactions' ou 'withdrawals'
 
-        // CASO SEJA APENAS NOTIFICAÇÃO:
         return new Response(JSON.stringify({ received: true }), {
             headers: { "Content-Type": "application/json" },
             status: 200,
         });
 
-    } catch (error) {
-        console.error('Erro no webhook:', error);
+    } catch (error: any) {
+        console.error('[Webhook] Erro Interno:', error);
         return new Response(JSON.stringify({ error: error.message }), {
             headers: { "Content-Type": "application/json" },
             status: 400,

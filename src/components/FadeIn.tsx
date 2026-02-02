@@ -40,9 +40,9 @@ export function FadeIn({
             initial={initial}
             animate={isInView ? { opacity: 1, x: 0, y: 0 } : initial}
             transition={{
-                duration: 0.6,
+                duration: 0.8,
                 delay: delay,
-                ease: [0.25, 0.1, 0.25, 1.0],
+                ease: [0.16, 1, 0.3, 1], // Apple-style organic ease
             }}
             className={className}
             style={{

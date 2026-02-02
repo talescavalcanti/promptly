@@ -27,6 +27,13 @@ export default function SettingsPage() {
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    // User profile from database (contains plano_ativo, status, etc.)
+    const [userProfile, setUserProfile] = useState<{ plano_ativo?: string; status?: string } | null>(null);
+
+    // Cancel subscription modal
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [cancellingSubscription, setCancellingSubscription] = useState(false);
+
     // Password Requirements
     const requirements = [
         { label: 'Pelo menos 8 caracteres', test: (p: string) => p.length >= 8 },
@@ -46,6 +53,17 @@ export default function SettingsPage() {
                 setFullName(user.user_metadata?.full_name || '');
                 setEmail(user.email || '');
                 setAvatarUrl(user.user_metadata?.avatar_url || '');
+
+                // Fetch user profile from database to get plan info
+                const { data: profile } = await supabase
+                    .from('users')
+                    .select('plano_ativo, status')
+                    .eq('id', user.id)
+                    .single();
+
+                if (profile) {
+                    setUserProfile(profile);
+                }
             }
             setLoading(false);
         };
@@ -313,8 +331,178 @@ export default function SettingsPage() {
                             </div>
                         </form>
                     </section>
+                    <section className={styles.section}>
+                        <h2 className={styles.sectionTitle}>Assinatura</h2>
+                        <div className={styles.formGroup}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                <div style={{
+                                    padding: '20px',
+                                    background: 'rgba(255, 255, 255, 0.03)',
+                                    borderRadius: '12px',
+                                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center'
+                                }}>
+                                    <div>
+                                        <p style={{ color: '#86868B', fontSize: '13px', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Plano Atual</p>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            <span style={{
+                                                fontSize: '18px',
+                                                fontWeight: 600,
+                                                color: userProfile?.plano_ativo && userProfile?.plano_ativo !== 'FREE' ? '#F5F5F7' : '#86868B'
+                                            }}>
+                                                {userProfile?.plano_ativo === 'PRO' ? 'Promptly PRO' :
+                                                    userProfile?.plano_ativo === 'STARTER' ? 'Promptly STARTER' : 'Gratuito'}
+                                            </span>
+                                            {userProfile?.status === 'canceled' && (
+                                                <span style={{
+                                                    fontSize: '11px',
+                                                    background: 'rgba(244, 67, 54, 0.15)',
+                                                    color: '#FF453A',
+                                                    padding: '4px 10px',
+                                                    borderRadius: '20px',
+                                                    fontWeight: 500
+                                                }}>
+                                                    Cancelado
+                                                </span>
+                                            )}
+                                            {userProfile?.plano_ativo && userProfile?.plano_ativo !== 'FREE' && userProfile?.status !== 'canceled' && (
+                                                <span style={{
+                                                    fontSize: '11px',
+                                                    background: 'rgba(48, 209, 88, 0.15)',
+                                                    color: '#30D158',
+                                                    padding: '4px 10px',
+                                                    borderRadius: '20px',
+                                                    fontWeight: 500
+                                                }}>
+                                                    Ativo
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    {userProfile?.plano_ativo && userProfile?.plano_ativo !== 'FREE' && userProfile?.status !== 'canceled' && (
+                                        <Button
+                                            variant="secondary"
+                                            onClick={() => setShowCancelModal(true)}
+                                            style={{
+                                                borderColor: 'rgba(255, 69, 58, 0.3)',
+                                                color: '#FF453A',
+                                                background: 'rgba(255, 69, 58, 0.1)'
+                                            }}
+                                        >
+                                            Cancelar Assinatura
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
                 </div>
             </div>
+
+            {/* Cancel Subscription Modal */}
+            {showCancelModal && (
+                <div style={{
+                    position: 'fixed',
+                    inset: 0,
+                    background: 'rgba(0, 0, 0, 0.8)',
+                    backdropFilter: 'blur(8px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000,
+                    padding: '20px'
+                }}>
+                    <div style={{
+                        background: '#1C1C1E',
+                        borderRadius: '20px',
+                        padding: '32px',
+                        maxWidth: '420px',
+                        width: '100%',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)'
+                    }}>
+                        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                            <div style={{
+                                width: '64px',
+                                height: '64px',
+                                background: 'rgba(255, 69, 58, 0.15)',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                margin: '0 auto 16px'
+                            }}>
+                                <X size={32} color="#FF453A" />
+                            </div>
+                            <h3 style={{ color: '#F5F5F7', fontSize: '22px', fontWeight: 600, marginBottom: '8px' }}>
+                                Cancelar Assinatura?
+                            </h3>
+                            <p style={{ color: '#86868B', fontSize: '15px', lineHeight: 1.5 }}>
+                                Você perderá acesso aos recursos premium ao fim do período atual. Esta ação não pode ser desfeita.
+                            </p>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                            <Button
+                                variant="secondary"
+                                onClick={() => setShowCancelModal(false)}
+                                style={{ flex: 1 }}
+                                disabled={cancellingSubscription}
+                            >
+                                Voltar
+                            </Button>
+                            <Button
+                                variant="primary"
+                                loading={cancellingSubscription}
+                                onClick={async () => {
+                                    setCancellingSubscription(true);
+                                    try {
+                                        const { data: { session } } = await supabase.auth.getSession();
+                                        const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/cancel-subscription`, {
+                                            method: 'POST',
+                                            headers: {
+                                                'Authorization': `Bearer ${session?.access_token}`,
+                                                'Content-Type': 'application/json'
+                                            }
+                                        });
+
+                                        const result = await response.json();
+
+                                        if (!response.ok) throw new Error(result.error);
+
+                                        // Update local state immediately
+                                        setUserProfile(prev => prev ? { ...prev, status: 'canceled' } : null);
+                                        setShowCancelModal(false);
+                                        showMessage('success', 'Assinatura cancelada com sucesso.');
+
+                                        // Also refresh from database to be sure
+                                        const { data: profile } = await supabase
+                                            .from('users')
+                                            .select('plano_ativo, status')
+                                            .eq('id', user?.id)
+                                            .single();
+                                        if (profile) setUserProfile(profile);
+
+                                    } catch (err: any) {
+                                        showMessage('error', `Erro ao cancelar: ${err.message}`);
+                                    } finally {
+                                        setCancellingSubscription(false);
+                                    }
+                                }}
+                                style={{
+                                    flex: 1,
+                                    background: '#FF453A',
+                                    borderColor: '#FF453A'
+                                }}
+                            >
+                                {cancellingSubscription ? 'Cancelando...' : 'Confirmar Cancelamento'}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

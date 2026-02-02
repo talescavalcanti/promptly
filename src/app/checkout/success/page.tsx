@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { CheckCircle, Zap, ArrowRight, Rocket } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Button } from '../../components/Button/Button';
 import styles from './success.module.css';
@@ -54,39 +54,28 @@ function CheckoutSuccessContent() {
             <div className={styles.blob2} />
 
             <div className={styles.card}>
-                <div className={styles.iconWrapper}>
-                    <CheckCircle size={36} strokeWidth={2.5} />
+                <div className={styles.successIndicator}>
+                    <div style={{ width: 6, height: 6, background: '#10B981', borderRadius: '50%', boxShadow: '0 0 10px #10B981' }} />
+                    Sucesso
                 </div>
 
                 <h1 className={styles.title}>
-                    Pagamento Aprovado!
+                    Pagamento<br />Confirmado.
                 </h1>
 
                 <p className={styles.message}>
-                    Sua assinatura do plano <strong style={{ color: '#fff', fontWeight: 600 }}>{plan}</strong> foi confirmada com sucesso. <br />
-                    Prepare-se para criar prompts de outro nível.
+                    Sua assinatura do plano <strong style={{ color: '#fff', fontWeight: 600 }}>{plan}</strong> já está ativa. Você agora tem acesso total a todas as ferramentas de criação.
                 </p>
 
-                <div className={styles.detailsBox}>
-                    <div className={styles.detailRow}>
-                        <div className={styles.iconBox}>
-                            <Zap size={20} />
-                        </div>
-                        <div>
-                            <div className={styles.label}>Status do Plano</div>
-                            <div className={styles.valueSuccess}>Ativo & Confirmado</div>
-                        </div>
+                <div className={styles.detailsGrid}>
+                    <div className={styles.detailItem}>
+                        <div className={styles.label}>Status</div>
+                        <div className={styles.valueSuccess}>Ativo</div>
                     </div>
-
-                    <div className={styles.detailRow}>
-                        <div className={styles.iconBox}>
-                            <Rocket size={20} />
-                        </div>
-                        <div>
-                            <div className={styles.label}>Prompts Disponíveis</div>
-                            <div className={styles.value}>
-                                {plan === 'STARTER' ? '100 gerações/mês' : '400 gerações/mês'}
-                            </div>
+                    <div className={styles.detailItem}>
+                        <div className={styles.label}>Capacidade</div>
+                        <div className={styles.value}>
+                            {plan === 'STARTER' ? '100' : '400'} gerações/mês
                         </div>
                     </div>
                 </div>
@@ -97,7 +86,7 @@ function CheckoutSuccessContent() {
                     loading={loading}
                     className={styles.buttonStyle}
                 >
-                    Acessar Dashboard <ArrowRight size={18} />
+                    Acessar Dashboard <ArrowRight size={16} />
                 </Button>
             </div>
         </div>
