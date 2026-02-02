@@ -2,15 +2,28 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
 export async function POST(request: NextRequest) {
     try {
         const { email } = await request.json();
 
         if (!email) {
             return NextResponse.json({ error: 'Email é obrigatório' }, { status: 400 });
+        }
+
+        // Check required environment variables
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        const resendApiKey = process.env.RESEND_API_KEY;
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://iapromptly.com.br';
+
+        if (!supabaseUrl || !supabaseServiceKey) {
+            console.error('Missing Supabase config:', { supabaseUrl: !!supabaseUrl, serviceKey: !!supabaseServiceKey });
+            return NextResponse.json({ error: 'Configuração do servidor incompleta' }, { status: 500 });
+        }
+
+        if (!resendApiKey) {
+            console.error('Missing RESEND_API_KEY');
+            return NextResponse.json({ error: 'Configuração de email incompleta' }, { status: 500 });
         }
 
         // Create Supabase admin client for password reset
@@ -23,25 +36,28 @@ export async function POST(request: NextRequest) {
             type: 'recovery',
             email: email,
             options: {
-                redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
+                redirectTo: `${appUrl}/reset-password`,
             }
         });
 
         if (error) {
-            console.error('Supabase error:', error);
-            // Don't reveal if email exists or not for security
+            console.error('Supabase generateLink error:', error);
+            // Don't reveal if email exists or not for security - return success
             return NextResponse.json({ success: true });
         }
 
         const resetLink = data.properties?.action_link;
 
         if (!resetLink) {
-            console.error('No reset link generated');
+            console.error('No reset link generated - user may not exist');
+            // Still return success to prevent email enumeration
             return NextResponse.json({ success: true });
         }
 
+        console.log('Reset link generated, sending email to:', email);
+
         // Initialize Resend directly with the API key
-        const resend = new Resend(process.env.RESEND_API_KEY);
+        const resend = new Resend(resendApiKey);
 
         // Send email via Resend
         const { data: emailData, error: emailError } = await resend.emails.send({
@@ -102,14 +118,14 @@ export async function POST(request: NextRequest) {
 
         if (emailError) {
             console.error('Resend error:', emailError);
-            return NextResponse.json({ error: 'Erro ao enviar email' }, { status: 500 });
+            return NextResponse.json({ error: 'Erro ao enviar email. Tente novamente.' }, { status: 500 });
         }
 
-        console.log('Email sent successfully:', emailData);
+        console.log('Email sent successfully:', emailData?.id);
         return NextResponse.json({ success: true });
 
     } catch (error: any) {
-        console.error('Password reset error:', error);
-        return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
+        console.error('Password reset error:', error.message || error);
+        return NextResponse.json({ error: 'Erro ao processar solicitação' }, { status: 500 });
     }
 }
