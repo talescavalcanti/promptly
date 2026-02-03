@@ -10,6 +10,7 @@ import { User } from '@supabase/supabase-js';
 const navItems = [
     { label: 'Gerador', href: '/dashboard', icon: '✨' },
     { label: 'Meus Prompts', href: '/dashboard/library', icon: '📚' },
+    { label: 'Showcase', href: '/showcase', icon: '🚀' },
     { label: 'Modelos', href: '/dashboard/templates', icon: '🎨' },
     { label: 'Configurações', href: '/dashboard/settings', icon: '⚙️' },
 ];

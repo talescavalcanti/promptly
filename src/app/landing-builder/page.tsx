@@ -479,43 +479,18 @@ export default function LandingBuilderPage() {
                             ))}
                         </div>
 
-                        {/* Professional Expert Insight */}
-                        <div style={{
-                            marginTop: '1rem',
-                            padding: '1.25rem',
-                            background: 'linear-gradient(90deg, rgba(20,20,20,1) 0%, rgba(30,30,30,1) 100%)',
-                            borderRadius: '12px',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            display: 'flex',
-                            gap: '1.25rem',
-                            position: 'relative',
-                            overflow: 'hidden'
+                        {/* Pro Tip - Minimal */}
+                        <p style={{
+                            marginTop: '1.5rem',
+                            fontSize: '0.8rem',
+                            color: 'rgba(255,255,255,0.45)',
+                            fontStyle: 'italic',
+                            lineHeight: 1.6,
+                            borderLeft: '2px solid rgba(255,255,255,0.1)',
+                            paddingLeft: '1rem'
                         }}>
-                            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: 'var(--primary)' }} />
-
-                            <div style={{
-                                background: 'rgba(245, 165, 36, 0.1)',
-                                padding: '10px',
-                                borderRadius: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                height: 'fit-content',
-                                alignSelf: 'flex-start'
-                            }}>
-                                <Sparkles size={24} style={{ color: 'var(--primary)' }} />
-                            </div>
-
-                            <div>
-                                <h4 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.5rem', color: 'white', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Expertise em Direção de Arte</h4>
-                                <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', margin: 0, lineHeight: 1.6, maxWidth: '650px' }}>
-                                    O <b>Minimalismo Suíço</b> transmite segurança corporativa, ideal para B2B.
-                                    Para disrupção visual (B2C/Gen-Z), o <b>Neo-Brutalismo</b> cria "fricção intencional" que aumenta a retenção.
-                                    <br />
-                                    <span style={{ opacity: 0.8, fontStyle: 'italic', marginTop: '4px', display: 'block' }}>Evite Glassmorphism para conteúdos densos; use apenas para "wow factor" pontual.</span>
-                                </p>
-                            </div>
-                        </div>
+                            <strong style={{ color: 'rgba(255,255,255,0.6)', fontStyle: 'normal' }}>Nota:</strong> Minimalismo Suíço para B2B. Neo-Brutalismo para disrupção (B2C/Gen-Z).
+                        </p>
                     </>
                 );
 
@@ -629,42 +604,18 @@ export default function LandingBuilderPage() {
                             </div>
                         </div>
 
-                        {/* Professional Expert Insight */}
-                        <div style={{
-                            marginTop: '1rem',
-                            padding: '1.25rem',
-                            background: 'linear-gradient(90deg, rgba(20,20,20,1) 0%, rgba(30,30,30,1) 100%)',
-                            borderRadius: '12px',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            display: 'flex',
-                            gap: '1.25rem',
-                            position: 'relative',
-                            overflow: 'hidden'
+                        {/* Pro Tip - Minimal */}
+                        <p style={{
+                            marginTop: '1.5rem',
+                            fontSize: '0.8rem',
+                            color: 'rgba(255,255,255,0.45)',
+                            fontStyle: 'italic',
+                            lineHeight: 1.6,
+                            borderLeft: '2px solid rgba(255,255,255,0.1)',
+                            paddingLeft: '1rem'
                         }}>
-                            {/* Decorative accent line */}
-                            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: 'var(--primary)' }} />
-
-                            <div style={{
-                                background: 'rgba(245, 165, 36, 0.1)',
-                                padding: '10px',
-                                borderRadius: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                height: 'fit-content'
-                            }}>
-                                <Lightbulb size={24} style={{ color: 'var(--primary)' }} />
-                            </div>
-
-                            <div>
-                                <h4 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.4rem', color: 'white', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Frontend Architect Insight</h4>
-                                <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', margin: 0, lineHeight: 1.6, maxWidth: '600px' }}>
-                                    Em 2025, a saturação de grids padrão (Bento) criou uma "cegueira de banner".
-                                    Layouts <b>Radicais</b> restauram a atenção do usuário através da <i style={{ color: 'white' }}>quebra de expectativa</i>.
-                                    Para marcas Premium, recomendamos <b>Sharp Geometry</b>.
-                                </p>
-                            </div>
-                        </div>
+                            <strong style={{ color: 'rgba(255,255,255,0.6)', fontStyle: 'normal' }}>Nota:</strong> Layouts Radicais quebram a previsibilidade. Sharp Geometry para marcas Premium.
+                        </p>
                     </>
                 );
 
@@ -753,41 +704,18 @@ export default function LandingBuilderPage() {
                             </div>
                         </div>
 
-                        {/* Professional Expert Insight */}
-                        <div style={{
-                            marginTop: '1rem',
-                            padding: '1.25rem',
-                            background: 'linear-gradient(90deg, rgba(20,20,20,1) 0%, rgba(30,30,30,1) 100%)',
-                            borderRadius: '12px',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            display: 'flex',
-                            gap: '1.25rem',
-                            position: 'relative',
-                            overflow: 'hidden'
+                        {/* Pro Tip - Minimal */}
+                        <p style={{
+                            marginTop: '1.5rem',
+                            fontSize: '0.8rem',
+                            color: 'rgba(255,255,255,0.45)',
+                            fontStyle: 'italic',
+                            lineHeight: 1.6,
+                            borderLeft: '2px solid rgba(255,255,255,0.1)',
+                            paddingLeft: '1rem'
                         }}>
-                            {/* Decorative accent line - Red for Warning/Intensity */}
-                            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: '#ef4444' }} />
-
-                            <div style={{
-                                background: 'rgba(239, 68, 68, 0.1)',
-                                padding: '10px',
-                                borderRadius: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                height: 'fit-content'
-                            }}>
-                                <Zap size={24} style={{ color: '#ef4444' }} />
-                            </div>
-
-                            <div>
-                                <h4 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.4rem', color: 'white', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Alerta de Design: A Armadilha do Roxo</h4>
-                                <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', margin: 0, lineHeight: 1.6, maxWidth: '650px' }}>
-                                    O uso excessivo de <span style={{ color: '#c084fc', fontStyle: 'italic' }}>Violeta de IA</span> tornou-se um "porto seguro" genérico em 2025.
-                                    Para transmitir <b>Autoridade Real</b>, prefira o <span style={{ color: '#fff', fontWeight: 600 }}>Monocromático</span> ou tons de <span style={{ color: '#f97316', fontWeight: 600 }}>Alta Energia</span>. Diferenciação é a chave da conversão.
-                                </p>
-                            </div>
-                        </div>
+                            <strong style={{ color: 'rgba(255,255,255,0.6)', fontStyle: 'normal' }}>Nota:</strong> Evite Violeta de IA (saturado em 2025). Monocromático ou Alta Energia diferenciam melhor.
+                        </p>
                     </>
                 );
 
@@ -893,42 +821,18 @@ export default function LandingBuilderPage() {
                             </div>
                         </div>
 
-                        {/* Professional Expert Insight */}
-                        <div style={{
-                            marginTop: '1rem',
-                            padding: '1.25rem',
-                            background: 'linear-gradient(90deg, rgba(20,20,20,1) 0%, rgba(30,30,30,1) 100%)',
-                            borderRadius: '12px',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            display: 'flex',
-                            gap: '1.25rem',
-                            position: 'relative',
-                            overflow: 'hidden'
+                        {/* Pro Tip - Minimal */}
+                        <p style={{
+                            marginTop: '1.5rem',
+                            fontSize: '0.8rem',
+                            color: 'rgba(255,255,255,0.45)',
+                            fontStyle: 'italic',
+                            lineHeight: 1.6,
+                            borderLeft: '2px solid rgba(255,255,255,0.1)',
+                            paddingLeft: '1rem'
                         }}>
-                            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: 'var(--primary)' }} />
-
-                            <div style={{
-                                background: 'rgba(245, 165, 36, 0.1)',
-                                padding: '10px',
-                                borderRadius: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                height: 'fit-content'
-                            }}>
-                                <Type size={24} style={{ color: 'var(--primary)' }} />
-                            </div>
-
-                            <div>
-                                <h4 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.4rem', color: 'white', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Psicologia da Tipografia</h4>
-                                <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', margin: 0, lineHeight: 1.6, maxWidth: '650px' }}>
-                                    Fontes <b>Sans-Serif</b> (como Inter/Jakarta) projetam modernidade e eficiência tecnológica.
-                                    <b>Serifadas</b> (Playfair) evocam tradição, luxo e autoridade editorial.
-                                    <br />
-                                    <span style={{ opacity: 0.8, fontStyle: 'italic', fontSize: '0.8em' }}>Regra de Ouro: Nunca sacrifique legibilidade por estética.</span>
-                                </p>
-                            </div>
-                        </div>
+                            <strong style={{ color: 'rgba(255,255,255,0.6)', fontStyle: 'normal' }}>Nota:</strong> Sans-Serif para tech/moderno. Serifadas para luxo/autoridade. Nunca sacrifique legibilidade.
+                        </p>
                     </>
                 );
 
@@ -1110,9 +1014,7 @@ export default function LandingBuilderPage() {
 
     return (
         <div className={styles.container}>
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, opacity: 0.4 }}>
-                <Plasma color="#F5A524" speed={0.5} scale={1.2} />
-            </div>
+
             <Link href="/dashboard" className={styles.closeButton} aria-label="Voltar para o Dashboard">
                 <X size={24} />
             </Link>

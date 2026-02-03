@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { SAAS_PROMPTS_V2 } from '../../builder/saas-prompts-v2';
+import { generateSaasV4Prompt, SaasBuilderInput } from '../../builder/saas-prompts-v4';
 import { LANDING_PAGE_AGENT_V2_PROMPT, LANDING_PAGE_GOOGLE_STUDIO_PROMPT } from '../../landing-builder/agentPrompts';
 
 export const dynamic = 'force-dynamic';
@@ -134,7 +134,103 @@ export async function POST(req: Request) {
 
         let prompt = "";
 
-        if (promptMode === 'suggest_saas_details') {
+        if (promptMode === 'feature_builder') {
+            // Feature Builder - Uses Gemini to expand user description into full technical spec
+            const { featureName, description, context, robustness, includeTests } = body;
+
+            const robustnessConfig = {
+                fast: {
+                    label: 'Rápido (Protótipo)',
+                    validations: 'Validações básicas apenas',
+                    security: 'Nenhuma medida extra',
+                    tests: 'Sem testes'
+                },
+                secure: {
+                    label: 'Seguro (Recomendado)',
+                    validations: 'Validação completa de inputs, tratamento de nulls e tipos incorretos',
+                    security: 'Proteção XSS, SQL Injection, validação de permissões',
+                    tests: 'Testes unitários para happy path, validações e cenários de erro'
+                },
+                bulletproof: {
+                    label: 'Blindado (Produção)',
+                    validations: 'Validação exaustiva incluindo limites de tamanho, concorrência e timeouts',
+                    security: 'XSS, SQL Injection, CSRF, Rate Limiting, Audit Trail, validação de permissões',
+                    tests: 'Cobertura 100%: unit, integration, edge cases, performance, security testing'
+                }
+            };
+
+            const config = robustnessConfig[robustness as keyof typeof robustnessConfig] || robustnessConfig.secure;
+
+            const contextLabels: Record<string, string> = {
+                frontend: 'Frontend (React/Next.js components, hooks, state management)',
+                backend: 'Backend (API routes, services, business logic)',
+                database: 'Database (Schema, migrations, queries, indexes)',
+                integration: 'Integration (External APIs, webhooks, third-party services)',
+                auth: 'Authentication (Login, sessions, permissions, security)'
+            };
+
+            prompt = `
+Você é um Arquiteto de Software Sênior e Engenheiro de Prompts especializado em desenvolvimento com IA.
+
+Sua tarefa é EXPANDIR a descrição simples do usuário em um PROMPT TÉCNICO COMPLETO e DETALHADO que será usado em plataformas como Lovable, GPT-Engineer, ou Google AI Studio.
+
+---
+### ENTRADA DO USUÁRIO
+
+**Nome da Funcionalidade:** ${featureName}
+**Contexto:** ${contextLabels[context] || context}
+**Nível de Robustez:** ${config.label}
+**Incluir Testes:** ${includeTests ? 'Sim' : 'Não'}
+
+**Descrição do Usuário:**
+${description}
+
+---
+### SUA MISSÃO
+
+Transforme a descrição acima em um prompt PROFISSIONAL seguindo esta estrutura:
+
+1. **OBJETIVO CLARO**
+   - Reescreva o objetivo de forma técnica e precisa
+   - Identifique o problema que está sendo resolvido
+
+2. **ESPECIFICAÇÃO TÉCNICA**
+   - Inputs necessários (nome, tipo, validação)
+   - Outputs esperados (estrutura de resposta)
+   - Fluxo de dados
+
+3. **REGRAS DE NEGÓCIO**
+   - Liste TODAS as regras implícitas e explícitas
+   - Numere cada regra (RN01, RN02, etc.)
+
+4. **EDGE CASES E VALIDAÇÕES**
+   - ${config.validations}
+   - Liste cenários de erro que devem ser tratados
+
+5. **SEGURANÇA**
+   - ${config.security}
+
+${includeTests ? `6. **TESTES**
+   - ${config.tests}
+   - Descreva os cenários de teste necessários` : ''}
+
+7. **IMPLEMENTAÇÃO**
+   - Stack técnica recomendada
+   - Estrutura de arquivos sugerida
+   - Código inicial ou pseudo-código
+
+---
+### REGRAS DE SAÍDA
+
+1. Gere APENAS o prompt final. Não adicione explicações ou meta-comentários.
+2. O prompt deve ser LONGO e DETALHADO (mínimo 500 palavras)
+3. Use formatação Markdown para organizar seções
+4. Adicione detalhes que o usuário pode ter esquecido mas são importantes
+5. O prompt deve poder ser COPIADO E COLADO diretamente em uma IA
+
+GERE O PROMPT TÉCNICO AGORA:
+`;
+        } else if (promptMode === 'suggest_saas_details') {
             prompt = `
                 Atue como um Especialista de Produto e Designer de SaaS Sênior.
                 Analise o contexto abaixo e sugira detalhes criativos e técnicos para o projeto.
@@ -154,55 +250,30 @@ export async function POST(req: Request) {
                 }
             `;
         } else if (promptMode === 'saas_builder') {
-            const platformTarget = targetPlatform || 'Lovable';
+            // V4: Clean PRD format - no verbose headers
+            const saasInput: SaasBuilderInput = {
+                appName: saasName || 'New SaaS',
+                niche: saasNiche || '',
+                targetAudience: body.targetAudience || '',
+                features: body.features || [],
+                visualStyle: logoStyle || 'Modern & Clean',
+                primaryColor: saasColor || '#3b82f6',
+                secondaryColor: body.secondaryColor || '#ffffff',
+                typography: body.typography?.split(' (')[0] || 'Inter',
+                typographyWeight: body.typographyWeight || 600,
+                targetPlatform: targetPlatform || 'Lovable',
+                monetization: body.monetization || {
+                    enabled: false,
+                    model: 'subscription',
+                    provider: 'stripe',
+                    plans: ['Free', 'Pro', 'Enterprise'],
+                    trialDays: 7
+                }
+            };
 
-            prompt = `
-                ATUE COMO UM ENGENHEIRO DE PROMPTS ELITE E PRODUCT MANAGER SÊNIOR (TOP 1% MUNDIAL).
+            const { systemPrompt, userPrompt } = generateSaasV4Prompt(saasInput);
 
-                SEU OBJETIVO:
-                Gerar o "Input Perfeito" e EXAUSTIVAMENTE DETALHADO para um Agente de IA construtor de SaaS na plataforma ${platformTarget} (Lovable/Bolt/v0).
-                Você deve preencher TUDO que o usuário não forneceu.
-
-                ---
-                DADOS PARCIAIS DO USUÁRIO (Preencha as lacunas com sua criatividade técnica):
-                - Nome do App: ${saasName || 'A definir (Crie um nome incrível)'}
-                - Plataforma Destino: ${platformTarget}
-                - Nicho Base: ${saasNiche || 'INFERIR o mais lucrativo possível'}
-                - Público Alvo: ${body.targetAudience || 'INFERIR Persona detalhada'}
-                - Features Iniciais: ${body.features && body.features.length > 0 ? body.features.join(', ') : 'INFERIR 6-8 features essenciais para um MVP Premium'}
-                
-                - DESIGN VISUAL (ESTRITO - Siga estas escolhas):
-                  * Estilo: ${logoStyle}
-                  * Cor Primária: ${saasColor} (Use exatamente este HEX)
-                  * Cor Secundária: ${body.secondaryColor || 'INFERIR (Buscando contraste ideal)'}
-                  * Tipografia: ${body.typography || 'Poppins'} (Peso preferido: ${body.typographyWeight || 'Padrão'})
-
-                ---
-                TEMPLATE OBRIGATÓRIO DE SAÍDA:
-                Você deve retornar APENAS o prompt final, seguindo a estrutura exata do texto abaixo. 
-                NÃO MUDE A ESTRUTURA DO TEMPLATE. APENAS PREENCHA O CONTEÚDO "INTELIGENTE" DENTRO DELE.
-
-                ${SAAS_PROMPTS_V2}
-
-                ---
-                SUAS INSTRUÇÕES DE PREENCHIMENTO (Siga rigorosamente):
-
-                1. **Seção "ENTRADA DO USUÁRIO"**: Preencha com os dados acima. Se faltar algo, INVENTE algo coerente e profissional.
-                2. **Seção "INFERÊNCIA DO PRODUTO"**:
-                   - Defina explicitamente qual é o Nicho, Problema, "Key Action" e Entidades (Core + Secundaria) baseadas no nome/nicho.
-                   - NÃO deixe genérico. Ex: Se for "TaskApp", defina Entidade="Task", Secundária="Subtask/Comment".
-                3. **Seção "DESIGN SYSTEM"**:
-                   - No prompt gerado, escreva uma regra explícita: "OVERRIDE TIPOGRAFIA: Usar fonte ${body.typography || 'Poppins'} em todo o projeto."
-                   - "OVERRIDE CORES: Primária ${saasColor}, Secundária ${body.secondaryColor}".
-                4. **Seção "DADOS E BANCO"**:
-                   - ESCREVA um esboço do schema SQL para as entidades inferidas (tabela, colunas principais).
-                5. **DETALHES FINAIS**:
-                   - Garanta que o prompt gerado tenha pelo menos 1000 palavras de instruções técnicas ricas.
-                   - NÃO coloque placeholders como "[Inserir aqui]". VOCÊ É A IA QUE INSERE.
-
-                SAÍDA:
-                Apenas o texto final do prompt. Pronto para copiar e colar na Lovable/Bolt.
-            `;
+            prompt = `${systemPrompt}\n\n---\n\n${userPrompt}`;
 
         } else if (promptMode === 'optimize_prompt') {
             prompt = `
@@ -425,8 +496,8 @@ Act as a ** Senior Frontend Engineer & Component Architect ** specialized in ${t
                     // --- SUCCESS: INCREMENT USAGE & SAVE PROJECT ---
                     await supabase.rpc('increment_prompts');
 
-                    // Save to projects
-                    const title = body.appName || body.objective?.substring(0, 30) || "Projeto Sem Título";
+                    // Save to projects - use app name from SaaS or brand name from Landing
+                    const title = body.appName || body.brandName || body.objective?.substring(0, 30) || "Projeto Sem Título";
                     const { error: saveError } = await supabase
                         .from('projects')
                         .insert({

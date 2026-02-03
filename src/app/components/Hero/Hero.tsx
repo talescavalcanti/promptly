@@ -10,6 +10,7 @@ import { ContainerScroll } from '@/components/ui/container-scroll-animation';
 import Image from 'next/image';
 
 
+
 export const Hero = () => {
     const ref = useRef(null);
     const isInView = useInView(ref, { margin: "200px 0px 0px 0px" });
@@ -38,6 +39,6 @@ export const Hero = () => {
                     priority
                 />
             </ContainerScroll>
-        </section>
+        </section >
     );
 };

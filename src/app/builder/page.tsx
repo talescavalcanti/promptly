@@ -8,7 +8,6 @@ import {
 import Link from 'next/link';
 import styles from './saas-builder.module.css';
 import { TARGET_PLATFORMS } from '../../lib/saas_constants';
-
 import { TextShimmer } from '@/components/ui/text-shimmer';
 import Image from 'next/image';
 
@@ -24,6 +23,13 @@ type SaasBuilderState = {
     typography: string;
     typographyWeight: number;
     targetPlatform: string;
+    monetization: {
+        enabled: boolean;
+        model: 'subscription' | 'one-time' | 'freemium' | 'usage-based';
+        provider: 'stripe' | 'asaas' | 'mercadopago' | 'demo';
+        plans: string[];
+        trialDays: number;
+    };
 };
 
 const INITIAL_STATE: SaasBuilderState = {
@@ -37,7 +43,51 @@ const INITIAL_STATE: SaasBuilderState = {
     typography: 'Inter',
     typographyWeight: 400,
     targetPlatform: 'Lovable',
+    monetization: {
+        enabled: false,
+        model: 'subscription',
+        provider: 'stripe',
+        plans: ['Free', 'Pro', 'Enterprise'],
+        trialDays: 7,
+    },
 };
+
+// --- Preset Suggestions ---
+const NICHE_SUGGESTIONS = [
+    { id: 'productivity', label: 'Produtividade', desc: 'Gestão de tarefas, notas, projetos' },
+    { id: 'crm', label: 'CRM & Vendas', desc: 'Gestão de clientes e pipeline' },
+    { id: 'finance', label: 'Finanças', desc: 'Controle financeiro, faturas, cobranças' },
+    { id: 'health', label: 'Saúde & Fitness', desc: 'Agendamentos, prontuários, treinos' },
+    { id: 'education', label: 'Educação & Cursos', desc: 'LMS, aulas online, certificados' },
+    { id: 'ecommerce', label: 'E-commerce', desc: 'Catálogo, carrinho, checkout' },
+    { id: 'booking', label: 'Agendamentos', desc: 'Reservas, calendário, confirmações' },
+    { id: 'analytics', label: 'Analytics & BI', desc: 'Dashboards, relatórios, métricas' },
+];
+
+const AUDIENCE_SUGGESTIONS = [
+    { id: 'freelancers', label: 'Freelancers', desc: 'Profissionais autônomos' },
+    { id: 'startups', label: 'Startups', desc: 'Empresas em estágio inicial' },
+    { id: 'smb', label: 'PMEs', desc: 'Pequenas e médias empresas' },
+    { id: 'enterprise', label: 'Enterprise', desc: 'Grandes corporações' },
+    { id: 'creators', label: 'Criadores de Conteúdo', desc: 'YouTubers, influencers' },
+    { id: 'developers', label: 'Desenvolvedores', desc: 'Devs e times técnicos' },
+    { id: 'students', label: 'Estudantes', desc: 'Universitários e vestibulandos' },
+    { id: 'agencies', label: 'Agências', desc: 'Marketing, design, desenvolvimento' },
+];
+
+const PAYMENT_PROVIDERS = [
+    { id: 'stripe', label: 'Stripe', desc: 'Global - Cartão, PIX (via Stripe)', icon: '💳', region: 'Global' },
+    { id: 'asaas', label: 'Asaas', desc: 'Brasil - PIX, Boleto, Cartão', icon: '🇧🇷', region: 'Brasil' },
+    { id: 'mercadopago', label: 'Mercado Pago', desc: 'LATAM - PIX, Boleto, Cartão', icon: '🌎', region: 'LATAM' },
+    { id: 'demo', label: 'Demo Mode', desc: 'Sem pagamentos reais (teste)', icon: '🧪', region: 'Teste' },
+];
+
+const MONETIZATION_MODELS = [
+    { id: 'subscription', label: 'Assinatura', desc: 'Cobrança mensal/anual recorrente' },
+    { id: 'freemium', label: 'Freemium', desc: 'Grátis + planos premium' },
+    { id: 'one-time', label: 'Pagamento Único', desc: 'Licença vitalícia' },
+    { id: 'usage-based', label: 'Por Uso', desc: 'Cobra conforme consumo' },
+];
 
 const STYLES = [
     { id: 'modern', label: 'Moderno & Clean', desc: 'Minimalista, muito espaço em branco, foco no conteúdo.', icon: Layout, color: '#3b82f6' }, // Blue
@@ -86,12 +136,7 @@ const FONTS = [
 
 export default function SaasBuilderPage() {
     const [step, setStep] = useState(0);
-    const [state, setState] = useState<SaasBuilderState>({
-        ...INITIAL_STATE,
-        secondaryColor: '#ffffff',
-        typography: 'Inter',
-        targetPlatform: 'Lovable'
-    });
+    const [state, setState] = useState<SaasBuilderState>(INITIAL_STATE);
     const [generatedPrompt, setGeneratedPrompt] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
     const [isSuggesting, setIsSuggesting] = useState(false);
@@ -121,7 +166,7 @@ export default function SaasBuilderPage() {
     };
 
     const nextStep = () => {
-        if (step < 6) setStep(step + 1); // Updated for new step count (0-6)
+        if (step < 8) setStep(step + 1); // Steps: 0-7 wizard, 8 result
         else handleGeneratePrompt();
     };
 
@@ -172,7 +217,7 @@ export default function SaasBuilderPage() {
     };
 
     const handleGeneratePrompt = async () => {
-        setStep(7); // Result screen
+        setStep(8); // Result screen
         setIsGenerating(true);
         setGeneratedPrompt('');
 
@@ -189,9 +234,11 @@ export default function SaasBuilderPage() {
                     saasColor: state.primaryColor,
                     secondaryColor: state.secondaryColor,
                     typography: `${state.typography} (Weight: ${state.typographyWeight})`,
+                    typographyWeight: state.typographyWeight,
                     targetPlatform: state.targetPlatform,
                     logoStyle: state.visualStyle,
-                    voiceTone: 'Profissional e Persuasivo'
+                    voiceTone: 'Profissional e Persuasivo',
+                    monetization: state.monetization
                 }),
             });
 
@@ -315,6 +362,19 @@ export default function SaasBuilderPage() {
                                 value={state.niche}
                                 onChange={(e) => updateState('niche', e.target.value)}
                             />
+                            <div className={styles.suggestionsGrid} style={{ marginTop: '0.75rem' }}>
+                                {NICHE_SUGGESTIONS.map(n => (
+                                    <div
+                                        key={n.id}
+                                        className={styles.suggestionpill}
+                                        onClick={() => updateState('niche', n.label)}
+                                        title={n.desc}
+                                        style={{ opacity: state.niche === n.label ? 1 : 0.7 }}
+                                    >
+                                        {state.niche === n.label ? '✓ ' : '+ '}{n.label}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                         <div className={styles.formGroup} style={{ marginTop: '1.5rem' }}>
                             <label className={styles.label}>Público Alvo</label>
@@ -324,6 +384,19 @@ export default function SaasBuilderPage() {
                                 value={state.targetAudience}
                                 onChange={(e) => updateState('targetAudience', e.target.value)}
                             />
+                            <div className={styles.suggestionsGrid} style={{ marginTop: '0.75rem' }}>
+                                {AUDIENCE_SUGGESTIONS.map(a => (
+                                    <div
+                                        key={a.id}
+                                        className={styles.suggestionpill}
+                                        onClick={() => updateState('targetAudience', a.label)}
+                                        title={a.desc}
+                                        style={{ opacity: state.targetAudience === a.label ? 1 : 0.7 }}
+                                    >
+                                        {state.targetAudience === a.label ? '✓ ' : '+ '}{a.label}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                         <div className={styles.navButtons}>
                             <button className={styles.backButton} onClick={prevStep}>Voltar</button>
@@ -621,12 +694,122 @@ export default function SaasBuilderPage() {
                         <div className={styles.navButtons}>
                             <button className={styles.backButton} onClick={prevStep}>Voltar</button>
                             <button className={styles.nextButton} onClick={nextStep}>
-                                Revisar <ChevronDown style={{ transform: 'rotate(-90deg)' }} size={20} />
+                                Próximo <ChevronDown style={{ transform: 'rotate(-90deg)' }} size={20} />
                             </button>
                         </div>
                     </>
                 );
-            case 6: // Review
+            case 6: // Monetization
+                return (
+                    <>
+                        <div className={styles.stepHeader}>
+                            <h2 className={styles.stepTitle}>Monetização</h2>
+                            <p className={styles.stepDescription}>Como seu SaaS vai gerar receita?</p>
+                        </div>
+
+                        {/* Enable/Disable Toggle */}
+                        <div className={styles.formGroup}>
+                            <div
+                                className={`${styles.card} ${state.monetization.enabled ? styles.selected : ''}`}
+                                onClick={() => setState(prev => ({
+                                    ...prev,
+                                    monetization: { ...prev.monetization, enabled: !prev.monetization.enabled }
+                                }))}
+                                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem 1.5rem' }}
+                            >
+                                <div style={{
+                                    width: 24, height: 24, borderRadius: 6,
+                                    background: state.monetization.enabled ? 'var(--primary)' : 'transparent',
+                                    border: state.monetization.enabled ? 'none' : '2px solid rgba(255,255,255,0.2)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                }}>
+                                    {state.monetization.enabled && <Check size={16} color="#fff" />}
+                                </div>
+                                <div>
+                                    <p style={{ fontWeight: 600, color: 'white', margin: 0 }}>Ativar Pagamentos</p>
+                                    <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', margin: 0 }}>
+                                        Integrar sistema de cobrança recorrente
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {state.monetization.enabled && (
+                            <>
+                                {/* Payment Provider */}
+                                <div className={styles.formGroup} style={{ marginTop: '1.5rem' }}>
+                                    <label className={styles.label}>Provedor de Pagamento</label>
+                                    <div className={styles.grid2} style={{ marginTop: '0.75rem' }}>
+                                        {PAYMENT_PROVIDERS.map(p => (
+                                            <div
+                                                key={p.id}
+                                                className={`${styles.card} ${state.monetization.provider === p.id ? styles.selected : ''}`}
+                                                onClick={() => setState(prev => ({
+                                                    ...prev,
+                                                    monetization: { ...prev.monetization, provider: p.id as 'stripe' | 'asaas' | 'mercadopago' | 'demo' }
+                                                }))}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{p.icon}</div>
+                                                <p style={{ fontWeight: 600, color: 'white', margin: 0 }}>{p.label}</p>
+                                                <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', margin: 0 }}>{p.desc}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Billing Model */}
+                                <div className={styles.formGroup} style={{ marginTop: '1.5rem' }}>
+                                    <label className={styles.label}>Modelo de Cobrança</label>
+                                    <div className={styles.suggestionsGrid} style={{ marginTop: '0.75rem' }}>
+                                        {MONETIZATION_MODELS.map(m => (
+                                            <div
+                                                key={m.id}
+                                                className={styles.suggestionpill}
+                                                onClick={() => setState(prev => ({
+                                                    ...prev,
+                                                    monetization: { ...prev.monetization, model: m.id as 'subscription' | 'one-time' | 'freemium' | 'usage-based' }
+                                                }))}
+                                                style={{ opacity: state.monetization.model === m.id ? 1 : 0.7 }}
+                                                title={m.desc}
+                                            >
+                                                {state.monetization.model === m.id ? '✓ ' : ''}{m.label}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Trial Days */}
+                                <div className={styles.formGroup} style={{ marginTop: '1.5rem' }}>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <label className={styles.label}>Período de Teste: <span style={{ color: 'var(--primary)' }}>{state.monetization.trialDays} dias</span></label>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="30"
+                                        step="1"
+                                        value={state.monetization.trialDays}
+                                        onChange={(e) => setState(prev => ({
+                                            ...prev,
+                                            monetization: { ...prev.monetization, trialDays: parseInt(e.target.value) }
+                                        }))}
+                                        className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer"
+                                        style={{ accentColor: 'var(--primary)' }}
+                                    />
+                                </div>
+                            </>
+                        )}
+
+                        <div className={styles.navButtons}>
+                            <button className={styles.backButton} onClick={prevStep}>Voltar</button>
+                            <button className={styles.nextButton} onClick={nextStep}>
+                                Próximo <ChevronDown style={{ transform: 'rotate(-90deg)' }} size={20} />
+                            </button>
+                        </div>
+                    </>
+                );
+            case 7: // Review
                 return (
                     <>
                         <div className={styles.stepHeader}>
@@ -639,6 +822,15 @@ export default function SaasBuilderPage() {
                             <div className={styles.reviewItem}> <span className={styles.reviewLabel}>Estilo:</span> <span className={styles.reviewValue}>{state.visualStyle}</span> </div>
                             <div className={styles.reviewItem}> <span className={styles.reviewLabel}>Stack:</span> <span className={styles.reviewValue}>{state.targetPlatform} + {state.typography} ({state.typographyWeight})</span> </div>
                             <div className={styles.reviewItem}> <span className={styles.reviewLabel}>Features:</span> <span className={styles.reviewValue}>{state.features.length} funcionais</span> </div>
+                            <div className={styles.reviewItem}>
+                                <span className={styles.reviewLabel}>Monetização:</span>
+                                <span className={styles.reviewValue}>
+                                    {state.monetization.enabled
+                                        ? `${state.monetization.provider.charAt(0).toUpperCase() + state.monetization.provider.slice(1)} - ${state.monetization.model} (${state.monetization.trialDays}d trial)`
+                                        : 'Não configurado'
+                                    }
+                                </span>
+                            </div>
                         </div>
 
                         <div className={styles.navButtons}>
@@ -652,7 +844,7 @@ export default function SaasBuilderPage() {
     };
 
     // --- Result Screen ---
-    if (step === 7) {
+    if (step === 8) {
         return (
             <div className={styles.container}>
                 <Link href="/dashboard" className={styles.closeButton}><X size={24} /></Link>
@@ -709,7 +901,7 @@ export default function SaasBuilderPage() {
             <div className={styles.wizardCard}>
                 <div className={styles.progressContainer}>
                     <div className={styles.progressBar}>
-                        <div className={styles.progressFill} style={{ width: `${((step + 1) / 7) * 100}%` }} />
+                        <div className={styles.progressFill} style={{ width: `${((step + 1) / 8) * 100}%` }} />
                     </div>
                 </div>
                 <div className={styles.contentArea}>

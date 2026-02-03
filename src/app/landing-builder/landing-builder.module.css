@@ -18,18 +18,7 @@
     overflow: hidden;
 }
 
-/* Background Ambient Glow (Subtle - Matching Dashboard vibe) */
-.container::before {
-    content: '';
-    position: absolute;
-    top: -20%;
-    right: -10%;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(245, 165, 36, 0.08) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-}
+/* Background removed */
 
 .closeButton {
     position: absolute;
@@ -60,28 +49,26 @@
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 900px;
-    /* Slightly wider like dashboard */
+    max-width: 780px;
 
     /* Dashboard Glass Style */
     background: rgba(25, 25, 25, 0.4);
     backdrop-filter: blur(40px);
     -webkit-backdrop-filter: blur(40px);
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 28px;
-    /* Matching Dashboard Radius */
+    border-radius: 24px;
     box-shadow: 0 40px 100px -30px rgba(0, 0, 0, 0.8);
 
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    min-height: 600px;
+    min-height: 480px;
 }
 
 /* --- Progress Bar --- */
 .progressBar {
     width: 100%;
-    height: 4px;
+    height: 3px;
     background: rgba(255, 255, 255, 0.03);
     position: relative;
 }
@@ -95,40 +82,37 @@
 
 /* --- Step Content --- */
 .stepIndicator {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     color: var(--primary);
     font-weight: 600;
-    margin: 2.5rem 3rem 0;
-    /* Align with content padding */
+    margin: 1.5rem 2rem 0;
 }
 
 .contentArea {
     flex: 1;
-    padding: 2rem 3rem;
+    padding: 1.25rem 2rem 1.5rem;
     display: flex;
     flex-direction: column;
 }
 
 .stepHeader {
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
     text-align: left;
 }
 
 .stepTitle {
-    font-size: 2rem;
-    /* Matching Dashboard Title Size approximately */
+    font-size: 1.6rem;
     font-weight: 700;
     color: #fff;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.35rem;
     letter-spacing: -0.03em;
 }
 
 .stepDescription {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.4);
-    /* Matching Dashboard .stepDesc */
     line-height: 1.5;
     max-width: 90%;
 }

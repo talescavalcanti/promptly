@@ -16,6 +16,7 @@ export const Header = () => {
     const [isVisible, setIsVisible] = useState(true);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [hoveredPath, setHoveredPath] = useState<string | null>(null);
+    const [isPremium, setIsPremium] = useState(false);
     const { scrollY } = useScroll();
 
     useMotionValueEvent(scrollY, "change", (latest) => {
@@ -43,14 +44,50 @@ export const Header = () => {
     }, [isMenuOpen]);
 
     useEffect(() => {
-        const getSession = async () => {
+        const checkUser = async () => {
             const { data: { session } } = await supabase.auth.getSession();
-            setUser(session?.user ?? null);
+            const currentUser = session?.user ?? null;
+            setUser(currentUser);
+
+            if (currentUser) {
+                // Check subscription status
+                const { data: profile } = await supabase
+                    .from('users')
+                    .select('plano_ativo')
+                    .eq('id', currentUser.id)
+                    .single();
+
+                if (profile && profile.plano_ativo && profile.plano_ativo !== 'FREE') {
+                    setIsPremium(true);
+                } else {
+                    setIsPremium(false);
+                }
+            } else {
+                setIsPremium(false);
+            }
         };
-        getSession();
+
+        checkUser();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
             setUser(session?.user ?? null);
+            if (!session?.user) {
+                setIsPremium(false);
+            } else {
+                // Re-check premium status on auth change
+                supabase
+                    .from('users')
+                    .select('plano_ativo')
+                    .eq('id', session.user.id)
+                    .single()
+                    .then(({ data: profile }) => {
+                        if (profile && profile.plano_ativo && profile.plano_ativo !== 'FREE') {
+                            setIsPremium(true);
+                        } else {
+                            setIsPremium(false);
+                        }
+                    });
+            }
         });
 
         return () => {
@@ -61,10 +98,11 @@ export const Header = () => {
     const handleLogout = async () => {
         await supabase.auth.signOut();
         setIsMenuOpen(false);
+        setIsPremium(false);
         router.push('/');
     };
 
-    if (pathname === '/login' || pathname === '/signup' || pathname === '/auth/verify-email' || pathname?.startsWith('/checkout') || pathname === '/builder' || pathname === '/landing-builder') {
+    if (pathname === '/login' || pathname === '/signup' || pathname === '/auth/verify-email' || pathname?.startsWith('/checkout') || pathname === '/builder' || pathname === '/landing-builder' || pathname === '/feature-builder' || pathname === '/showcase') {
         return null;
     }
 
@@ -91,6 +129,8 @@ export const Header = () => {
                                         { name: 'Criar', path: '/dashboard' },
                                         { name: 'Projetos', path: '/projects' }
                                     ] : []),
+                                    // Hide Showcase for premium users
+                                    ...(!isPremium ? [{ name: 'Exemplos', path: '/showcase' }] : []),
                                     { name: 'Planos', path: '/pricing' }
                                 ];
 
@@ -205,6 +245,9 @@ export const Header = () => {
                                                 <span className={styles.sectionTitle}>Navegação</span>
                                                 <Link href="/dashboard" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>Criar</Link>
                                                 <Link href="/projects" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>Meus Projetos</Link>
+                                                {!isPremium && (
+                                                    <Link href="/showcase" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>Exemplos</Link>
+                                                )}
                                                 <Link href="/pricing" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>Planos</Link>
                                             </div>
 
@@ -224,6 +267,7 @@ export const Header = () => {
                                             <Link href="/signup" className={styles.mobileButton} onClick={() => setIsMenuOpen(false)}>
                                                 Começar Agora
                                             </Link>
+                                            <Link href="/showcase" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>Exemplos</Link>
                                             <Link href="/pricing" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>Planos</Link>
                                         </>
                                     )}

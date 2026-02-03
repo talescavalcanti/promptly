@@ -26,6 +26,7 @@ type FormData = {
 const PROMPT_MODES = [
     { id: 'guided_builder', label: 'Crie o seu saas do 0', icon: <Rocket size={16} />, desc: 'Crie o seu saas com apenas 1 prompt' },
     { id: 'landing_page', label: 'Landing Page', icon: <LayoutTemplate size={16} />, desc: 'Gere uma landing page inteira com apenas 1 prompt.' },
+    { id: 'feature_builder', label: 'Feature Pro', icon: <Zap size={16} />, desc: 'Funcionalidade production-ready com testes.' },
     { id: 'extract_design', label: 'Extrair Design', icon: <ImagePlus size={16} />, desc: 'Extraia cores e estilos de uma imagem de referência.' },
     { id: 'design', label: 'Design (UI/UX)', icon: <Palette size={16} />, desc: 'Focado em interface, cores e componentes.' },
     { id: 'feature', label: 'Nova Funcionalidade', icon: <Code2 size={16} />, desc: 'Adicione novos recursos ao app existente.' },
@@ -169,6 +170,10 @@ export default function DashboardPage() {
         }
         if (mode === 'extract_design') {
             router.push('/design-extractor');
+            return;
+        }
+        if (mode === 'feature_builder') {
+            router.push('/feature-builder');
             return;
         }
         updateField('promptMode', mode);
