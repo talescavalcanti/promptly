@@ -7,7 +7,6 @@ import { useRouter, usePathname } from 'next/navigation';
 import { supabase } from '../../../lib/supabase';
 import styles from './Header.module.css';
 import { Button } from '../Button/Button';
-import { GlassButton } from '../GlassButton/GlassButton';
 import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 export const Header = () => {
@@ -165,15 +164,13 @@ export const Header = () => {
                                     <Button variant="ghost">Entrar</Button>
                                 </Link>
                                 <Link href="/signup">
-                                    <GlassButton style={{ height: '36px', fontSize: '14px', borderRadius: '18px' }} glassBorderRadius={18}>
-                                        Começar
-                                    </GlassButton>
+                                    <Button variant="primary">Começar</Button>
                                 </Link>
                             </>
                         )}
                     </div>
                 </div>
-            </header >
+            </header>
 
             {/* Mobile Menu Overlay - Right Sheet */}
             <AnimatePresence>

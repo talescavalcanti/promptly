@@ -30,6 +30,9 @@ export default function ResetPasswordPage() {
 
     const allRequirementsMet = requirements.every(req => req.test(password));
 
+    // Store recovery tokens temporarily (not as a persistent session)
+    const [recoveryTokens, setRecoveryTokens] = useState<{ access: string; refresh: string } | null>(null);
+
     useEffect(() => {
         const handleRecovery = async () => {
             // Check URL hash for recovery tokens (Supabase sends tokens in hash fragment)
@@ -43,39 +46,22 @@ export default function ResetPasswordPage() {
                 const type = params.get('type');
 
                 if (type === 'recovery' && accessToken && refreshToken) {
-                    // Set the session with the recovery tokens
-                    const { error } = await supabase.auth.setSession({
-                        access_token: accessToken,
-                        refresh_token: refreshToken
-                    });
-
-                    if (!error) {
-                        setIsValidSession(true);
-                        setCheckingSession(false);
-                        // Clear hash from URL
-                        window.history.replaceState(null, '', window.location.pathname);
-                        return;
-                    }
+                    // Store tokens for password update, but DON'T create a persistent session
+                    setRecoveryTokens({ access: accessToken, refresh: refreshToken });
+                    setIsValidSession(true);
+                    setCheckingSession(false);
+                    // Clear hash from URL
+                    window.history.replaceState(null, '', window.location.pathname);
+                    return;
                 }
             }
 
-            // Fallback: check for existing session
-            const { data: { session } } = await supabase.auth.getSession();
-            setIsValidSession(!!session);
+            // No valid recovery tokens found
+            setIsValidSession(false);
             setCheckingSession(false);
         };
 
         handleRecovery();
-
-        // Listen for auth state changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            if (event === 'PASSWORD_RECOVERY') {
-                setIsValidSession(true);
-                setCheckingSession(false);
-            }
-        });
-
-        return () => subscription.unsubscribe();
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -95,14 +81,29 @@ export default function ResetPasswordPage() {
             return;
         }
 
+        if (!recoveryTokens) {
+            setError('Sessão de recuperação expirada. Solicite um novo link.');
+            setLoading(false);
+            return;
+        }
+
         try {
+            // Create a temporary session ONLY for updating the password
+            const { error: sessionError } = await supabase.auth.setSession({
+                access_token: recoveryTokens.access,
+                refresh_token: recoveryTokens.refresh
+            });
+
+            if (sessionError) throw sessionError;
+
+            // Update the password
             const { error: updateError } = await supabase.auth.updateUser({
                 password: password
             });
 
             if (updateError) throw updateError;
 
-            // Sign out after password reset
+            // Immediately sign out - user must login again with new password
             await supabase.auth.signOut();
 
             setSuccess(true);
@@ -120,7 +121,10 @@ export default function ResetPasswordPage() {
                 <div className={styles.card}>
                     <div className={styles.header}>
                         <Link href="/" className={styles.brand}>
-                            <span className={styles.brandName}>Promptly</span>
+                            <div className={styles.logoWrapper}>
+                                <div className={styles.logoGlow} />
+                                <img src="/logo.png" alt="Promptly" className={styles.logo} />
+                            </div>
                         </Link>
                         <p className={styles.subtitle}>Verificando sessão...</p>
                     </div>
@@ -135,7 +139,10 @@ export default function ResetPasswordPage() {
                 <div className={styles.card}>
                     <div className={styles.header}>
                         <Link href="/" className={styles.brand}>
-                            <span className={styles.brandName}>Promptly</span>
+                            <div className={styles.logoWrapper}>
+                                <div className={styles.logoGlow} />
+                                <img src="/logo.png" alt="Promptly" className={styles.logo} />
+                            </div>
                         </Link>
                         <h1 className={styles.title}>Link Inválido</h1>
                         <p className={styles.subtitle}>
@@ -157,7 +164,10 @@ export default function ResetPasswordPage() {
             <div className={styles.card}>
                 <div className={styles.header}>
                     <Link href="/" className={styles.brand}>
-                        <span className={styles.brandName}>Promptly</span>
+                        <div className={styles.logoWrapper}>
+                            <div className={styles.logoGlow} />
+                            <img src="/logo.png" alt="Promptly" className={styles.logo} />
+                        </div>
                     </Link>
                     <h1 className={styles.title}>Nova Senha</h1>
                     <p className={styles.subtitle}>

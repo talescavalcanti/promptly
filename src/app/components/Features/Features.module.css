@@ -6,7 +6,6 @@
 
 .container {
     max-width: 1000px;
-    /* Tighter container = smaller cards */
     margin: 0 auto;
 }
 
@@ -25,6 +24,10 @@
     letter-spacing: -0.02em;
 }
 
+.highlight {
+    color: #F5A524;
+}
+
 .subtitle {
     font-size: 1.1rem;
     color: #86868B;
@@ -37,7 +40,6 @@
 .grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    /* 3 Equal columns = smaller cards */
     gap: 1.5rem;
     grid-auto-rows: minmax(180px, auto);
 }
@@ -58,7 +60,6 @@
 
 .card:hover {
     border-color: rgba(245, 165, 36, 0.3);
-    /* Gold hint on hover */
     transform: translateY(-2px);
 }
 
@@ -69,7 +70,6 @@
 
 .cardTitle {
     font-size: 1.25rem;
-    /* Standardized size */
     font-weight: 600;
     color: #F5F5F7;
     margin: 0;
@@ -89,18 +89,15 @@
 @media (max-width: 1024px) {
     .grid {
         grid-template-columns: repeat(2, 1fr);
-        /* 2 cols on tablet */
     }
 }
 
 @media (max-width: 640px) {
     .grid {
         grid-template-columns: 1fr;
-        /* 1 col on mobile */
     }
 }
 
-/* Responsiveness */
 @media (max-width: 900px) {
     .grid {
         grid-template-columns: 1fr;

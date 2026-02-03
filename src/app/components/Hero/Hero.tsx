@@ -3,14 +3,12 @@
 import React from 'react';
 import Link from 'next/link';
 import styles from './Hero.module.css';
-import { Button } from '../Button/Button';
-import { GlassButton } from '../GlassButton/GlassButton';
 import { FadeIn } from '@/components/FadeIn';
-import { Sparkles } from 'lucide-react';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { ContainerScroll } from '@/components/ui/container-scroll-animation';
 import Image from 'next/image';
+
 
 export const Hero = () => {
     const ref = useRef(null);

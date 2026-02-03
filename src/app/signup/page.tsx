@@ -73,7 +73,10 @@ export default function SignupPage() {
             <div className={`${styles.card} animate-fade-blur`}>
                 <div className={styles.header}>
                     <Link href="/" className={styles.brand}>
-                        <span className={styles.brandName}>Promptly</span>
+                        <div className={styles.logoWrapper}>
+                            <div className={styles.logoGlow} />
+                            <img src="/logo.png" alt="Promptly" className={styles.logo} />
+                        </div>
                     </Link>
                     <h1 className={styles.title}>Criar Conta</h1>
                     <p className={styles.subtitle}>Comece a criar prompts profissionais hoje</p>
