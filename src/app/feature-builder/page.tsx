@@ -12,7 +12,7 @@ import Plasma from '../components/Plasma/Plasma';
 import { TextShimmer } from '@/components/ui/text-shimmer';
 
 // --- Simplified State ---
-type FeatureBuilderState = {
+export type FeatureBuilderState = {
     featureName: string;
     description: string;
     context: 'frontend' | 'backend' | 'database' | 'integration' | 'auth';
