@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import styles from './HowItWorks.module.css';
 import { Button } from '../Button/Button';
-import { useScrollReveal } from '../../../lib/hooks/useScrollReveal';
+import { FadeIn } from '@/components/FadeIn';
 import { ArrowRight } from 'lucide-react';
 
 const steps = [
@@ -26,39 +26,37 @@ const steps = [
 ];
 
 export const HowItWorks = () => {
-    useScrollReveal();
-
     return (
-        <section className={`${styles.section} reveal`}>
+        <section className={styles.section}>
             <div className={styles.container}>
-                <div className={styles.header}>
-                    <h2 className={styles.title}>
-                        Do conceito ao código<br />
-                        <span className={styles.highlight}>em 3 passos simples</span>
-                    </h2>
-                    <p className={styles.subtitle}>
-                        Transforme suas ideias em prompts estruturados que IAs de código realmente entendem.
-                    </p>
-                </div>
+                <FadeIn>
+                    <div className={styles.header}>
+                        <h2 className={styles.title}>
+                            Do conceito ao código<br />
+                            <span className={styles.highlight}>em 3 passos simples</span>
+                        </h2>
+                        <p className={styles.subtitle}>
+                            Transforme suas ideias em prompts estruturados que IAs de código realmente entendem.
+                        </p>
+                    </div>
+                </FadeIn>
 
                 <div className={styles.stepsGrid}>
                     {steps.map((step, index) => (
-                        <div
-                            key={index}
-                            className={styles.stepCard}
-                            style={{ animationDelay: `${index * 0.15}s` }}
-                        >
-                            <span className={styles.stepNumber}>{step.number}</span>
-                            <h3 className={styles.stepTitle}>{step.title}</h3>
-                            <p className={styles.stepDescription}>{step.description}</p>
+                        <FadeIn key={index} delay={0.2 * index}>
+                            <div className={styles.stepCard}>
+                                <span className={styles.stepNumber}>{step.number}</span>
+                                <h3 className={styles.stepTitle}>{step.title}</h3>
+                                <p className={styles.stepDescription}>{step.description}</p>
 
-                            {/* Connector line between cards */}
-                            {index < steps.length - 1 && (
-                                <div className={styles.connector}>
-                                    <ArrowRight size={16} />
-                                </div>
-                            )}
-                        </div>
+                                {/* Connector line between cards */}
+                                {index < steps.length - 1 && (
+                                    <div className={styles.connector}>
+                                        <ArrowRight size={16} />
+                                    </div>
+                                )}
+                            </div>
+                        </FadeIn>
                     ))}
                 </div>
 

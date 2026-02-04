@@ -134,12 +134,26 @@
 /* Responsiveness */
 @media (max-width: 768px) {
     .section {
-        padding: 8rem 1.5rem 6rem;
+        padding: 7.5rem 0.5rem 4rem;
+        /* Reduced top padding, changed alignment */
+        justify-content: flex-start;
+        /* Move content to top */
+        min-height: auto;
+        /* Allow content to dictate height if needed, or keep 100vh but align top */
+        height: 100dvh;
+        /* Use dynamic viewport height for mobile */
     }
 
     .title {
-        font-size: 3rem;
-        letter-spacing: -0.02em;
+        font-size: 10vw;
+        /* Responsive scaling to fill width */
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+        /* Tighten to fit more chars */
+        width: 100%;
+        padding: 0;
+        margin-bottom: 0;
+        /* text-wrap: balance; Removed to prevent premature balancing */
     }
 
     .description {

@@ -4,7 +4,7 @@ import { InfiniteSlider } from '@/components/ui/infinite-slider';
 
 export const LogoTicker = () => {
     return (
-        <section className="w-full py-12 md:py-20 relative z-10 overflow-hidden">
+        <section className="w-full pt-4 pb-12 md:py-20 relative z-10 overflow-hidden">
             <div className="container mx-auto px-4 md:px-6">
                 <div className="relative">
                     {/* Gradient Masks */}

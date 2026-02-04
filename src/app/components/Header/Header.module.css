@@ -467,19 +467,34 @@
 
     .container {
         padding: 0 1rem;
+        position: relative;
+        /* Ensure container is relative for absolute positioning of logo */
+        justify-content: space-between;
+        /* Keep hamburger and actions apart */
+    }
+
+    .left {
+        flex: 0 0 auto;
+        /* Stop left section from taking up space */
+        gap: 0;
     }
 
     .logo {
         position: absolute;
         left: 50%;
-        transform: translateX(-50%);
+        top: 50%;
+        transform: translate(-50%, -50%);
+        /* Center perfectly */
         font-size: 1rem;
         gap: 0.4rem;
+        margin: 0;
+        /* Remove existing margin */
     }
 
     .logo:hover,
     .logo:active {
-        transform: translateX(-50%) scale(1.05);
+        transform: translate(-50%, -50%) scale(1.05);
+        /* Maintain centering on hover */
     }
 
     .logo span {
@@ -488,6 +503,8 @@
 
     .actions {
         gap: 0.5rem;
+        flex: 0 0 auto;
+        /* Stop actions section from taking up extra space */
     }
 
     .userName {
