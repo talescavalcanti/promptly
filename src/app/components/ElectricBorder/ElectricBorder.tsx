@@ -1,20 +1,5 @@
 import React, { useEffect, useRef, useCallback, CSSProperties } from 'react';
 
-function hexToRgba(hex: string, alpha: number = 1): string {
-    if (!hex) return `rgba(0,0,0,${alpha})`;
-    let h = hex.replace('#', '');
-    if (h.length === 3) {
-        h = h
-            .split('')
-            .map(c => c + c)
-            .join('');
-    }
-    const int = parseInt(h, 16);
-    const r = (int >> 16) & 255;
-    const g = (int >> 8) & 255;
-    const b = int & 255;
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
 
 interface ElectricBorderProps {
     color?: string;
@@ -35,9 +20,6 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
 }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-    const animationRef = useRef<number | null>(null);
-    const timeRef = useRef(0);
-    const lastFrameTimeRef = useRef(0);
 
     const random = useCallback((x: number): number => {
         return (Math.sin(x * 12.9898) * 43758.5453) % 1;

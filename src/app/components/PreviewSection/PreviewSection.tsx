@@ -5,7 +5,7 @@ import styles from './PreviewSection.module.css';
 import { FadeIn } from '@/components/FadeIn';
 
 import Link from 'next/link';
-import { ArrowRight, Zap } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Button } from '@/app/components/Button/Button';
 
 export const PreviewSection = () => {
@@ -33,19 +33,19 @@ export const PreviewSection = () => {
                                     <div className={styles.line}>
                                         <span className={styles.lineNumber}>1</span>
                                         <div className={styles.content}>
-                                            <span className={styles.key}>Contexto:</span> <span className={styles.value}>"Tech Lead Sênior..."</span>
+                                            <span className={styles.key}>Contexto:</span> <span className={styles.value}>&quot;Tech Lead Sênior...&quot;</span>
                                         </div>
                                     </div>
                                     <div className={styles.line}>
                                         <span className={styles.lineNumber}>2</span>
                                         <div className={styles.content}>
-                                            <span className={styles.key}>Stack:</span> <span className={styles.value}>"React 19, Next.js 15..."</span>
+                                            <span className={styles.key}>Stack:</span> <span className={styles.value}>&quot;React 19, Next.js 15...&quot;</span>
                                         </div>
                                     </div>
                                     <div className={styles.line}>
                                         <span className={styles.lineNumber}>3</span>
                                         <div className={styles.content}>
-                                            <span className={styles.key}>Requisitos:</span> <span className={styles.value}>"Sistema real-time..."</span>
+                                            <span className={styles.key}>Requisitos:</span> <span className={styles.value}>&quot;Sistema real-time...&quot;</span>
                                         </div>
                                     </div>
                                     <div className={styles.line}>

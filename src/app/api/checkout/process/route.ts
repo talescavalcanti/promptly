@@ -39,9 +39,6 @@ export async function POST(req: Request) {
         const ASAAS_API_KEY = process.env.ASAAS_API_KEY;
         const ASAAS_BASE_URL = process.env.ASAAS_BASE_URL;
 
-        console.log("DEBUG: Env Check");
-        console.log("typeof ASAAS_API_KEY:", typeof process.env.ASAAS_API_KEY);
-        console.log("Raw process.env.ASAAS_API_KEY:", process.env.ASAAS_API_KEY);
 
         if (!ASAAS_API_KEY || !ASAAS_BASE_URL) {
             console.error("Missing Asaas Keys in .env.local");
@@ -55,7 +52,7 @@ export async function POST(req: Request) {
         const { plan, method, cardDetails, billingDetails } = body;
 
         // Helper for safe fetching
-        const safeFetch = async (url: string, options: any) => {
+        const safeFetch = async (url: string, options: RequestInit) => {
             const response = await fetch(url, options);
             const text = await response.text();
             try {
@@ -64,7 +61,7 @@ export async function POST(req: Request) {
                     status: response.status,
                     data: JSON.parse(text)
                 };
-            } catch (e) {
+            } catch {
                 console.error(`Starting fetch to ${url}`);
                 console.error(`Failed to parse JSON from ${url}. Status: ${response.status}`);
                 console.error("Raw response:", text.substring(0, 500)); // Log first 500 chars
@@ -137,7 +134,7 @@ export async function POST(req: Request) {
         const value = plan === 'PRO' ? 27.90 : 9.90;
         const description = `Assinatura Plano ${plan}`;
 
-        const subscriptionBody: any = {
+        const subscriptionBody: Record<string, unknown> = {
             customer: asaasCustomerId,
             billingType: method,
             value,
@@ -263,10 +260,11 @@ export async function POST(req: Request) {
             environment: ASAAS_BASE_URL.includes('sandbox') ? 'sandbox' : 'production'
         });
 
-    } catch (error: any) {
-        console.error("Internal Error:", error);
+    } catch (error: unknown) {
+        const err = error instanceof Error ? error : new Error(String(error));
+        console.error("Internal Error:", err);
         return NextResponse.json({
-            error: error.message || "Erro interno no servidor."
+            error: err.message || "Erro interno no servidor."
         }, { status: 500 });
     }
 }

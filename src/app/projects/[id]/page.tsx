@@ -3,7 +3,6 @@
 import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../../lib/supabase';
-import { Header } from '../../components/Header/Header';
 import { Button } from '../../components/Button/Button';
 import { ArrowLeft, Copy, PenLine, RefreshCw } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
@@ -16,6 +15,7 @@ import { extractVariables, fillVariables } from '../../../utils/prompt-utils';
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const router = useRouter();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [project, setProject] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
@@ -24,7 +24,6 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     const [detectedVars, setDetectedVars] = useState<string[]>([]);
 
     useEffect(() => {
-        console.log('Project ID:', id);
         fetchProject();
     }, [id]);
 
@@ -108,6 +107,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                 alert(`Erro: ${data.error || 'Falha ao regenerar.'}`);
             } else {
                 // Update local state and ideally refetch to sync with DB if API updates DB (it does)
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 setProject((prev: any) => ({ ...prev, generated_content: data.result }));
                 alert("Conteúdo regenerado com sucesso!");
             }

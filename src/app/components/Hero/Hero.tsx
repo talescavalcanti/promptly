@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import styles from './Hero.module.css';
 import { FadeIn } from '@/components/FadeIn';
 import { useInView } from 'framer-motion';
@@ -13,7 +12,7 @@ import Image from 'next/image';
 
 export const Hero = () => {
     const ref = useRef(null);
-    const isInView = useInView(ref, { margin: "200px 0px 0px 0px" });
+    useInView(ref, { margin: "200px 0px 0px 0px" });
 
     return (
         <section className={styles.section} ref={ref}>

@@ -115,15 +115,11 @@ export async function POST(req: Request) {
             promptMode, objective, context, targetPlatform,
             // SaaS Wizard Specifics
             saasName, saasColor, saasFont, logoStyle, voiceTone,
-            saasNiche, businessModel, chargingModel, planNames,
-            coreEntity, coreView, dataInputType,
-            userRoles, loginMethod, registrationPolicy,
-            notificationChannels, integrations, supportChannels,
-            problemSolved, marketingHeadline, cta,
+            saasNiche, problemSolved, cta,
             // Landing Builder Specifics
-            targetAudience, colorPalette, typography,
+            targetAudience, typography,
             primaryColor, secondaryColor, fontWeight, useSingleFont,
-            geometry, layout, brandName, sections, wizardMode
+            geometry, layout, brandName, sections
         } = body;
 
         const apiKey = process.env.GEMINI_API_KEY?.trim();
@@ -484,9 +480,7 @@ Act as a ** Senior Frontend Engineer & Component Architect ** specialized in ${t
 
         for (const modelId of modelsToTry) {
             try {
-                console.log(`Tentando modelo identificado: ${modelId} `);
                 const model = genAI.getGenerativeModel({ model: modelId });
-                console.log(`[DEBUG] Prompt Length for ${modelId}:`, prompt.length);
 
                 const result = await model.generateContent(prompt);
                 const response = await result.response;

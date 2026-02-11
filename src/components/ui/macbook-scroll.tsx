@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MotionValue, motion, useScroll, useTransform } from "motion/react";
 import { cn } from "@/lib/utils";
 import {
@@ -27,7 +27,7 @@ import { IconCaretDownFilled } from "@tabler/icons-react";
 
 export const MacbookScroll = ({
     src,
-    showGradient,
+    showGradient: _showGradient,
     title,
     badge,
 }: {
@@ -46,6 +46,7 @@ export const MacbookScroll = ({
 
     useEffect(() => {
         if (window && window.innerWidth < 768) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setIsMobile(true);
         }
     }, []);
@@ -90,7 +91,7 @@ export const MacbookScroll = ({
                 scaleY={scaleY}
                 rotate={rotate}
                 translate={translate}
-                showGradient={showGradient}
+                showGradient={_showGradient}
             />
             {/* Base area */}
             <div className="relative -z-10 h-[22rem] w-[32rem] overflow-hidden rounded-2xl bg-gray-200 dark:bg-[#272729]">
@@ -111,7 +112,7 @@ export const MacbookScroll = ({
                 </div>
                 <Trackpad />
                 <div className="absolute inset-x-0 bottom-0 mx-auto h-2 w-20 rounded-tl-3xl rounded-tr-3xl bg-gradient-to-t from-[#272729] to-[#050505]" />
-                {showGradient && (
+                {_showGradient && (
                     <div className="absolute inset-x-0 bottom-0 z-50 h-40 w-full bg-gradient-to-t from-white via-white to-transparent dark:from-black dark:via-black"></div>
                 )}
                 {badge && <div className="absolute bottom-4 left-4">{badge}</div>}
@@ -126,7 +127,7 @@ export const Lid = ({
     rotate,
     translate,
     src,
-    showGradient,
+
 }: {
     scaleX: MotionValue<number>;
     scaleY: MotionValue<number>;
@@ -645,23 +646,3 @@ export const OptionKey = ({ className }: { className: string }) => {
     );
 };
 
-const AceternityLogo = () => {
-    return (
-        <svg
-            width="66"
-            height="65"
-            viewBox="0 0 66 65"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-3 w-3 text-white"
-        >
-            <path
-                d="M8 8.05571C8 8.05571 54.9009 18.1782 57.8687 30.062C60.8365 41.9458 9.05432 57.4696 9.05432 57.4696"
-                stroke="currentColor"
-                strokeWidth="15"
-                strokeMiterlimit="3.86874"
-                strokeLinecap="round"
-            />
-        </svg>
-    );
-};

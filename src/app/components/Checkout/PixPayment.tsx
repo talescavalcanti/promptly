@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from '../../checkout/checkout.module.css';
 import { Copy, Check } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -16,10 +15,13 @@ interface PixPaymentProps {
 
 export function PixPayment({ pixQrCodeBase64, pixCopyPaste, paymentId, onSuccess, environment }: PixPaymentProps) {
     const [copied, setCopied] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
+
 
     // Polling logic
     useEffect(() => {
-        let intervalId: NodeJS.Timeout;
+        // The intervalRef is now declared at the top level of the component.
 
         const checkStatus = async () => {
             try {
@@ -39,7 +41,7 @@ export function PixPayment({ pixQrCodeBase64, pixCopyPaste, paymentId, onSuccess
                     const data = await response.json();
                     if (data.status === 'RECEIVED' || data.status === 'CONFIRMED') {
                         onSuccess();
-                        clearInterval(intervalId);
+                        if (intervalRef.current) clearInterval(intervalRef.current);
                     }
                 }
             } catch (err) {
@@ -48,9 +50,11 @@ export function PixPayment({ pixQrCodeBase64, pixCopyPaste, paymentId, onSuccess
         };
 
         // Start polling every 3 seconds
-        intervalId = setInterval(checkStatus, 3000);
+        intervalRef.current = setInterval(checkStatus, 3000);
 
-        return () => clearInterval(intervalId);
+        return () => {
+            if (intervalRef.current) clearInterval(intervalRef.current);
+        };
     }, [paymentId, onSuccess]);
 
     const handleCopy = () => {
@@ -62,7 +66,7 @@ export function PixPayment({ pixQrCodeBase64, pixCopyPaste, paymentId, onSuccess
     return (
         <div className={styles.pixContainer}>
             <p style={{ color: '#aaa', fontSize: '0.9rem' }}>
-                Escaneie o QR Code abaixo com o app do seu banco ou use o "Pix Copia e Cola".
+                Escaneie o QR Code abaixo com o app do seu banco ou use o &quot;Pix Copia e Cola&quot;.
             </p>
 
             <div className={styles.qrCodeWrapper}>

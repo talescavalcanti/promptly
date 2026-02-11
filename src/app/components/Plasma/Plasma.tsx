@@ -185,10 +185,10 @@ export const Plasma: React.FC<PlasmaProps> = ({
                 const u = segmentTime / pingpongDuration;
                 const smooth = u * u * (3 - 2 * u);
                 const pingpongTime = isForward ? smooth * pingpongDuration : (1 - smooth) * pingpongDuration;
-                (program.uniforms.uDirection as any).value = 1.0;
-                (program.uniforms.iTime as any).value = pingpongTime;
+                (program.uniforms.uDirection as { value: number }).value = 1.0;
+                (program.uniforms.iTime as { value: number }).value = pingpongTime;
             } else {
-                (program.uniforms.iTime as any).value = timeValue;
+                (program.uniforms.iTime as { value: number }).value = timeValue;
             }
 
             renderer.render({ scene: mesh });

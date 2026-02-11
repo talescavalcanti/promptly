@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { supabase } from '../../../lib/supabase';
 import styles from './Sidebar.module.css';
@@ -31,8 +32,6 @@ export const Sidebar = () => {
             .select('plano_ativo, prompts_used')
             .eq('id', userId)
             .single();
-
-        console.log("DEBUG Sidebar:", { userId, data });
 
         if (data) {
             setProfile({
@@ -83,8 +82,6 @@ export const Sidebar = () => {
     const currentPlan = profile?.plan || 'free';
     const limit = isDeveloper ? 9999 : (PLAN_LIMITS[currentPlan] || 5);
     const used = profile?.prompts_used || 0;
-    const percent = Math.min(100, (used / limit) * 100);
-    const isFree = currentPlan === 'free' && !isDeveloper;
 
     return (
         <aside className={styles.sidebar}>
@@ -107,7 +104,7 @@ export const Sidebar = () => {
             <div className={styles.user}>
                 <div className={styles.avatar}>
                     {avatarUrl ? (
-                        <img src={avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                        <Image src={avatarUrl} alt="Avatar" width={40} height={40} style={{ borderRadius: '50%', objectFit: 'cover' }} />
                     ) : (
                         fullName.charAt(0).toUpperCase()
                     )}

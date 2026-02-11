@@ -124,8 +124,9 @@ export async function POST(request: NextRequest) {
         console.log('Email sent successfully:', emailData?.id);
         return NextResponse.json({ success: true });
 
-    } catch (error: any) {
-        console.error('Password reset error:', error.message || error);
+    } catch (error: unknown) {
+        const err = error instanceof Error ? error : new Error(String(error));
+        console.error('Password reset error:', err.message);
         return NextResponse.json({ error: 'Erro ao processar solicitação' }, { status: 500 });
     }
 }

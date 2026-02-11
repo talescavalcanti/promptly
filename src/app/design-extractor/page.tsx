@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import styles from './page.module.css';
 import { Header } from '../components/Header/Header';
-import { UploadCloud, ArrowRight, Palette, Type, Paintbrush, Check, Loader2, ArrowLeft, FileText, Code, Lightbulb, Copy, Layers } from 'lucide-react';
+import { UploadCloud, ArrowRight, Check, Loader2, ArrowLeft, FileText, Code, Lightbulb, Copy, Layers } from 'lucide-react';
 
 type ExtractionResult = {
     success: boolean;
     fullReport: string;
-    tokens: any;
+    tokens: Record<string, unknown>;
     sections: {
         metadata: string;
         direction: string;
@@ -79,8 +79,9 @@ export default function DesignExtractorPage() {
             if (!res.ok) throw new Error(data.error || 'Falha na extração');
 
             setExtractionData(data);
-        } catch (error: any) {
-            alert(`Erro: ${error.message}`);
+        } catch (error: unknown) {
+            const err = error instanceof Error ? error : new Error(String(error));
+            alert(`Erro: ${err.message}`);
         } finally {
             setExtracting(false);
         }

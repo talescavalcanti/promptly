@@ -5,12 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-    Briefcase, Target, Palette, Layout, FileText, Check, Copy, ChevronDown, ChevronUp, Bot, Sparkles, Lightbulb, Type, Layers, X, Zap, Sliders, Frame, Feather, Megaphone, ArrowUpRight
+    Briefcase, Target, Palette, Layout, Check, Copy, ChevronDown, Type, Layers, X, Zap, Sliders, Frame, Feather, ArrowUpRight
 } from 'lucide-react';
-import styles from './landing-builder.module.css'; // Reusing the copied/renamed styles
-import { ScrollReveal } from '../components/ScrollReveal/ScrollReveal';
-import { LANDING_PAGE_AGENT_V2_PROMPT } from './agentPrompts';
-import Plasma from '../components/Plasma/Plasma';
+import styles from './landing-builder.module.css';
 import { TextShimmer } from '@/components/ui/text-shimmer';
 
 // --- Types ---
@@ -34,7 +31,7 @@ type LandingBuilderState = {
     tone: string;
     targetPlatform: 'Lovable' | 'Google AI Studio' | 'Vercel' | 'Replit'; // New Step 8
 };
-const TOTAL_STEPS = 10;
+
 
 const INITIAL_STATE: LandingBuilderState = {
     mode: 'custom',
@@ -186,7 +183,7 @@ export default function LandingBuilderPage() {
         "Clínica Odontológica", "Consultoria Financeira", "SaaS B2B", "Barbearia Premium", "Nutricionista Esportiva", "Advocacia Trabalhista"
     ];
 
-    const updateState = (key: keyof LandingBuilderState, value: any) => {
+    const updateState = (key: keyof LandingBuilderState, value: LandingBuilderState[keyof LandingBuilderState]) => {
         setState(prev => ({ ...prev, [key]: value }));
     };
 
@@ -275,7 +272,7 @@ export default function LandingBuilderPage() {
             } else {
                 setGeneratedPrompt(data.result);
             }
-        } catch (error) {
+        } catch {
             setGeneratedPrompt('Erro de conexão ao gerar prompt. Tente novamente.');
         } finally {
             setIsGenerating(false);
@@ -368,7 +365,7 @@ export default function LandingBuilderPage() {
                             />
                             {state.mode === 'portfolio' && (
                                 <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', marginTop: '0.5rem' }}>
-                                    No "Modo Flash", se você não der nome, criaremos um criativo para você.
+                                    No &quot;Modo Flash&quot;, se você não der nome, criaremos um criativo para você.
                                 </p>
                             )}
                         </div>
@@ -427,7 +424,7 @@ export default function LandingBuilderPage() {
                         <div className={styles.stepHeader}>
                             <h2 className={styles.stepTitle}>Direção de Arte</h2>
                             <p className={styles.stepDescription}>
-                                "O estilo não é enfeite, é posicionamento."
+                                &quot;O estilo não é enfeite, é posicionamento.&quot;
                                 <br />
                                 <span style={{ opacity: 0.5, fontSize: '0.9em' }}>Escolha a estética que ressoa com o inconsciente do seu público.</span>
                             </p>
@@ -500,7 +497,7 @@ export default function LandingBuilderPage() {
                         <div className={styles.stepHeader}>
                             <h2 className={styles.stepTitle}>Física & Estrutura</h2>
                             <p className={styles.stepDescription}>
-                                A "psicologia invisível" do seu design.
+                                A &quot;psicologia invisível&quot; do seu design.
                                 <br />
                                 <span style={{ opacity: 0.5, fontSize: '0.9em' }}>Decisões de geometria afetam a confiança subconsciente do usuário em 50ms.</span>
                             </p>
@@ -625,9 +622,9 @@ export default function LandingBuilderPage() {
                         <div className={styles.stepHeader}>
                             <h2 className={styles.stepTitle}>Paleta Cromática</h2>
                             <p className={styles.stepDescription}>
-                                "Cores são emoção codificada."
+                                &quot;Cores são emoção codificada.&quot;
                                 <br />
-                                <span style={{ opacity: 0.5, fontSize: '0.9em' }}>Escolha contraste alto para retenção. Evite tons pastéis lavados ("SaaS Safe").</span>
+                                <span style={{ opacity: 0.5, fontSize: '0.9em' }}>Escolha contraste alto para retenção. Evite tons pastéis lavados (&quot;SaaS Safe&quot;).</span>
                             </p>
                         </div>
 
@@ -725,7 +722,7 @@ export default function LandingBuilderPage() {
                         <div className={styles.stepHeader}>
                             <h2 className={styles.stepTitle}>Tipografia</h2>
                             <p className={styles.stepDescription}>
-                                "A voz textual do seu projeto."
+                                &quot;A voz textual do seu projeto.&quot;
                                 <br />
                                 <span style={{ opacity: 0.5, fontSize: '0.9em' }}>Legibilidade constrói confiança. Escolha com base na densidade de informação.</span>
                             </p>
@@ -908,7 +905,7 @@ export default function LandingBuilderPage() {
                             <p className={styles.stepDescription}>
                                 Onde você vai buildar esse projeto?
                                 <br />
-                                <span style={{ opacity: 0.6, fontSize: '0.9em' }}>Otimizaremos o prompt especificamente para a "mente" da IA escolhida.</span>
+                                <span style={{ opacity: 0.6, fontSize: '0.9em' }}>Otimizaremos o prompt especificamente para a &quot;mente&quot; da IA escolhida.</span>
                             </p>
                         </div>
                         <div className={styles.grid2}>

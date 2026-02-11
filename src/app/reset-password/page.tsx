@@ -108,8 +108,9 @@ export default function ResetPasswordPage() {
 
             setSuccess(true);
             setTimeout(() => router.push('/login'), 2000);
-        } catch (err: any) {
-            setError(err.message || 'Erro ao atualizar senha.');
+        } catch (err: unknown) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            setError(error.message || 'Erro ao atualizar senha.');
         } finally {
             setLoading(false);
         }

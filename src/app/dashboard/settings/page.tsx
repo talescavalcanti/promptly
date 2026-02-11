@@ -1,15 +1,16 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { supabase } from '../../../lib/supabase';
 import styles from './settings.module.css';
 import { Button } from '../../components/Button/Button';
 import { User } from '@supabase/supabase-js';
-import { Loader2, Camera, Save, Lock, Eye, EyeOff, Check, X } from 'lucide-react';
+import { Camera, Save, Lock, Eye, EyeOff, Check, X } from 'lucide-react';
 
 export default function SettingsPage() {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [, setLoading] = useState(false);
     const [savingProfile, setSavingProfile] = useState(false);
     const [savingPassword, setSavingPassword] = useState(false);
     const [uploadingAvatar, setUploadingAvatar] = useState(false);
@@ -196,7 +197,7 @@ export default function SettingsPage() {
                         <div className={styles.avatarSection}>
                             <div className={styles.avatar}>
                                 {avatarUrl ? (
-                                    <img src={avatarUrl} alt="Avatar" />
+                                    <Image src={avatarUrl} alt="Avatar" width={80} height={80} style={{ borderRadius: '50%', objectFit: 'cover' }} />
                                 ) : (
                                     fullName.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase()
                                 )}
@@ -485,8 +486,9 @@ export default function SettingsPage() {
                                             .single();
                                         if (profile) setUserProfile(profile);
 
-                                    } catch (err: any) {
-                                        showMessage('error', `Erro ao cancelar: ${err.message}`);
+                                    } catch (err: unknown) {
+                                        const error = err instanceof Error ? err : new Error(String(err));
+                                        showMessage('error', `Erro ao cancelar: ${error.message}`);
                                     } finally {
                                         setCancellingSubscription(false);
                                     }

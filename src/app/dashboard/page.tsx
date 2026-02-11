@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
-import { Button } from '../components/Button/Button';
 import { supabase } from '../../lib/supabase';
 import {
     LayoutTemplate, Rocket, ImagePlus, Zap

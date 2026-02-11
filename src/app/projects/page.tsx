@@ -4,12 +4,13 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../components/Button/Button';
-import { Plus, ArrowRight, Clock } from 'lucide-react';
+import { Plus, Clock } from 'lucide-react';
 import { ScrollReveal } from '../components/ScrollReveal/ScrollReveal';
 
 import styles from './projects.module.css';
 
 export default function ProjectsPage() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [projects, setProjects] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -37,14 +38,7 @@ export default function ProjectsPage() {
         }
     };
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        const target = e.currentTarget;
-        const rect = target.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        target.style.setProperty('--mouse-x', `${x}px`);
-        target.style.setProperty('--mouse-y', `${y}px`);
-    };
+
 
     return (
         <div className={styles.page}>

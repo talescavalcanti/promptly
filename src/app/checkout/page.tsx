@@ -180,9 +180,10 @@ function CheckoutContent() {
                 router.push(`/checkout/success?plan=${plan}`);
             }
 
-        } catch (err: any) {
-            console.error(err);
-            setError(err.message || "Ocorreu um erro ao processar o pagamento.");
+        } catch (err: unknown) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            console.error(error);
+            setError(error.message || "Ocorreu um erro ao processar o pagamento.");
             setLoading(false);
         }
     };

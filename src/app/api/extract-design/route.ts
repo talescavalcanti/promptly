@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 
         try {
             systemInstruction = fs.readFileSync(promptPath, 'utf-8');
-        } catch (e) {
+        } catch {
             console.warn("Could not read variable agent file, using fallback.");
             systemInstruction = "Analyze this image and extract design variables (colors, typography, style) in JSON format.";
         }
@@ -89,9 +89,10 @@ export async function POST(req: Request) {
                     }
                 ]);
                 if (result) break; // Success
-            } catch (e: any) {
-                console.warn(`Extraction failed with ${modelId}:`, e.message);
-                lastError = e;
+            } catch (e: unknown) {
+                const err = e instanceof Error ? e : new Error(String(e));
+                console.warn(`Extraction failed with ${modelId}:`, err.message);
+                lastError = err;
             }
         }
 
@@ -106,7 +107,7 @@ export async function POST(req: Request) {
         // We need to extract the JSON section and also preserve the full report.
 
         let jsonTokens = null;
-        let markdownReport = responseText;
+        const markdownReport = responseText;
 
         // Try to extract JSON block from the response
         const jsonMatch = responseText.match(/```json\s*([\s\S]*?)\s*```/);
@@ -141,9 +142,10 @@ export async function POST(req: Request) {
             sections: sections
         });
 
-    } catch (error: any) {
-        console.error("Extraction Error:", error);
-        return NextResponse.json({ error: "Extraction Failed: " + error.message }, { status: 500 });
+    } catch (error: unknown) {
+        const err = error instanceof Error ? error : new Error(String(error));
+        console.error("Extraction Error:", err);
+        return NextResponse.json({ error: "Extraction Failed: " + err.message }, { status: 500 });
     }
 }
 

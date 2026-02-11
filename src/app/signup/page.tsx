@@ -59,8 +59,9 @@ export default function SignupPage() {
                 // Redirect to verify email page
                 router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
             }
-        } catch (err: any) {
-            setError(err.message || 'Ocorreu um erro ao criar sua conta.');
+        } catch (err: unknown) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            setError(error.message || 'Ocorreu um erro ao criar sua conta.');
         } finally {
             setLoading(false);
         }

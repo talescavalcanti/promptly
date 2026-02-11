@@ -32,6 +32,7 @@ export const Header = () => {
     });
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsMenuOpen(false);
     }, [pathname]);
 
@@ -102,7 +103,7 @@ export const Header = () => {
         router.push('/');
     };
 
-    if (pathname === '/login' || pathname === '/signup' || pathname === '/auth/verify-email' || pathname?.startsWith('/checkout') || pathname === '/builder' || pathname === '/landing-builder' || pathname === '/feature-builder' || pathname === '/showcase') {
+    if (pathname === '/login' || pathname === '/signup' || pathname === '/auth/verify-email' || pathname?.startsWith('/checkout') || pathname === '/builder' || pathname === '/landing-builder' || pathname === '/feature-builder' || pathname === '/showcase' || pathname === '/forgot-password' || pathname === '/reset-password') {
         return null;
     }
 

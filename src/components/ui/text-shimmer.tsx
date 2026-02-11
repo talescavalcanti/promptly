@@ -18,7 +18,8 @@ export function TextShimmer({
     duration = 2,
     spread = 2,
 }: TextShimmerProps) {
-    const MotionComponent = motion(Component as keyof JSX.IntrinsicElements);
+    // eslint-disable-next-line react-hooks/static-components
+    const MotionComponent = useMemo(() => motion(Component as keyof JSX.IntrinsicElements), [Component]);
 
     const dynamicSpread = useMemo(() => {
         return children.length * spread;

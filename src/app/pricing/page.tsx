@@ -10,7 +10,7 @@ import { ScrollReveal } from '../components/ScrollReveal/ScrollReveal';
 import ElectricBorder from '../components/ElectricBorder/ElectricBorder';
 
 export default function PricingPage() {
-    const [user, setUser] = React.useState<any>(null);
+    const [user, setUser] = React.useState<{ id: string; email?: string; plan?: string } | null>(null);
 
     React.useEffect(() => {
         const checkUser = async () => {

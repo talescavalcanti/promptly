@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useState, useId } from 'react';
+import React, { useEffect, useRef, useState, useId, useCallback } from 'react';
 
 export interface GlassSurfaceProps {
     children?: React.ReactNode;
@@ -49,6 +49,7 @@ const useDarkMode = () => {
         if (typeof window === 'undefined') return;
 
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsDark(mediaQuery.matches);
 
         const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
@@ -65,26 +66,17 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
     height = '100%',
     borderRadius = 20,
     borderWidth = 0.07,
-    brightness = 50,
-    opacity = 0.93,
-    blur = 11,
     displace = 0,
     backgroundOpacity = 0,
     saturation = 1,
-    distortionScale = -180,
     redOffset = 0,
     greenOffset = 10,
     blueOffset = 20,
-    xChannel = 'R',
-    yChannel = 'G',
-    mixBlendMode = 'difference',
     className = '',
     style = {}
 }) => {
     const uniqueId = useId().replace(/:/g, '-');
     const filterId = `glass-filter-${uniqueId}`;
-    const redGradId = `red-grad-${uniqueId}`;
-    const blueGradId = `blue-grad-${uniqueId}`;
 
     const [svgSupported, setSvgSupported] = useState<boolean>(false);
     const [backdropSupported, setBackdropSupported] = useState<boolean>(false);
@@ -98,7 +90,7 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
 
     const isDarkMode = useDarkMode();
 
-    const updateDisplacementMap = () => {
+    const updateDisplacementMap = useCallback(() => {
         if (
             !redChannelRef.current ||
             !greenChannelRef.current ||
@@ -112,9 +104,9 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
         blueChannelRef.current.scale.baseVal = displace * blueOffset;
 
         gaussianBlurRef.current.setStdDeviation(0.7, 0.7);
-    };
+    }, [displace, redOffset, greenOffset, blueOffset]);
 
-    const generateDisplacementMap = () => {
+    const generateDisplacementMap = useCallback(() => {
         const rect = containerRef.current?.getBoundingClientRect();
         const actualWidth = rect?.width || 400;
         const actualHeight = rect?.height || 200;
@@ -136,14 +128,14 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
         feImageRef.current!.setAttribute('href', `data:image/svg+xml;charset=utf-8,${encoded}`);
 
         updateDisplacementMap();
-    };
+    }, [borderRadius, borderWidth, updateDisplacementMap]);
 
     const supportsBackdropFilter = () => {
         if (typeof window === 'undefined') return false;
         return CSS.supports('backdrop-filter', 'blur(10px)');
     };
 
-    const supportsSVGFilters = () => {
+    const supportsSVGFilters = useCallback(() => {
         if (typeof window === 'undefined' || typeof document === 'undefined') {
             return false;
         }
@@ -159,12 +151,13 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
         div.style.backdropFilter = `url(#${filterId})`;
 
         return div.style.backdropFilter !== '';
-    };
+    }, [filterId]);
 
     useEffect(() => {
         setSvgSupported(supportsSVGFilters());
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setBackdropSupported(supportsBackdropFilter());
-    }, []);
+    }, [supportsSVGFilters]);
 
     useEffect(() => {
         if (svgSupported) {
@@ -176,13 +169,13 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
             window.addEventListener('resize', handleResize);
             return () => window.removeEventListener('resize', handleResize);
         }
-    }, [svgSupported]);
+    }, [svgSupported, generateDisplacementMap]);
 
     useEffect(() => {
         if (svgSupported) {
             updateDisplacementMap();
         }
-    }, [displace, redOffset, greenOffset, blueOffset, svgSupported]);
+    }, [displace, redOffset, greenOffset, blueOffset, svgSupported, updateDisplacementMap]);
 
     const getContainerStyles = (): React.CSSProperties => {
         const baseStyles: React.CSSProperties = {

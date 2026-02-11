@@ -3,13 +3,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Rocket, Target, Zap, Layout, Check, Copy, ChevronDown, ChevronUp, Bot, Sparkles, Lightbulb, Layers, X, Feather, Smartphone, Globe, Palette, Type, Briefcase, Monitor
+    Zap, Layout, Check, Copy, ChevronDown, Bot, X, Briefcase, Monitor
 } from 'lucide-react';
 import Link from 'next/link';
 import styles from './saas-builder.module.css';
 import { TARGET_PLATFORMS } from '../../lib/saas_constants';
 import { TextShimmer } from '@/components/ui/text-shimmer';
-import Image from 'next/image';
 
 // --- Types ---
 type SaasBuilderState = {
@@ -464,7 +463,7 @@ export default function SaasBuilderPage() {
                     <>
                         <div className={styles.stepHeader}>
                             <h2 className={styles.stepTitle}>Estilo Visual</h2>
-                            <p className={styles.stepDescription}>Qual a "vibe" do seu SaaS?</p>
+                            <p className={styles.stepDescription}>Qual a &quot;vibe&quot; do seu SaaS?</p>
                         </div>
                         <div className={styles.grid2} style={{ marginTop: '1rem' }}>
                             {STYLES.map(s => (

@@ -74,6 +74,7 @@ export const useShowcaseData = () => {
     }, []);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchData();
     }, [fetchData]);
 
@@ -95,6 +96,7 @@ export const useShowcaseData = () => {
     }, [filteredData, currentPage]);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCurrentPage(1);
     }, [searchTerm]);
 

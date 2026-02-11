@@ -30,8 +30,9 @@ export default function LoginPage() {
             if (loginError) throw loginError;
 
             router.push('/dashboard');
-        } catch (err: any) {
-            setError(err.message || 'Erro ao entrar. Verifique suas credenciais.');
+        } catch (err: unknown) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            setError(error.message || 'Erro ao entrar. Verifique suas credenciais.');
         } finally {
             setLoading(false);
         }

@@ -8,7 +8,6 @@ export const metadata: Metadata = {
 };
 
 import { FloatingUsage } from "./components/FloatingUsage/FloatingUsage";
-import { ScrollReveal } from "./components/ScrollReveal/ScrollReveal";
 
 export default function RootLayout({
   children,

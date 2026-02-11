@@ -28,8 +28,9 @@ export default function ForgotPasswordPage() {
             if (!response.ok) throw new Error(data.error || 'Erro ao enviar email');
 
             setSuccess(true);
-        } catch (err: any) {
-            setError(err.message || 'Erro ao enviar email de recuperação.');
+        } catch (err: unknown) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            setError(error.message || 'Erro ao enviar email de recuperação.');
         } finally {
             setLoading(false);
         }
