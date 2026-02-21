@@ -1,0 +1,167 @@
+/* Container para o efeito magnético */
+.buttonWrapper {
+    display: inline-block;
+    perspective: 1000px;
+}
+
+/* Container que agrupa o botão e a borda externa animada */
+.magneticWrap {
+    position: relative;
+    display: inline-flex;
+}
+
+.awwwardsBtn {
+    box-sizing: border-box;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 56px;
+    padding: 0 44px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+    background: linear-gradient(180deg, #FFC266 0%, #F5A524 35%, #DF8E0E 100%);
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 28px;
+    cursor: pointer;
+    overflow: hidden;
+    box-shadow:
+        0 12px 24px -6px rgba(245, 165, 36, 0.5),
+        inset 0 1px 2px rgba(255, 255, 255, 0.9),
+        inset 0 -3px 6px rgba(180, 80, 0, 0.4),
+        inset 0 0 8px rgba(255, 255, 255, 0.15);
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Radial Gradient no TOPO (Glow Suave) */
+.awwwardsBtn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse 100% 80% at 50% 0%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.awwwardsBtn:hover::after {
+    opacity: 1;
+}
+
+.awwwardsBtn:hover {
+    background: linear-gradient(180deg, #FFCD80 0%, #F8B038 35%, #E69B15 100%);
+    box-shadow:
+        0 16px 32px -6px rgba(245, 165, 36, 0.6),
+        inset 0 1px 2px rgba(255, 255, 255, 1),
+        inset 0 -3px 6px rgba(180, 80, 0, 0.5),
+        inset 0 0 12px rgba(255, 255, 255, 0.25);
+}
+
+/* Reflexo Metálico Dinâmico (Shimmer) */
+.awwwardsBtn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.5),
+            transparent);
+    transform: skewX(-25deg);
+    transition: left 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 2;
+}
+
+.awwwardsBtn:hover::before {
+    left: 150%;
+}
+
+/* O texto do botão */
+.btnText {
+    position: relative;
+    z-index: 2;
+    transform: translateX(8px);
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* SVG DA BORDA INTERNA (INSET ANIMATED) */
+.borderSvg {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
+    pointer-events: none;
+    z-index: 10;
+    overflow: visible;
+}
+
+.borderSvg rect {
+    width: 100%;
+    height: 100%;
+    rx: 26px;
+    ry: 26px;
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.95);
+    stroke-width: 2.5px;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    transition: stroke-dashoffset 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Container da Seta (A bolinha do lado esquerdo) */
+.dynamicDot {
+    position: absolute;
+    top: 50%;
+    left: 16px;
+    width: 36px;
+    height: 36px;
+    background-color: #ffffff;
+    color: #f5a524;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    transform: translateY(-50%) scale(0.22) rotate(0deg);
+    transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.dynamicDot svg {
+    width: 18px;
+    height: 18px;
+    opacity: 0;
+    transform: scale(0) rotate(-180deg);
+    transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* ====== AÇÕES NO HOVER ====== */
+
+.awwwardsBtn:hover .btnText {
+    transform: translateX(-18px);
+}
+
+.awwwardsBtn:hover .dynamicDot {
+    left: calc(100% - 52px);
+    transform: translateY(-50%) scale(1) rotate(360deg);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.awwwardsBtn:hover .dynamicDot svg {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+}
+
+.awwwardsBtn:hover .borderSvg rect {
+    stroke-dashoffset: 0;
+}

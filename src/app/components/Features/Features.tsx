@@ -33,7 +33,7 @@ export const Features = () => {
                 <div className={styles.grid}>
                     {features.map((feature, index) => (
                         <FadeIn key={index} delay={0.2 * index} fullWidth>
-                            <div className={styles.card}>
+                            <div className={`${styles.card} cursor-target`}>
                                 <div className={styles.cardHeader}>
                                     <h3 className={styles.cardTitle}>{feature.title}</h3>
                                 </div>

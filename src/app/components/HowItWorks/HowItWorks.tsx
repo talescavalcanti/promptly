@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import styles from './HowItWorks.module.css';
-import { Button } from '../Button/Button';
 import { FadeIn } from '@/components/FadeIn';
 import { ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { AwwwardsButton } from '../AwwwardsButton/AwwwardsButton';
 
 const steps = [
     {
@@ -26,6 +26,8 @@ const steps = [
 ];
 
 export const HowItWorks = () => {
+    const router = useRouter();
+
     return (
         <section className={styles.section}>
             <div className={styles.container}>
@@ -44,7 +46,7 @@ export const HowItWorks = () => {
                 <div className={styles.stepsGrid}>
                     {steps.map((step, index) => (
                         <FadeIn key={index} delay={0.2 * index}>
-                            <div className={styles.stepCard}>
+                            <div className={`${styles.stepCard} cursor-target`}>
                                 <span className={styles.stepNumber}>{step.number}</span>
                                 <h3 className={styles.stepTitle}>{step.title}</h3>
                                 <p className={styles.stepDescription}>{step.description}</p>
@@ -67,15 +69,13 @@ export const HowItWorks = () => {
                         <p className={styles.ctaText}>
                             Crie sua conta gratuita e gere até 5 prompts completos.
                         </p>
-                        <Link href="/signup">
-                            <Button variant="primary">
-                                Começar gratuitamente
-                                <ArrowRight size={18} />
-                            </Button>
-                        </Link>
+                        <AwwwardsButton onClick={() => router.push('/signup')}>
+                            Começar gratuitamente
+                        </AwwwardsButton>
                     </div>
                 </div>
             </div>
         </section>
     );
 };
+

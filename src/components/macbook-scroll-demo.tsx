@@ -13,7 +13,7 @@ export default function MacbookScrollDemo() {
                 <p className="text-gray-400 text-base mb-6">Sem esforço.</p>
                 <div className="relative mx-auto max-w-[300px] rounded-xl overflow-hidden border border-white/10">
                     <img
-                        src="/macbook-screen-v2.png"
+                        src="/hero-new.png"
                         alt="Promptly Preview"
                         className="w-full h-auto"
                     />
@@ -36,7 +36,7 @@ export default function MacbookScrollDemo() {
                             <Badge className="h-10 w-10 -rotate-12 transform" />
                         </a>
                     }
-                    src={`/macbook-screen-v2.png`}
+                    src={`/hero-new.png`}
                     showGradient={true}
                 />
             </div>

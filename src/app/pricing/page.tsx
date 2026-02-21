@@ -2,14 +2,17 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Footer } from '../components/Footer/Footer';
 import { Button } from '../components/Button/Button';
+import { AwwwardsButton } from '../components/AwwwardsButton/AwwwardsButton';
 import { Check } from 'lucide-react';
 import styles from './page.module.css';
 import { ScrollReveal } from '../components/ScrollReveal/ScrollReveal';
 import ElectricBorder from '../components/ElectricBorder/ElectricBorder';
 
 export default function PricingPage() {
+    const router = useRouter();
     const [user, setUser] = React.useState<{ id: string; email?: string; plan?: string } | null>(null);
 
     React.useEffect(() => {
@@ -37,18 +40,16 @@ export default function PricingPage() {
                 <ScrollReveal>
                     <section className={styles.hero}>
                         <h1 className={styles.heroTitle}>
-                            Escolha o plano ideal para criar seus sites com prompts profissionais.
+                            Escolha o plano ideal para criar seus sites com <span className={styles.highlight}>prompts profissionais.</span>
                         </h1>
                         <p className={styles.heroSubtitle}>
                             Transforme suas ideias em especificações técnicas de alta fidelidade.
                             Comece hoje mesmo sem custos e evolua seu plano conforme sua necessidade cresce.
                         </p>
                         {!user && (
-                            <Link href="/signup">
-                                <Button variant="primary" className={styles.heroButton}>
-                                    Começar grátis agora
-                                </Button>
-                            </Link>
+                            <AwwwardsButton onClick={() => router.push('/signup')}>
+                                Começar grátis agora
+                            </AwwwardsButton>
                         )}
                     </section>
                 </ScrollReveal>
@@ -71,7 +72,7 @@ export default function PricingPage() {
                                 </div>
 
                                 <ul className={styles.features}>
-                                    <li><Check size={16} /> <strong>5 prompts</strong> por mês</li>
+                                    <li><Check size={16} /> <span><span className={styles.highlight}>5 prompts</span> por mês</span></li>
                                     <li><Check size={16} /> Assistente guiado inteligente</li>
                                     <li><Check size={16} /> Especificações técnicas básicas</li>
                                     <li><Check size={16} /> Atualizações de sistema inclusas</li>
@@ -104,7 +105,7 @@ export default function PricingPage() {
                                 </div>
 
                                 <ul className={styles.features}>
-                                    <li><Check size={16} /> <strong>100 prompts</strong> por mês</li>
+                                    <li><Check size={16} /> <span><span className={styles.highlight}>100 prompts</span> por mês</span></li>
                                     <li><Check size={16} /> Acesso total ao assistente guiado</li>
                                     <li><Check size={16} /> Arquiteturas de sistema detalhadas</li>
                                     <li><Check size={16} /> Suporte prioritário via ticket</li>
@@ -138,7 +139,7 @@ export default function PricingPage() {
                                 </div>
 
                                 <ul className={styles.features}>
-                                    <li><Check size={16} /> <strong>400 prompts</strong> por mês</li>
+                                    <li><Check size={16} /> <span><span className={styles.highlight}>400 prompts</span> por mês</span></li>
                                     <li><Check size={16} /> Maior limite de gerações do mercado</li>
                                     <li><Check size={16} /> Suporte prioritário via Direct</li>
                                     <li><Check size={16} /> Exportação avançada de requisitos</li>
@@ -164,7 +165,7 @@ export default function PricingPage() {
                 {/* Additional Info */}
                 <ScrollReveal delay={0.2}>
                     <section className={styles.infoSection}>
-                        <h3 className={styles.infoTitle}>Flexibilidade total para sua jornada</h3>
+                        <h3 className={styles.infoTitle}><span className={styles.highlight}>Flexibilidade total</span> para sua jornada</h3>
                         <div className={styles.infoGrid}>
                             <div className={styles.infoBlock}>
                                 <h4>Comece Grátis</h4>
@@ -185,21 +186,21 @@ export default function PricingPage() {
                 {/* FAQ */}
                 <ScrollReveal delay={0.2}>
                     <section className={styles.faqSection}>
-                        <h3 className={styles.faqHeader}>Perguntas Frequentes</h3>
+                        <h3 className={styles.faqHeader}>Perguntas <span className={styles.highlight}>Frequentes</span></h3>
                         <div className={styles.faqGrid}>
-                            <div className={styles.faqItem}>
+                            <div className={`${styles.faqItem} cursor-target`}>
                                 <h5>O que acontece quando eu atingir o limite de prompts?</h5>
                                 <p>No plano Free, o limite reinicia no próximo mês. Nos planos pagos, você pode optar por fazer um upgrade para um plano maior ou aguardar o próximo ciclo de cobrança.</p>
                             </div>
-                            <div className={styles.faqItem}>
+                            <div className={`${styles.faqItem} cursor-target`}>
                                 <h5>Posso mudar de plano depois?</h5>
                                 <p>Com certeza! Você pode subir ou descer de plano (upgrade ou downgrade) a qualquer momento diretamente nas configurações da sua conta.</p>
                             </div>
-                            <div className={styles.faqItem}>
+                            <div className={`${styles.faqItem} cursor-target`}>
                                 <h5>Preciso cadastrar um cartão para usar o plano Free?</h5>
                                 <p>Não. O plano Free é 100% gratuito e não exige nenhuma informação bancária. Queremos que você sinta o poder da ferramenta antes de decidir investir.</p>
                             </div>
-                            <div className={styles.faqItem}>
+                            <div className={`${styles.faqItem} cursor-target`}>
                                 <h5>Como funciona o cancelamento dos planos pagos?</h5>
                                 <p>Sem letras miúdas. Se decidir cancelar, você continuará com acesso aos benefícios do seu plano atual até o final do período já pago.</p>
                             </div>

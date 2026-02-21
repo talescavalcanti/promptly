@@ -83,7 +83,7 @@ export const ExampleCard: React.FC<ExampleCardProps> = ({ example }) => {
 
     return (
         <article
-            className={styles.card}
+            className={`${styles.card} cursor-target`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >

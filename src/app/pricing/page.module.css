@@ -44,6 +44,11 @@
     font-weight: 400;
 }
 
+.highlight {
+    color: #F5A524;
+    -webkit-text-fill-color: #F5A524;
+}
+
 .heroButton {
     padding: 1rem 2.5rem !important;
     height: auto !important;
@@ -124,10 +129,7 @@
     /* Stronger glow */
 }
 
-/* Push header down to clear badge */
-.popular .cardHeader {
-    margin-top: 1rem;
-}
+/* Badge is absolutely positioned, no extra margin needed */
 
 .cardHeader {
     margin-bottom: 2.5rem;

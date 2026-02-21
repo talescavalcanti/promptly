@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { useRouter, usePathname } from 'next/navigation';
 import { supabase } from '../../../lib/supabase';
 import styles from './Header.module.css';
 import { Button } from '../Button/Button';
+import { AwwwardsButton } from '../AwwwardsButton/AwwwardsButton';
 import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 export const Header = () => {
@@ -17,7 +18,16 @@ export const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [hoveredPath, setHoveredPath] = useState<string | null>(null);
     const [isPremium, setIsPremium] = useState(false);
+    const [spotlightPos, setSpotlightPos] = useState({ x: 0, y: 0 });
+    const [spotlightOpacity, setSpotlightOpacity] = useState(0);
+    const spotlightRef = useRef<HTMLAnchorElement>(null);
     const { scrollY } = useScroll();
+
+    const handleSpotlightMove = useCallback((e: React.MouseEvent) => {
+        if (!spotlightRef.current) return;
+        const rect = spotlightRef.current.getBoundingClientRect();
+        setSpotlightPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    }, []);
 
     useMotionValueEvent(scrollY, "change", (latest) => {
         if (isMenuOpen) return;
@@ -201,11 +211,32 @@ export const Header = () => {
                             </>
                         ) : (
                             <>
-                                <Link href="/login" className={styles.desktopOnly}>
-                                    <Button variant="ghost">Entrar</Button>
+                                <Link
+                                    href="/login"
+                                    ref={spotlightRef}
+                                    className={`${styles.desktopOnly} ${styles.spotlightBtn} cursor-target`}
+                                    onMouseMove={handleSpotlightMove}
+                                    onMouseEnter={() => setSpotlightOpacity(1)}
+                                    onMouseLeave={() => setSpotlightOpacity(0)}
+                                >
+                                    <div
+                                        className={styles.spotlightGlow}
+                                        style={{
+                                            background: `radial-gradient(120px circle at ${spotlightPos.x}px ${spotlightPos.y}px, rgba(255, 215, 0, 0.15), transparent 80%)`,
+                                            opacity: spotlightOpacity,
+                                        }}
+                                    />
+                                    <div
+                                        className={styles.spotlightInner}
+                                        style={{
+                                            background: `radial-gradient(100px circle at ${spotlightPos.x}px ${spotlightPos.y}px, rgba(255, 180, 0, 0.06), transparent 80%)`,
+                                            opacity: spotlightOpacity,
+                                        }}
+                                    />
+                                    <span>Entrar</span>
                                 </Link>
-                                <Link href="/signup">
-                                    <Button variant="primary">Começar</Button>
+                                <Link href="/signup" className={`${styles.ctaPill} cursor-target`}>
+                                    <span>Começar</span>
                                 </Link>
                             </>
                         )}

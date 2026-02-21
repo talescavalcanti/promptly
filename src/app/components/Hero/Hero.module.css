@@ -6,7 +6,29 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    /* overflow: hidden; Removed to allow scroll effects if needed, but ContainerScroll handles its own height */
+    overflow: hidden;
+}
+
+/* Gold grid background pattern */
+.section::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image:
+        repeating-linear-gradient(0deg,
+            rgba(245, 165, 36, 0.15) 0px,
+            rgba(245, 165, 36, 0.15) 1px,
+            transparent 1px,
+            transparent 50px),
+        repeating-linear-gradient(90deg,
+            rgba(245, 165, 36, 0.15) 0px,
+            rgba(245, 165, 36, 0.15) 1px,
+            transparent 1px,
+            transparent 50px);
+    mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, black 0%, transparent 85%);
+    -webkit-mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, black 0%, transparent 85%);
+    pointer-events: none;
 }
 
 .contentContainer {
@@ -22,9 +44,17 @@
     margin: 0 auto;
 }
 
-/* Apple-style background glow - Removed per user request */
+/* Bottom fade mask for smooth section transition */
 .section::before {
-    display: none;
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.8) 60%, #000 100%);
+    z-index: 2;
+    pointer-events: none;
 }
 
 /* Cinematic Vignette */

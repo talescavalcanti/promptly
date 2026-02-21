@@ -3,12 +3,12 @@
 import React from 'react';
 import styles from './PreviewSection.module.css';
 import { FadeIn } from '@/components/FadeIn';
-
-import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
-import { Button } from '@/app/components/Button/Button';
+import { useRouter } from 'next/navigation';
+import { AwwwardsButton } from '@/app/components/AwwwardsButton/AwwwardsButton';
 
 export const PreviewSection = () => {
+    const router = useRouter();
+
     return (
         <section id="example" className={styles.section}>
             <div className={styles.container}>
@@ -71,12 +71,9 @@ export const PreviewSection = () => {
                                 Transforme ideias simples em software complexo com apenas um comando.
                             </p>
 
-                            <Link href="/showcase">
-                                <Button>
-                                    Ver Exemplos
-                                    <ArrowRight className="w-5 h-5 ml-2" />
-                                </Button>
-                            </Link>
+                            <AwwwardsButton onClick={() => router.push('/showcase')}>
+                                Ver Exemplos
+                            </AwwwardsButton>
                         </div>
                     </div>
                 </FadeIn>

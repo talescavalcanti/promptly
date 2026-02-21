@@ -166,16 +166,13 @@ export const Lid = ({
                     transformStyle: "preserve-3d",
                     transformOrigin: "top",
                 }}
-                className="absolute inset-0 h-96 w-[32rem] rounded-2xl bg-[#010101] p-2"
+                className="absolute inset-0 h-[20rem] w-[32rem] rounded-2xl bg-[#010101] p-2"
             >
-                <div className="absolute inset-0 rounded-lg bg-[#272729]" />
+                <div className="absolute inset-0 rounded-lg bg-white" />
                 <img
                     src={src as string}
                     alt="aceternity logo"
-                    className="absolute inset-0 h-full w-full rounded-lg object-cover"
-                    style={{
-                        objectPosition: '35% 0',
-                    }}
+                    className="absolute inset-0 h-full w-full rounded-lg object-cover object-top"
                 />
             </motion.div>
 

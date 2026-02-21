@@ -15,15 +15,15 @@ export const Footer = () => {
                     <div className={styles.column}>
                         <h4>Navegação</h4>
                         <ul>
-                            <li><Link href="/">Início</Link></li>
-                            <li><Link href="/dashboard">Dashboard</Link></li>
-                            <li><Link href="/pricing">Planos</Link></li>
+                            <li><Link href="/" className="cursor-target">Início</Link></li>
+                            <li><Link href="/dashboard" className="cursor-target">Dashboard</Link></li>
+                            <li><Link href="/pricing" className="cursor-target">Planos</Link></li>
                         </ul>
                     </div>
                     <div className={styles.column}>
                         <h4>Contato</h4>
                         <ul>
-                            <li><a href="mailto:iapromptly@gmail.com">iapromptly@gmail.com</a></li>
+                            <li><a href="mailto:iapromptly@gmail.com" className="cursor-target">iapromptly@gmail.com</a></li>
                         </ul>
                     </div>
                 </div>
